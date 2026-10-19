@@ -27,7 +27,6 @@ namespace DeadCounty.Player
 
         [Header("Camera")]
         [SerializeField] Transform cameraTarget;
-        [SerializeField] Transform visual;
         [SerializeField] float mouseSensitivity = 0.12f;
         [SerializeField] float stickSpeed = 180f;
         [SerializeField] float minPitch = -40f;
@@ -38,6 +37,8 @@ namespace DeadCounty.Player
         Vector3 moveDirection;
         float yaw, pitch, verticalVelocity, turnVelocity, cameraTargetStandingY;
 
+        public float WalkSpeed => walkSpeed;
+        public float SprintSpeed => sprintSpeed;
         public float CurrentSpeed { get; private set; }
         public bool IsSprinting { get; private set; }
         public bool IsCrouching { get; private set; }
@@ -118,9 +119,6 @@ namespace DeadCounty.Player
             var height = Mathf.MoveTowards(controller.height, IsCrouching ? crouchHeight : standingHeight, heightChangeSpeed * Time.deltaTime);
             controller.height = height;
             controller.center = Vector3.up * height / 2f;
-            // The visual is a Unity capsule (2 m tall at scale 1).
-            visual.localScale = new Vector3(visual.localScale.x, height / 2f, visual.localScale.z);
-            visual.localPosition = Vector3.up * height / 2f;
             var target = cameraTarget.localPosition;
             target.y = cameraTargetStandingY * height / standingHeight;
             cameraTarget.localPosition = target;

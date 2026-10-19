@@ -18,6 +18,10 @@ namespace DeadCounty.EditorTools
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
             if (prefab == null) prefab = CreatePlayerPrefab();
+            // Keeps DeleteUnusedMaterials from removing materials only the existing prefab references.
+            foreach (var r in prefab.GetComponentsInChildren<Renderer>(true))
+            foreach (var m in r.sharedMaterials)
+                if (m != null) UsedMaterials.Add(AssetDatabase.GetAssetPath(m));
             var rig = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             rig.transform.SetPositionAndRotation(SpawnPosition, Quaternion.identity);
             Camera.main.gameObject.AddComponent<CinemachineBrain>();
@@ -38,9 +42,7 @@ namespace DeadCounty.EditorTools
             controller.slopeLimit = 45f;
             controller.skinWidth = 0.03f;
 
-            // Capsule body with a dark visor so the facing direction reads from the camera.
-            var visual = Primitive(PrimitiveType.Capsule, "Visual", player.transform, new Vector3(0f, 0.9f, 0f), new Vector3(0.6f, 0.9f, 0.6f), "Player", null, false);
-            Box("Visiere", visual.transform, new Vector3(0f, 0.6f, 0.45f), new Vector3(0.7f, 0.12f, 0.2f), "CarBlack", solid: false);
+            var joints = BuildSurvivor(player.transform);
 
             var target = new GameObject("CameraTarget").transform;
             target.SetParent(player.transform, false);
@@ -53,8 +55,12 @@ namespace DeadCounty.EditorTools
             var tpc = player.AddComponent<ThirdPersonController>();
             var so = new SerializedObject(tpc);
             so.FindProperty("cameraTarget").objectReferenceValue = target;
-            so.FindProperty("visual").objectReferenceValue = visual.transform;
             so.ApplyModifiedPropertiesWithoutUndo();
+
+            var animator = new SerializedObject(player.AddComponent<ProceduralHumanoidAnimator>());
+            animator.FindProperty("controller").objectReferenceValue = tpc;
+            foreach (var (field, joint) in joints) animator.FindProperty(field).objectReferenceValue = joint;
+            animator.ApplyModifiedPropertiesWithoutUndo();
 
             var camera = new GameObject("PlayerFollowCamera");
             camera.transform.SetParent(rig.transform, false);
