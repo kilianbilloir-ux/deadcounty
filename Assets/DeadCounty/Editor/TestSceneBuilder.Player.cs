@@ -10,6 +10,7 @@ namespace DeadCounty.EditorTools
     {
         const string PlayerPrefabPath = "Assets/DeadCounty/Prefabs/PlayerRig.prefab";
         static readonly Vector3 SpawnPosition = new(65.2f, 0.15f, -10f);
+        const int PlayerLayerIndex = 6;
 
         // The prefab is only generated when missing, so Inspector tweaks survive scene rebuilds.
         // Delete it to regenerate it from this code.
@@ -45,6 +46,10 @@ namespace DeadCounty.EditorTools
             target.SetParent(player.transform, false);
             target.localPosition = new Vector3(0f, 1.55f, 0f);
 
+            // Own layer so camera probes and future AI sight checks can ignore the player's colliders.
+            var playerLayer = EnsureLayer(PlayerLayerIndex, "Player");
+            foreach (var t in player.GetComponentsInChildren<Transform>()) t.gameObject.layer = playerLayer;
+
             var tpc = player.AddComponent<ThirdPersonController>();
             var so = new SerializedObject(tpc);
             so.FindProperty("cameraTarget").objectReferenceValue = target;
@@ -73,10 +78,25 @@ namespace DeadCounty.EditorTools
             obstacles.DampingIntoCollision = 0f;
             obstacles.DampingFromCollision = 0.4f;
             follow.AvoidObstacles = obstacles;
+            camera.AddComponent<PlayerCameraDirector>();
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(rig, PlayerPrefabPath);
             Object.DestroyImmediate(rig);
             return prefab;
+        }
+
+        static int EnsureLayer(int index, string name)
+        {
+            var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            var slot = tagManager.FindProperty("layers").GetArrayElementAtIndex(index);
+            if (slot.stringValue != name)
+            {
+                if (!string.IsNullOrEmpty(slot.stringValue))
+                    throw new System.InvalidOperationException($"Layer {index} is already used by '{slot.stringValue}'");
+                slot.stringValue = name;
+                tagManager.ApplyModifiedPropertiesWithoutUndo();
+            }
+            return index;
         }
     }
 }
