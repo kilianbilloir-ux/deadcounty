@@ -37,8 +37,8 @@ namespace DeadCounty.Player
             var state = !player.IsGrounded ? "en l'air"
                 : player.IsSliding ? "glisse"
                 : player.IsCrouching ? "accroupi"
-                : player.IsSprinting ? "sprint"
-                : player.CurrentSpeed > 0.1f ? "marche" : "immobile";
+                : player.CurrentSpeed < 0.1f ? "immobile"
+                : player.Gait switch { Gait.Sprint => "sprint", Gait.Run => "course", _ => "marche" };
             var text = "<b>Debug joueur</b>  (F1)\n"
                 + $"{fps:0} fps\n"
                 + $"État : {state}\n"
