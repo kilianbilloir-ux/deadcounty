@@ -1859,6 +1859,10 @@ GameObject:
   - component: {fileID: 1610396139385065015}
   - component: {fileID: 5725230979097016096}
   - component: {fileID: 3607536596185247656}
+  - component: {fileID: 7460525599096219946}
+  - component: {fileID: 6684348859937068969}
+  - component: {fileID: 5878281340476389133}
+  - component: {fileID: 6087673885327060316}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1925,12 +1929,17 @@ MonoBehaviour:
   runSpeed: 3.5
   sprintSpeed: 6
   stickRunThreshold: 0.7
-  acceleration: 6
-  deceleration: 9
-  airAcceleration: 1.5
-  standingTurnRate: 600
-  sprintingTurnRate: 200
-  pivotAngle: 120
+  locomotion:
+    Acceleration: 6
+    Deceleration: 9
+    AirAcceleration: 1.5
+    StandingTurnRate: 600
+    MovingTurnRate: 200
+    TurnRateReferenceSpeed: 6
+    PivotAngle: 120
+    PivotMinSpeed: 2.45
+    PivotTurnScale: 0.3
+    TightTurnSpeedFactor: 0.55
   uphillSlowdown: 0.5
   jumpHeight: 0.5
   gravity: -9.81
@@ -2012,6 +2021,73 @@ MonoBehaviour:
   maxFootOffset: 0.35
   footBlendSpeed: 15
   stepSmoothTime: 0.07
+--- !u!114 &7460525599096219946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7ae59f50430d4220984b87f02ac1403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerStamina
+  settings:
+    Max: 100
+    SprintDrainPerSecond: 20
+    JumpCost: 10
+    MinToJump: 10
+    RegenDelay: 1
+    IdleRegenPerSecond: 25
+    WalkRegenPerSecond: 18
+    ExhaustionRecoverThreshold: 40
+--- !u!114 &6684348859937068969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4b94331ab1c84bbda0f8622a0025359, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerHealth
+  maxHealth: 100
+  invulnerabilityTime: 0.8
+  knockbackDistance: 0.4
+  knockbackDuration: 0.12
+  staggerTime: 0.4
+  staggerSpeedFactor: 0.4
+--- !u!114 &5878281340476389133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eb4adf79bc7a49e6b5ad6769ffde02c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PerceptionTarget
+  flashlightOn: 0
+--- !u!114 &6087673885327060316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e1c3c396b2444ca6863e258066a594e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerNoiseEmitter
+  stepInterval: 0.25
+  pantingRadius: 2
+  pantingInterval: 0.5
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0
@@ -2358,6 +2434,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3012412907313332803}
   - component: {fileID: 2922239359997387129}
+  - component: {fileID: 5939641845900695887}
+  - component: {fileID: 5259575293262474391}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -2395,6 +2473,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeadCounty.Player.PlayerDebugOverlay
   visible: 1
+--- !u!114 &5939641845900695887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cad56342822de4224829d3e748ef7a18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerDeathFlow
+  collapseTime: 0.6
+  fadeDelay: 1.2
+  fadeTime: 1.5
+  restartDelay: 2.5
+  fadeOutTime: 0.6
+  lyingAngle: 88
+  lyingLift: 0.12
+--- !u!114 &5259575293262474391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6065cbb8ba1b4de5bc1dcea633aab18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerHud
+  margin: 20
+  healthWidth: 220
+  healthHeight: 12
+  staminaWidth: 140
+  staminaHeight: 5
+  hitFlashTime: 0.3
+  hitFlashAlpha: 0.35
 --- !u!1 &6092803171642249547
 GameObject:
   m_ObjectHideFlags: 0
