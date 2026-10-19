@@ -1,3 +1,7 @@
+using System;
+using DeadCounty.Core;
+using DeadCounty.Locomotion;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,14 +10,17 @@ namespace DeadCounty.Player
     public enum Gait { Idle, Walk, Run, Sprint }
 
     // Third-person movement on a CharacterController with human-scale values: walk by default (1.5 m/s),
-    // Shift runs (3.5 m/s), Alt sprints (6 m/s), C crouch-walks (1 m/s). Speed builds up and drops with real
-    // acceleration, the body faces its velocity and turns at a rate that shrinks with speed, sharp reversals at
-    // speed brake before pivoting, and climbing a slope slows the player down.
+    // Shift runs (3.5 m/s), Alt sprints (6 m/s), C crouch-walks (1 m/s). Planar physics (acceleration, speed
+    // dependent turn rate, pivot on sharp reversals, airborne momentum) come from PlanarLocomotion, shared with
+    // the zombies; climbing a slope and hard landings slow the player down on top of it.
+    // PlayerStamina gates the gaits (no run or sprint while exhausted) and pays for jumps.
     // Look input rotates CameraTarget, which the Cinemachine ThirdPersonFollow camera tracks.
     // Grounding uses its own probe plus snapping, so walking down steps and ramps never flickers into the air
     // state; coyote time and a jump buffer make jumps forgiving; slopes steeper than the controller's slope
     // limit slide the player off. NoiseRadius exposes the GDD noise values for the zombie AI.
-    [RequireComponent(typeof(CharacterController))]
+    // Hits go through Knockback (collides like any move) and Stagger; Teleport warps the player and camera.
+    [DefaultExecutionOrder(-100)]
+    [RequireComponent(typeof(CharacterController), typeof(PlayerStamina))]
     public class ThirdPersonController : MonoBehaviour
     {
         [Header("Speeds (m/s)")]
@@ -25,14 +32,7 @@ namespace DeadCounty.Player
         [SerializeField, Range(0f, 1f)] float stickRunThreshold = 0.7f;
 
         [Header("Acceleration and turning")]
-        [SerializeField] float acceleration = 6f;
-        [SerializeField] float deceleration = 9f;
-        [SerializeField] float airAcceleration = 1.5f;
-        [Tooltip("Body turn rate when standing (deg/s); it shrinks linearly down to the sprinting rate.")]
-        [SerializeField] float standingTurnRate = 600f;
-        [SerializeField] float sprintingTurnRate = 200f;
-        [Tooltip("Heading changes wider than this while running brake to a stop before turning.")]
-        [SerializeField] float pivotAngle = 120f;
+        [SerializeField] LocomotionSettings locomotion = LocomotionSettings.Player;
         [Tooltip("Fraction of speed lost on a 45 degree climb.")]
         [SerializeField, Range(0f, 1f)] float uphillSlowdown = 0.5f;
 
@@ -71,11 +71,20 @@ namespace DeadCounty.Player
         [SerializeField] float maxPitch = 70f;
 
         CharacterController controller;
+        PlayerStamina stamina;
         InputAction move, look, jump, run, sprint, crouch, cancel, click;
-        Vector3 planarVelocity, heading, groundNormal = Vector3.up;
-        float speed, yaw, pitch, verticalVelocity, cameraTargetStandingY, landingNoiseTimer, recoveryTimer;
+        LocomotionState motion;
+        Vector3 groundNormal = Vector3.up, knockbackVelocity;
+        float yaw, pitch, verticalVelocity, cameraTargetStandingY, landingNoiseTimer, recoveryTimer;
+        float knockbackTimer, staggerTimer, staggerSpeedFactor = 1f;
         float lastGroundedTime = float.NegativeInfinity, lastJumpPressTime = float.NegativeInfinity;
 
+        // When false (death screen) movement, jump and crouch input are ignored and the player brakes; look still works.
+        public bool InputEnabled { get; set; } = true;
+        // Actual horizontal velocity of the last move, after collisions.
+        public Vector3 Velocity { get; private set; }
+        // Increases on every Teleport so animators can snap instead of blending across the warp.
+        public int MotionResetId { get; private set; }
         public float WalkSpeed => walkSpeed;
         public float RunSpeed => runSpeed;
         public float SprintSpeed => sprintSpeed;
@@ -96,6 +105,7 @@ namespace DeadCounty.Player
         void Awake()
         {
             controller = GetComponent<CharacterController>();
+            stamina = GetComponent<PlayerStamina>();
             var actions = InputSystem.actions;
             move = actions.FindAction("Player/Move", true);
             look = actions.FindAction("Player/Look", true);
@@ -106,7 +116,7 @@ namespace DeadCounty.Player
             cancel = actions.FindAction("UI/Cancel", true);
             click = actions.FindAction("UI/Click", true);
             yaw = transform.eulerAngles.y;
-            heading = transform.forward;
+            motion = LocomotionState.Facing(transform.forward);
             cameraTargetStandingY = cameraTarget.localPosition.y;
         }
 
@@ -120,6 +130,7 @@ namespace DeadCounty.Player
             if (Cursor.lockState == CursorLockMode.Locked) ReadLook();
             UpdateCrouch();
             Move();
+            UpdateStamina();
             UpdateNoise();
             // World rotation set last so the body turning this frame does not drag the camera.
             cameraTarget.rotation = Quaternion.Euler(pitch, yaw, 0f);
@@ -150,54 +161,34 @@ namespace DeadCounty.Player
         void Move()
         {
             var dt = Time.deltaTime;
-            var input = Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f);
+            var input = InputEnabled ? Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f) : Vector2.zero;
             var hasInput = input.sqrMagnitude > 0.01f;
             var onStick = move.activeControl?.device is Gamepad;
+            var staggered = staggerTimer > 0f;
             Gait = !hasInput ? Gait.Idle
-                : IsCrouching ? Gait.Walk
-                : sprint.IsPressed() ? Gait.Sprint
-                : run.IsPressed() || (onStick && input.magnitude > stickRunThreshold) ? Gait.Run
+                : IsCrouching || staggered ? Gait.Walk
+                : sprint.IsPressed() && stamina.Model.CanSprint ? Gait.Sprint
+                : (run.IsPressed() || (onStick && input.magnitude > stickRunThreshold)) && stamina.Model.CanRun ? Gait.Run
                 : Gait.Walk;
 
-            var wish = hasInput ? Quaternion.Euler(0f, Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + yaw, 0f) * Vector3.forward : heading;
+            var wish = hasInput ? Quaternion.Euler(0f, Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + yaw, 0f) * Vector3.forward : motion.Heading;
             var targetSpeed = !hasInput ? 0f : GaitSpeed() * (onStick && Gait == Gait.Walk ? Mathf.Clamp01(input.magnitude / stickRunThreshold) : 1f);
-
             if (IsGrounded)
             {
-                if (hasInput)
-                {
-                    var turn = Vector3.Angle(heading, wish);
-                    var turnRate = Mathf.Lerp(standingTurnRate, sprintingTurnRate, speed / sprintSpeed);
-                    // A runner cannot reverse on the spot: plant, brake, then turn. Tight turns also cost speed.
-                    var pivoting = turn > pivotAngle && speed > runSpeed * 0.7f;
-                    if (pivoting)
-                    {
-                        targetSpeed = 0f;
-                        turnRate *= 0.3f;
-                    }
-                    else
-                    {
-                        targetSpeed *= Mathf.Lerp(1f, 0.55f, turn / 180f) * SlopeFactor();
-                    }
-                    heading = Vector3.RotateTowards(heading, wish, turnRate * Mathf.Deg2Rad * dt, 0f);
-                }
+                targetSpeed *= SlopeFactor();
                 if (recoveryTimer > 0f) targetSpeed *= 0.4f;
-                speed = Mathf.MoveTowards(speed, targetSpeed, (targetSpeed > speed ? acceleration : deceleration) * dt);
-                planarVelocity = heading * speed;
             }
-            else
-            {
-                // Airborne: momentum carries, the player can only nudge it.
-                planarVelocity = Vector3.MoveTowards(planarVelocity, wish * targetSpeed, airAcceleration * dt);
-                speed = planarVelocity.magnitude;
-                if (speed > 0.1f) heading = planarVelocity / speed;
-            }
-            transform.rotation = Quaternion.LookRotation(heading);
+            if (staggered) targetSpeed *= staggerSpeedFactor;
+            PlanarLocomotion.Step(ref motion, locomotion, wish, targetSpeed, hasInput, IsGrounded, dt);
+            transform.rotation = Quaternion.LookRotation(motion.Heading);
             recoveryTimer -= dt;
+            staggerTimer -= dt;
 
-            if (jump.WasPressedThisFrame()) lastJumpPressTime = Time.time;
+            if (InputEnabled && jump.WasPressedThisFrame()) lastJumpPressTime = Time.time;
             var jumped = false;
-            if (!IsCrouching && !IsSliding && recoveryTimer <= 0f && Time.time - lastGroundedTime <= coyoteTime && Time.time - lastJumpPressTime <= jumpBufferTime)
+            // Stamina is checked last so it is only spent on a jump that actually fires.
+            if (InputEnabled && !IsCrouching && !IsSliding && recoveryTimer <= 0f && Time.time - lastGroundedTime <= coyoteTime
+                && Time.time - lastJumpPressTime <= jumpBufferTime && stamina.Model.TryJump())
             {
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 lastJumpPressTime = lastGroundedTime = float.NegativeInfinity;
@@ -210,12 +201,15 @@ namespace DeadCounty.Player
             verticalVelocity += gravity * dt;
 
             var slide = IsSliding ? Vector3.ProjectOnPlane(Vector3.down, groundNormal).normalized * slideSpeed : Vector3.zero;
+            var knock = knockbackVelocity * Mathf.Clamp(knockbackTimer, 0f, dt);
+            knockbackTimer -= dt;
             var start = transform.position;
-            controller.Move((planarVelocity + slide + Vector3.up * verticalVelocity) * dt);
+            controller.Move((motion.PlanarVelocity + slide + Vector3.up * verticalVelocity) * dt + knock);
             var moved = transform.position - start;
-            CurrentSpeed = new Vector2(moved.x, moved.z).magnitude / Mathf.Max(dt, 1e-5f);
+            Velocity = new Vector3(moved.x, 0f, moved.z) / Mathf.Max(dt, 1e-5f);
+            CurrentSpeed = Velocity.magnitude;
             // Walking into a wall bleeds the stored speed instead of keeping it for when the wall ends.
-            if (IsGrounded && CurrentSpeed < speed) speed = Mathf.Max(CurrentSpeed, speed - deceleration * dt);
+            if (IsGrounded && CurrentSpeed < motion.Speed) motion.Speed = Mathf.Max(CurrentSpeed, motion.Speed - locomotion.Deceleration * dt);
 
             var wasGrounded = IsGrounded;
             if (wasGrounded && !jumped && !controller.isGrounded && Probe(snapDistance, out var below))
@@ -233,8 +227,64 @@ namespace DeadCounty.Player
         // Uphill along the heading slows the player down; flat ground and descents keep full speed.
         float SlopeFactor()
         {
-            var climb = Mathf.Atan(-Vector3.Dot(groundNormal, heading) / Mathf.Max(groundNormal.y, 0.1f)) * Mathf.Rad2Deg;
+            var climb = Mathf.Atan(-Vector3.Dot(groundNormal, motion.Heading) / Mathf.Max(groundNormal.y, 0.1f)) * Mathf.Rad2Deg;
             return 1f - uphillSlowdown * Mathf.Clamp01(climb / 45f);
+        }
+
+        void UpdateStamina()
+        {
+            var activity = !IsGrounded ? StaminaActivity.Airborne
+                : Gait == Gait.Sprint ? StaminaActivity.Sprint
+                : Gait == Gait.Run ? StaminaActivity.Run
+                : CurrentSpeed > 0.1f ? StaminaActivity.Walk
+                : StaminaActivity.Idle;
+            stamina.Model.Tick(activity, Time.deltaTime);
+        }
+
+        // Moves the player along `displacement` over `duration` through the CharacterController, so walls stop it.
+        public void Knockback(Vector3 displacement, float duration)
+        {
+            if (duration <= 0f) throw new ArgumentOutOfRangeException(nameof(duration), duration, "Knockback needs a positive duration");
+            knockbackVelocity = displacement / duration;
+            knockbackTimer = duration;
+        }
+
+        // Scales the target speed by `speedFactor` and forbids running and sprinting for `duration` seconds.
+        public void Stagger(float duration, float speedFactor)
+        {
+            staggerTimer = duration;
+            staggerSpeedFactor = speedFactor;
+        }
+
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+            var delta = position - transform.position;
+            motion = LocomotionState.Facing(rotation * Vector3.forward);
+            // A CharacterController overwrites a moved transform with its own position unless it is disabled.
+            controller.enabled = false;
+            transform.SetPositionAndRotation(position, Quaternion.LookRotation(motion.Heading));
+            controller.enabled = true;
+
+            verticalVelocity = 0f;
+            knockbackTimer = staggerTimer = recoveryTimer = landingNoiseTimer = 0f;
+            lastJumpPressTime = float.NegativeInfinity;
+            Velocity = Vector3.zero;
+            CurrentSpeed = 0f;
+            yaw = transform.eulerAngles.y;
+            cameraTarget.rotation = Quaternion.Euler(pitch, yaw, 0f);
+            CinemachineCore.OnTargetObjectWarped(cameraTarget, delta);
+            MotionResetId++;
+        }
+
+        // Back on both feet at full height, e.g. when respawning after dying while crouched.
+        public void StandUp()
+        {
+            IsCrouching = false;
+            controller.height = standingHeight;
+            controller.center = Vector3.up * standingHeight / 2f;
+            var target = cameraTarget.localPosition;
+            target.y = cameraTargetStandingY;
+            cameraTarget.localPosition = target;
         }
 
         void UpdateGround(bool wasGrounded)
@@ -280,7 +330,7 @@ namespace DeadCounty.Player
 
         void UpdateCrouch()
         {
-            if (crouch.WasPressedThisFrame() && (!IsCrouching || CanStand())) IsCrouching = !IsCrouching;
+            if (InputEnabled && crouch.WasPressedThisFrame() && (!IsCrouching || CanStand())) IsCrouching = !IsCrouching;
 
             var height = Mathf.MoveTowards(controller.height, IsCrouching ? crouchHeight : standingHeight, heightChangeSpeed * Time.deltaTime);
             controller.height = height;

@@ -17,7 +17,7 @@ namespace DeadCounty.EditorTools
         static void BuildPlayer()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
-            if (prefab == null) prefab = CreatePlayerPrefab();
+            prefab = prefab == null ? CreatePlayerPrefab() : EnsurePlayerComponents(prefab);
             // Keeps DeleteUnusedMaterials from removing materials only the existing prefab references.
             foreach (var r in prefab.GetComponentsInChildren<Renderer>(true))
             foreach (var m in r.sharedMaterials)
@@ -86,10 +86,50 @@ namespace DeadCounty.EditorTools
             follow.AvoidObstacles = obstacles;
             camera.AddComponent<PlayerCameraDirector>();
             rig.AddComponent<PlayerDebugOverlay>();
+            AddMissingPlayerComponents(rig, player);
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(rig, PlayerPrefabPath);
             Object.DestroyImmediate(rig);
             return prefab;
+        }
+
+        // The prefab is never regenerated, so components added to the player since it was created are added in
+        // place; existing components and their serialized values are left untouched to keep Inspector tweaks.
+        static GameObject EnsurePlayerComponents(GameObject prefabAsset)
+        {
+            var path = AssetDatabase.GetAssetPath(prefabAsset);
+            var root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                var controller = root.GetComponentInChildren<ThirdPersonController>(true);
+                if (controller == null) throw new System.InvalidOperationException($"{path} has no ThirdPersonController");
+                if (!AddMissingPlayerComponents(root, controller.gameObject)) return prefabAsset;
+                return PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        // Checked one by one because RequireComponent may already have added some of them (PlayerStamina with the controller).
+        static bool AddMissingPlayerComponents(GameObject rig, GameObject player)
+        {
+            var added = false;
+            added |= AddMissing<PlayerStamina>(player);
+            added |= AddMissing<PlayerHealth>(player);
+            added |= AddMissing<PerceptionTarget>(player);
+            added |= AddMissing<PlayerNoiseEmitter>(player);
+            added |= AddMissing<PlayerDeathFlow>(rig);
+            added |= AddMissing<PlayerHud>(rig);
+            return added;
+        }
+
+        static bool AddMissing<T>(GameObject target) where T : Component
+        {
+            if (target.TryGetComponent<T>(out _)) return false;
+            target.AddComponent<T>();
+            return true;
         }
 
         static int EnsureLayer(int index, string name)
