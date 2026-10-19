@@ -4,7 +4,8 @@ namespace DeadCounty.Player
 {
     // Procedural animation for the segmented prototype character (no rig, no clips). The gait phase advances
     // with distance travelled so feet roughly match ground speed; legs use a planar two-bone IK toward foot
-    // targets, which also keeps the feet planted when crouching. Arms counter-swing, the torso bobs and leans.
+    // targets, which also keeps the feet planted when crouching. A ray under each foot adapts the legs to steps
+    // and slopes, lowering the pelvis so the lower foot still reaches. Arms counter-swing, the torso bobs and leans.
     // Temporary until a rigged character with Mixamo / Synty animations replaces it.
     public class ProceduralHumanoidAnimator : MonoBehaviour
     {
@@ -28,7 +29,12 @@ namespace DeadCounty.Player
         [SerializeField] float walkLift = 0.08f;
         [SerializeField] float sprintLift = 0.2f;
 
-        float phase, crouch, air, standingHipHeight, hipJointOffset;
+        [Header("Ground adaptation")]
+        [SerializeField] LayerMask groundMask = 1;
+        [SerializeField] float maxFootOffset = 0.35f;
+        [SerializeField] float footBlendSpeed = 15f;
+
+        float phase, crouch, air, standingHipHeight, hipJointOffset, leftFootOffset, rightFootOffset;
 
         void Awake()
         {
@@ -49,9 +55,15 @@ namespace DeadCounty.Player
             var s = Mathf.Sin(phase * Mathf.PI * 2f);
             var c = Mathf.Cos(phase * Mathf.PI * 2f);
 
-            // Hips are lowest when the legs are spread.
+            var stride = Mathf.Lerp(walkStride, sprintStride, run) * move;
+            var grounded = controller.IsGrounded;
+            var blend = 1f - Mathf.Exp(-footBlendSpeed * dt);
+            leftFootOffset = Mathf.Lerp(leftFootOffset, grounded ? GroundOffset(leftHip, stride * s) : 0f, blend);
+            rightFootOffset = Mathf.Lerp(rightFootOffset, grounded ? GroundOffset(rightHip, -stride * s) : 0f, blend);
+
+            // Hips are lowest when the legs are spread, and drop so the lower foot reaches a step below.
             var bob = -Mathf.Abs(s) * Mathf.Lerp(0.025f, 0.05f, run) * move * (1f - air);
-            var hipHeight = Mathf.Lerp(standingHipHeight, crouchHipHeight, crouch) + bob;
+            var hipHeight = Mathf.Lerp(standingHipHeight, crouchHipHeight, crouch) + bob + Mathf.Min(0f, Mathf.Min(leftFootOffset, rightFootOffset));
             hips.localPosition = new Vector3(0f, hipHeight, 0f);
             hips.localRotation = Quaternion.Euler(0f, s * 6f * move, 0f);
 
@@ -60,18 +72,27 @@ namespace DeadCounty.Player
             spine.localRotation = Quaternion.Euler(lean + breathe, -s * 9f * move, 0f);
             neck.localRotation = Quaternion.Euler(headPitch - lean * 0.7f, 0f, 0f);
 
-            var stride = Mathf.Lerp(walkStride, sprintStride, run) * move;
             var lift = Mathf.Lerp(walkLift, sprintLift, run) * move;
             var legHeight = hipHeight + hipJointOffset - ankleHeight;
             // A foot lifts while it swings forward (sine rising), and both tuck in the air.
-            Leg(leftHip, leftKnee, leftAnkle, stride * s, legHeight - lift * Mathf.Max(0f, c) - 0.22f * air);
-            Leg(rightHip, rightKnee, rightAnkle, -stride * s, legHeight - lift * Mathf.Max(0f, -c) - 0.22f * air);
+            Leg(leftHip, leftKnee, leftAnkle, stride * s, legHeight - leftFootOffset - lift * Mathf.Max(0f, c) - 0.22f * air);
+            Leg(rightHip, rightKnee, rightAnkle, -stride * s, legHeight - rightFootOffset - lift * Mathf.Max(0f, -c) - 0.22f * air);
 
             var armSwing = Mathf.Lerp(18f, 50f, run) * move * (1f - 0.5f * crouch);
             var bend = Mathf.Lerp(12f, 75f, run) * move + 8f + 25f * crouch;
             var raise = -35f * air - 15f * crouch;
             Arm(leftShoulder, leftElbow, armSwing * s + raise, -7f, bend);
             Arm(rightShoulder, rightElbow, -armSwing * s + raise, 7f, bend);
+        }
+
+        // Ground height under a foot relative to the character's feet, clamped to one step up or down.
+        float GroundOffset(Transform hip, float forward)
+        {
+            var foot = hip.position + transform.forward * forward;
+            var origin = new Vector3(foot.x, transform.position.y + maxFootOffset, foot.z);
+            return Physics.Raycast(origin, Vector3.down, out var hit, maxFootOffset * 2f, groundMask, QueryTriggerInteraction.Ignore)
+                ? Mathf.Clamp(hit.point.y - transform.position.y, -maxFootOffset, maxFootOffset)
+                : 0f;
         }
 
         // Negative X swings a limb forward; Z spreads the arm away from the torso.
