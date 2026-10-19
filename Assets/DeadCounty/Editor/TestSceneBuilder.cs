@@ -61,6 +61,7 @@ namespace DeadCounty.EditorTools
                 GameObjectUtility.SetStaticEditorFlags(t.gameObject, StaticEditorFlags.BatchingStatic);
 
             SetupAtmosphere();
+            EnsureGaitProfiles();
             BuildPlayer();
             BakeNavMesh(env.gameObject);
 

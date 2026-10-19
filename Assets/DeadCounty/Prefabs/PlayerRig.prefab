@@ -1978,6 +1978,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeadCounty.Player.ProceduralHumanoidAnimator
   controller: {fileID: 5725230979097016096}
+  gait: {fileID: 11400000, guid: 8e785faeb0ae94c48955c21e9a4d0c36, type: 2}
   hips: {fileID: 4374764708901550846}
   spine: {fileID: 3002265778951506828}
   neck: {fileID: 7990872425895491036}
@@ -1997,30 +1998,18 @@ MonoBehaviour:
   footLength: 0.17
   crouchHipHeight: 0.5
   headPitch: 6
-  cadenceBase: 0.85
-  cadencePerSpeed: 0.12
-  runTransitionSpeed: 2.2
-  walkDuty: 0.62
-  runDuty: 0.38
-  sprintDuty: 0.3
-  walkLift: 0.09
-  runLift: 0.22
-  sprintLift: 0.32
-  stanceBias: 0.22
-  maxDip: 0.12
-  hipSmoothTime: 0.04
-  runBob: 0.05
-  walkSway: 0.025
-  accelerationLean: 2
-  maxTurnLean: 12
-  headYawLimit: 70
-  headPitchLimit: 30
+  limp:
+    Enabled: 0
+    LeftIsBad: 0
+    BadDuty: 0.62
+    GoodDuty: 0.78
+    PhaseOffset: 0.56
+    BadLiftScale: 0.4
+    PelvisRollScale: 2
+    ExtraDip: 0.03
   groundMask:
     serializedVersion: 2
     m_Bits: 1
-  maxFootOffset: 0.35
-  footBlendSpeed: 15
-  stepSmoothTime: 0.07
 --- !u!114 &7460525599096219946
 MonoBehaviour:
   m_ObjectHideFlags: 0

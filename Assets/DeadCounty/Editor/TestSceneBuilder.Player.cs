@@ -1,4 +1,5 @@
 using System.IO;
+using DeadCounty.Animation;
 using DeadCounty.Core;
 using DeadCounty.Player;
 using Unity.Cinemachine;
@@ -58,6 +59,7 @@ namespace DeadCounty.EditorTools
 
             var animator = new SerializedObject(player.AddComponent<ProceduralHumanoidAnimator>());
             animator.FindProperty("controller").objectReferenceValue = tpc;
+            animator.FindProperty("gait").objectReferenceValue = SurvivorGait();
             foreach (var (field, joint) in joints) animator.FindProperty(field).objectReferenceValue = joint;
             animator.ApplyModifiedPropertiesWithoutUndo();
 
@@ -92,8 +94,9 @@ namespace DeadCounty.EditorTools
             return prefab;
         }
 
-        // The prefab is never regenerated, so components added to the player since it was created are added in
-        // place; existing components and their serialized values are left untouched to keep Inspector tweaks.
+        // The prefab is never regenerated, so components and references added to the player since it was created
+        // are added in place; existing components and their serialized values are left untouched to keep
+        // Inspector tweaks.
         static GameObject EnsurePlayerComponents(GameObject prefabAsset)
         {
             var path = AssetDatabase.GetAssetPath(prefabAsset);
@@ -102,7 +105,11 @@ namespace DeadCounty.EditorTools
             {
                 var controller = root.GetComponentInChildren<ThirdPersonController>(true);
                 if (controller == null) throw new System.InvalidOperationException($"{path} has no ThirdPersonController");
-                if (!AddMissingPlayerComponents(root, controller.gameObject)) return prefabAsset;
+                var animator = root.GetComponentInChildren<ProceduralHumanoidAnimator>(true);
+                if (animator == null) throw new System.InvalidOperationException($"{path} has no ProceduralHumanoidAnimator");
+                var changed = AddMissingPlayerComponents(root, controller.gameObject);
+                changed |= AssignMissingGait(animator);
+                if (!changed) return prefabAsset;
                 return PrefabUtility.SaveAsPrefabAsset(root, path);
             }
             finally
@@ -122,6 +129,17 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerDeathFlow>(rig);
             added |= AddMissing<PlayerHud>(rig);
             return added;
+        }
+
+        // Animators saved before GaitProfile existed get the survivor profile; an assigned profile is kept.
+        static bool AssignMissingGait(ProceduralHumanoidAnimator animator)
+        {
+            var so = new SerializedObject(animator);
+            var gait = so.FindProperty("gait");
+            if (gait.objectReferenceValue != null) return false;
+            gait.objectReferenceValue = SurvivorGait();
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return true;
         }
 
         static bool AddMissing<T>(GameObject target) where T : Component
