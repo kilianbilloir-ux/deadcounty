@@ -42,6 +42,9 @@ namespace DeadCounty.EditorTools
             controller.stepOffset = 0.3f;
             controller.slopeLimit = 45f;
             controller.skinWidth = 0.03f;
+            // The 1 mm default swallows the first steps of a start from rest above ~300 fps; the controller then
+            // reads the lost motion as a wall and bleeds its speed back to zero.
+            controller.minMoveDistance = 0f;
 
             var joints = BuildSurvivor(player.transform);
 
