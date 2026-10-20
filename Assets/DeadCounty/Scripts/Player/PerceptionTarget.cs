@@ -1,4 +1,5 @@
 using System;
+using DeadCounty.AI;
 using UnityEngine;
 
 namespace DeadCounty.Player
@@ -7,7 +8,7 @@ namespace DeadCounty.Player
     // flags, cached once per frame right after the controller has moved.
     [DefaultExecutionOrder(-90)]
     [RequireComponent(typeof(CharacterController), typeof(ThirdPersonController), typeof(PlayerHealth))]
-    public class PerceptionTarget : MonoBehaviour
+    public class PerceptionTarget : MonoBehaviour, IPerceivable
     {
         const float HeadHeightRatio = 0.92f;
         const float ChestHeightRatio = 0.65f;
@@ -20,6 +21,7 @@ namespace DeadCounty.Player
 
         public static PerceptionTarget Player { get; private set; }
 
+        public Vector3 Position { get; private set; }
         public Vector3 HeadPoint { get; private set; }
         public Vector3 ChestPoint { get; private set; }
         public Vector3 Velocity { get; private set; }
@@ -33,6 +35,8 @@ namespace DeadCounty.Player
         // False in ghost mode: zombies neither see nor hear the player.
         public bool Visible { get; set; } = true;
         public bool IsAlive => health.IsAlive;
+
+        public bool ApplyHit(float damage, Vector3 source) => health.ApplyHit(damage, source);
 
         void Awake()
         {
@@ -59,6 +63,7 @@ namespace DeadCounty.Player
         void Cache()
         {
             var feet = transform.position;
+            Position = feet;
             var height = body.height;
             HeadPoint = feet + Vector3.up * (HeadHeightRatio * height);
             ChestPoint = feet + Vector3.up * (ChestHeightRatio * height);

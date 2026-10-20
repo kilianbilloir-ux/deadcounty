@@ -1,4 +1,5 @@
 using System;
+using DeadCounty.Animation;
 using DeadCounty.Core;
 using DeadCounty.Locomotion;
 using Unity.Cinemachine;
@@ -21,7 +22,7 @@ namespace DeadCounty.Player
     // Hits go through Knockback (collides like any move) and Stagger; Teleport warps the player and camera.
     [DefaultExecutionOrder(-100)]
     [RequireComponent(typeof(CharacterController), typeof(PlayerStamina))]
-    public class ThirdPersonController : MonoBehaviour
+    public class ThirdPersonController : MonoBehaviour, IHumanoidMotion
     {
         [Header("Speeds (m/s)")]
         [SerializeField] float crouchSpeed = 1f;
@@ -99,6 +100,7 @@ namespace DeadCounty.Player
         // Camera aim in world space, used to turn the character's head toward where the player looks.
         public float AimYaw => yaw;
         public float AimPitch => pitch;
+        public PoseModifiers Pose => PoseModifiers.Neutral;
         // Radius within which zombies hear the player this frame, 0 when silent.
         public float NoiseRadius { get; private set; }
 
