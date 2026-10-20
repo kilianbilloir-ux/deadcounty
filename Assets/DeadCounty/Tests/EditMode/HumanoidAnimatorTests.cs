@@ -95,6 +95,50 @@ namespace DeadCounty.Tests
             Assert.That(flight, Is.Zero);
         }
 
+        // The attack as the agent drives it: standing through the wind-up, 0.6 m in 0.2 s, then standing again.
+        // The stride under a planted foot jumps with the speed; the foot must not jump with it.
+        [TestCase(true)]
+        [TestCase(false)]
+        public void LungeFromStandstillKeepsPlantedFeetInPlace(bool limping)
+        {
+            using var rig = Shambler(limping, false);
+            rig.Initialize();
+            rig.Motion.Pose = new PoseModifiers { ArmsForward = 1f, LookWeight = 1f };
+            for (var frame = 0; frame < 60; frame++) rig.Step(0f);
+            var maxSlip = 0f;
+            var maxSwing = 0f;
+            var lastLeft = rig.LeftAnkle.position;
+            var lastRight = rig.RightAnkle.position;
+            bool wasLeftPlanted = rig.Animator.LeftFootPlanted, wasRightPlanted = rig.Animator.RightFootPlanted;
+            for (var frame = 0; frame < 72; frame++)
+            {
+                rig.Motion.Pose = new PoseModifiers { ArmsForward = 1f, LookWeight = 1f, Lunge = frame < 12 ? 1f : 0f };
+                rig.Step(frame < 12 ? 3f : 0f);
+                var left = rig.LeftAnkle.position;
+                var right = rig.RightAnkle.position;
+                Track(left - lastLeft, wasLeftPlanted && rig.Animator.LeftFootPlanted);
+                Track(right - lastRight, wasRightPlanted && rig.Animator.RightFootPlanted);
+                lastLeft = left;
+                lastRight = right;
+                wasLeftPlanted = rig.Animator.LeftFootPlanted;
+                wasRightPlanted = rig.Animator.RightFootPlanted;
+            }
+            TestContext.WriteLine($"max planted slip {maxSlip:0.0000} m/s, fastest foot {maxSwing:0.00} m/s");
+            Assert.That(maxSlip, Is.LessThanOrEqualTo(0.05f));
+            // The step that follows the lunge peaks near 11 m/s; a foot jumping to a resized stride moved 0.4 m
+            // and more in one frame (25+ m/s).
+            Assert.That(maxSwing, Is.LessThanOrEqualTo(15f));
+
+            void Track(Vector3 delta, bool planted)
+            {
+                var speed = Planar(delta) / Dt;
+                if (planted) maxSlip = Mathf.Max(maxSlip, speed);
+                maxSwing = Mathf.Max(maxSwing, speed);
+            }
+
+            static float Planar(Vector3 delta) => new Vector2(delta.x, delta.z).magnitude;
+        }
+
         [Test]
         public void ArmsForwardRaisesShouldersToMinus100()
         {

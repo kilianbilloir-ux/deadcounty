@@ -25,6 +25,22 @@ namespace DeadCounty.Animation
             public float Forward, Lift, Roll, Support;
         }
 
+        // A planted foot moves back exactly as far as the body goes forward, so it keeps its place on the ground
+        // when the stride under it is resized by a speed change (lunge, braking). Drift is how far it ends up
+        // from the steady-speed cycle; the next swing absorbs it. A swinging foot covers, each frame, the share
+        // of its remaining way that the swing curve covers, toward a landing point that follows speed changes
+        // at a bounded rate, and lands where the swing brought it.
+        struct FootTrack
+        {
+            public bool Planted, Swinging;
+            // ToeOff: how far the cycle still had to go back at the last stance frame.
+            public float Forward, Drift, ToeOff, Blend, Landing;
+        }
+
+        // How fast a swinging foot's landing point follows the stride: normal accelerations stay well below it,
+        // the stop at the end of a lunge does not swing the foot back.
+        const float LandingShiftSpeed = 3f;
+
         [Tooltip("Motion source implementing IHumanoidMotion.")]
         [SerializeField] MonoBehaviour controller;
         [SerializeField] GaitProfile gait;
@@ -55,6 +71,7 @@ namespace DeadCounty.Animation
         float lastYaw, yawRate, forwardAccel, airVerticalSpeed, landingDrop, visualY, visualYVelocity;
         float bob, hipY, hipYVelocity, headYaw, leftArmDrive, rightArmDrive, leftTrackX, rightTrackX, clock;
         float pendingDt;
+        FootTrack leftTrack, rightTrack;
         int resetId, framesSinceUpdate, updateEvery = 1;
         bool wasGrounded = true, snapped;
 
@@ -112,6 +129,7 @@ namespace DeadCounty.Animation
             forwardAccel = yawRate = airVerticalSpeed = landingDrop = 0f;
             visualY = transform.position.y;
             visualYVelocity = 0f;
+            leftTrack = rightTrack = default;
         }
 
         void LateUpdate()
@@ -160,8 +178,9 @@ namespace DeadCounty.Animation
             // Half the ground covered while a foot is down: the planted foot slides back at ground speed.
             var leftHalf = Mathf.Min(gaitSpeed * leftDuty / (2f * cadence), g.MaxHalfStride);
             var rightHalf = Mathf.Min(gaitSpeed * rightDuty / (2f * cadence), g.MaxHalfStride);
-            var left = FootCycle(leftPhase, leftDuty, leftHalf, g.StanceBias * leftHalf, lift * (leftBad ? limp.BadLiftScale : 1f));
-            var right = FootCycle(rightPhase, rightDuty, rightHalf, g.StanceBias * rightHalf, lift * (rightBad ? limp.BadLiftScale : 1f));
+            var advance = gaitSpeed * dt;
+            var left = FootCycle(ref leftTrack, leftPhase, leftDuty, leftHalf, g.StanceBias * leftHalf, lift * (leftBad ? limp.BadLiftScale : 1f), advance, dt);
+            var right = FootCycle(ref rightTrack, rightPhase, rightDuty, rightHalf, g.StanceBias * rightHalf, lift * (rightBad ? limp.BadLiftScale : 1f), advance, dt);
             LeftFootPlanted = leftPhase < leftDuty;
             RightFootPlanted = rightPhase < rightDuty;
 
@@ -297,8 +316,11 @@ namespace DeadCounty.Animation
         }
 
         // Stance: the foot moves from +half to -half with the ground (heel strike, then toe-off), the whole
-        // window shifted back by `shift`. Swing: it travels forward again on an arc.
-        FootPose FootCycle(float p, float duty, float half, float shift, float lift)
+        // window shifted back by `shift`; it lands on the cycle and then moves back by `advance` per frame, which
+        // matches the cycle at a steady speed. Swing: it travels forward again on an arc from where it took off,
+        // lifting at least as high as the distance it has to catch up (capped at a walking step). Both match the
+        // plain cycle exactly at a steady speed.
+        FootPose FootCycle(ref FootTrack track, float p, float duty, float half, float shift, float lift, float advance, float dt)
         {
             var heel = gait.HeelStrikeRoll;
             var toe = gait.ToeOffRoll;
@@ -306,13 +328,38 @@ namespace DeadCounty.Animation
             {
                 var t = p / duty;
                 var roll = t < 0.2f ? Mathf.Lerp(heel, 0f, t / 0.2f) : t > 0.7f ? Mathf.Lerp(0f, toe, (t - 0.7f) / 0.3f) : 0f;
-                return new FootPose { Forward = Mathf.Lerp(half, -half, t) - shift, Roll = roll, Support = Mathf.Sin(Mathf.PI * t) };
+                var cycle = Mathf.Lerp(half, -half, t) - shift;
+                // Landing: on the cycle, unless the swing ended away from it, then where the swing ended (the
+                // window covers how far a steady swing and the cycle can differ over one frame).
+                track.Forward = track.Planted ? track.Forward - advance
+                    : track.Swinging ? Mathf.Clamp(cycle, track.Forward - 2f * advance, track.Forward + advance)
+                    : cycle;
+                track.Planted = true;
+                track.Swinging = false;
+                track.Drift = track.Forward - cycle;
+                track.ToeOff = cycle + half + shift;
+                return new FootPose { Forward = track.Forward, Roll = roll, Support = Mathf.Sin(Mathf.PI * t) };
             }
+            var landing = half - shift;
+            if (!track.Swinging)
+            {
+                // Takes off from where the foot stands, after the rest of its stance (at most this frame's step).
+                if (track.Planted) track.Forward -= Mathf.Min(track.ToeOff, advance);
+                track.Planted = false;
+                track.Swinging = true;
+                track.Blend = 0f;
+                track.Landing = landing;
+            }
+            track.Landing = Mathf.MoveTowards(track.Landing, landing, LandingShiftSpeed * dt);
             var s = (p - duty) / (1f - duty);
+            var blend = Mathf.SmoothStep(0f, 1f, s);
+            if (blend > track.Blend && track.Blend < 1f)
+                track.Forward += (track.Landing - track.Forward) * (blend - track.Blend) / (1f - track.Blend);
+            track.Blend = blend;
             return new FootPose
             {
-                Forward = Mathf.Lerp(-half, half, Mathf.SmoothStep(0f, 1f, s)) - shift,
-                Lift = lift * Mathf.Sin(Mathf.PI * s),
+                Forward = track.Forward,
+                Lift = Mathf.Max(lift, Mathf.Min(Mathf.Abs(track.Drift), gait.WalkLift)) * Mathf.Sin(Mathf.PI * s),
                 Roll = Mathf.Lerp(toe, heel, s),
             };
         }
@@ -360,14 +407,14 @@ namespace DeadCounty.Animation
             if (roll > 0f) down -= footLength * Mathf.Sin(roll * Mathf.Deg2Rad);
             var lateral = trackX - joint.x;
             forward -= joint.z;
-            // A planted foot out of reach (hips lagging over a far foot) is lifted straight up rather than pulled
-            // toward the hip, so it never slides; past heel strike the boot pitches further so the toes stay
-            // down while the heel rises.
+            // A foot out of reach (hips lagging over a far foot) is lifted straight up rather than pulled toward the
+            // hip, so it never slides when planted nor jumps forward when it takes off; past heel strike a planted
+            // boot pitches further so the toes stay down while the heel rises.
             var maxReach = thighLength + shinLength - 0.001f;
             var reachableDown = Mathf.Sqrt(Mathf.Max(0f, maxReach * maxReach - forward * forward - lateral * lateral));
-            if (planted && down > reachableDown)
+            if (down > reachableDown)
             {
-                if (roll >= 0f) roll = Mathf.Asin(Mathf.Min(1f, Mathf.Sin(roll * Mathf.Deg2Rad) + (down - reachableDown) / footLength)) * Mathf.Rad2Deg;
+                if (planted && roll >= 0f) roll = Mathf.Asin(Mathf.Min(1f, Mathf.Sin(roll * Mathf.Deg2Rad) + (down - reachableDown) / footLength)) * Mathf.Rad2Deg;
                 down = reachableDown;
             }
             var tilt = Quaternion.AngleAxis(Mathf.Atan2(lateral, down) * Mathf.Rad2Deg, Vector3.forward);
