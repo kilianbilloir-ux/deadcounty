@@ -76,7 +76,8 @@ namespace DeadCounty.EditorTools
             {
                 mat.EnableKeyword("_EMISSION");
                 mat.SetColor("_EmissionColor", Palette[key] * glow);
-                mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+                // URP's material validation keeps _EMISSION only on materials flagged as emissive for GI.
+                mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
             }
             if (key == "Grass")
             {
