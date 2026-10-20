@@ -64,6 +64,7 @@ namespace DeadCounty.EditorTools
             EnsureGaitProfiles();
             BuildPlayer();
             BakeNavMesh(env.gameObject);
+            BuildZombies();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings();

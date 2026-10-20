@@ -19,10 +19,7 @@ namespace DeadCounty.EditorTools
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
             prefab = prefab == null ? CreatePlayerPrefab() : EnsurePlayerComponents(prefab);
-            // Keeps DeleteUnusedMaterials from removing materials only the existing prefab references.
-            foreach (var r in prefab.GetComponentsInChildren<Renderer>(true))
-            foreach (var m in r.sharedMaterials)
-                if (m != null) UsedMaterials.Add(AssetDatabase.GetAssetPath(m));
+            MarkMaterialsUsed(prefab);
             var rig = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             rig.transform.SetPositionAndRotation(SpawnPosition, Quaternion.identity);
             Camera.main.gameObject.AddComponent<CinemachineBrain>();

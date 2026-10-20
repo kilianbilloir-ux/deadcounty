@@ -94,6 +94,7 @@ namespace DeadCounty.AI
                 tuning.WanderSpeedJitter = 0f;
                 tuning.SpeedJitter = 0f;
             }
+            if (animator != null) animator.Limp = SeededLimp(animator.Limp);
             spawnPosition = transform.position;
             spawnRotation = transform.rotation;
             brain = new ZombieBrain(tuning, seed, spawnPosition);
@@ -186,6 +187,17 @@ namespace DeadCounty.AI
                 ZombieLod.Dormant => DormantAnimationInterval,
                 _ => 1,
             };
+        }
+
+        // The profile's share of limpers, picked by seed so a zombie always limps on the same leg. Deterministic
+        // zombies never limp, which keeps test measurements symmetric.
+        LimpSettings SeededLimp(LimpSettings limp)
+        {
+            // Multiplicative hash: unrelated to the brain's random stream built from the same seed.
+            var hash = unchecked((uint)seed * 2654435761u);
+            limp.Enabled = !deterministic && (hash >> 8) * (1f / (1 << 24)) < profile.LimpChance;
+            limp.LeftIsBad = (hash & 0x10u) != 0;
+            return limp;
         }
 
         void OnDied(ZombieHealth _)

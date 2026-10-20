@@ -41,12 +41,15 @@ namespace DeadCounty.EditorTools
             ["Skin"] = Rgb(0xC69C7A), ["Hair"] = Rgb(0x2A211B), ["Eye"] = Rgb(0x151515), ["Jacket"] = Rgb(0x5C6340),
             ["JacketDark"] = Rgb(0x434A30), ["Jeans"] = Rgb(0x34404F), ["Boots"] = Rgb(0x3B2F25), ["Backpack"] = Rgb(0x6E5B3D),
             ["BackpackDark"] = Rgb(0x55462F), ["Strap"] = Rgb(0x2A2A2A),
+            ["ZombieSkin"] = Rgb(0x8E9681), ["ZombieHair"] = Rgb(0x3A342D), ["ZombieEye"] = Rgb(0xD9CF8C), ["Blood"] = Rgb(0x3A1714),
+            ["ZombieShirt"] = Rgb(0x6E6650), ["ZombieShirtBlue"] = Rgb(0x48566A), ["ZombieShirtRed"] = Rgb(0x6A3530), ["ZombieShirtWhite"] = Rgb(0x9C998C),
+            ["ZombiePants"] = Rgb(0x39414E), ["ZombiePantsKhaki"] = Rgb(0x655C45), ["ZombiePantsDark"] = Rgb(0x2C2C2F),
             ["Obstacle"] = Rgb(0xE08A33), ["Ramp"] = Rgb(0x4F7FD0), ["Stairs"] = Rgb(0x5AA866),
         };
 
         static readonly Dictionary<string, float> Glow = new()
         {
-            ["LampGlow"] = 2.5f, ["PanelGlow"] = 1.6f, ["PoliceRed"] = 3f, ["PoliceBlue"] = 3f,
+            ["LampGlow"] = 2.5f, ["PanelGlow"] = 1.6f, ["PoliceRed"] = 3f, ["PoliceBlue"] = 3f, ["ZombieEye"] = 1.8f,
         };
 
         static float SmoothnessOf(string key) => key switch
