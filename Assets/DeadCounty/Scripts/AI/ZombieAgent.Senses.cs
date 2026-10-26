@@ -82,6 +82,9 @@ namespace DeadCounty.AI
 
         void SenseNoises(float now)
         {
+            // Each listening window starts fresh: a loud noise (consumed or not) must never block
+            // a quieter one heard later. Within the window the widest margin wins (see Listen).
+            noiseMargin = float.NegativeInfinity;
             var ear = motor.Position + Vector3.up * tuning.EyeHeight;
             var multiplier = brain.HearingMultiplier;
             int count;
@@ -98,7 +101,8 @@ namespace DeadCounty.AI
             } while (count == Noises.Length);
         }
 
-        // Keeps the noise heard with the widest margin until the next Think.
+        // Keeps the noise heard with the widest margin of the current Sense window; reset per Sense
+        // (see SenseNoises) and cleared on consumption (see Think).
         void Listen(in NoiseEvent noise, Vector3 ear, float multiplier)
         {
             var origin = noise.Position + Vector3.up * NoiseHeight;
@@ -133,6 +137,7 @@ namespace DeadCounty.AI
         {
             snapshot = default;
             noisePending = false;
+            noiseMargin = float.NegativeInfinity;
             lastNoiseId = NoiseSystem.Buffer.LatestId;
             LastNoiseWalls = 0;
         }

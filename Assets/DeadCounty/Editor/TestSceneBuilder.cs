@@ -28,6 +28,7 @@ namespace DeadCounty.EditorTools
 
         static readonly List<Rect> Reserved = new();
         static readonly List<Vector3> ReservedCircles = new(); // x, z, radius
+        static readonly List<Light> BuiltLamps = new();
 
         [MenuItem("DeadCounty/Build Test Scene")]
         public static void Build()
@@ -39,6 +40,7 @@ namespace DeadCounty.EditorTools
             MeshCache.Clear();
             Reserved.Clear();
             ReservedCircles.Clear();
+            BuiltLamps.Clear();
             ConfigureProject();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);

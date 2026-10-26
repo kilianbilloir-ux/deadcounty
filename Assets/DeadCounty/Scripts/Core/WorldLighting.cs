@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace DeadCounty.Core
 {
-    // Global darkness level read by perception (0 day, 1 night). Stands in for the day/night cycle until it exists.
+    // Global darkness level (0 day, 1 night). Runtime: DayNightDirector is the only writer.
+    // Tests and scene setup write it directly to force a time of day.
     public static class WorldLighting
     {
         static float nightFactor;

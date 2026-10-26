@@ -3,6 +3,7 @@
     "rootNamespace": "DeadCounty.Tests",
     "references": [
         "DeadCounty.Runtime",
+        "Unity.InputSystem",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

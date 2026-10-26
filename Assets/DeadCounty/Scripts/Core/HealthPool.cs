@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace DeadCounty.Core
@@ -7,6 +8,7 @@ namespace DeadCounty.Core
     {
         public HealthPool(float max)
         {
+            if (!float.IsFinite(max) || max <= 0f) throw new ArgumentOutOfRangeException(nameof(max), max, "HealthPool needs a positive finite max");
             Max = max;
             Current = max;
         }
@@ -16,10 +18,10 @@ namespace DeadCounty.Core
         public bool IsDead => Current <= 0f;
         public float Normalized => Current / Max;
 
-        // Returns true only on the hit that kills.
+        // Returns true only on the hit that kills. !(damage > 0) rejects NaN, where <= would let it through.
         public bool Apply(float damage)
         {
-            if (damage <= 0f || IsDead) return false;
+            if (!(damage > 0f) || IsDead) return false;
             Current = Mathf.Max(Current - damage, 0f);
             return IsDead;
         }

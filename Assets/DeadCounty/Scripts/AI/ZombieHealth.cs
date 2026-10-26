@@ -21,9 +21,10 @@ namespace DeadCounty.AI
         void Awake() => Pool = new HealthPool(maxHealth);
 
         // Returns true when the damage was applied, false once dead.
+        // !(damage > 0) rejects NaN, where <= would let it through.
         public bool ApplyDamage(float damage, Vector3 source)
         {
-            if (damage <= 0f || !IsAlive) return false;
+            if (!(damage > 0f) || !IsAlive) return false;
             var killed = Pool.Apply(damage);
             LastHitSource = source;
             Damaged?.Invoke(this);

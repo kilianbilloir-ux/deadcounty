@@ -1,0 +1,138 @@
+/* Prototype HUD (GDD 8.11): desaturated palette, dried blood as the single danger accent. */
+.root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-grow: 1;
+}
+
+.hit-flash {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(167, 95, 59);
+    opacity: 0;
+}
+
+.hud {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding-left: 28px;
+    padding-bottom: 28px;
+    padding-top: 28px;
+    padding-right: 28px;
+    align-items: flex-start;
+}
+
+.bars {
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.bar-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.bar-label {
+    width: 92px;
+    margin-right: 10px;
+    -unity-text-align: middle-right;
+    font-size: 15px;
+    color: rgb(180, 188, 201);
+}
+
+.bar-frame {
+    width: 260px;
+    height: 14px;
+    background-color: rgba(26, 29, 34, 0.55);
+    border-width: 1px;
+    border-color: rgba(212, 185, 118, 0.35);
+}
+
+.bar-fill {
+    width: 50%;
+    height: 100%;
+}
+
+.health-fill {
+    background-color: rgb(180, 188, 201);
+}
+
+.health-fill--low {
+    background-color: rgb(167, 95, 59);
+}
+
+.stamina-fill {
+    background-color: rgb(212, 185, 118);
+}
+
+.stamina-fill--spent {
+    background-color: rgb(89, 48, 26);
+}
+
+.stamina-row .bar-frame {
+    height: 7px;
+}
+
+.readouts {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.readout {
+    font-size: 16px;
+    margin-right: 14px;
+    color: rgb(138, 143, 150);
+}
+
+.flashlight-readout {
+    color: rgb(212, 185, 118);
+    opacity: 0.45;
+}
+
+.flashlight-readout--on {
+    opacity: 1;
+}
+
+.time-readout {
+    color: rgb(180, 188, 201);
+}
+
+.game-over {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0, 0, 0);
+    opacity: 0;
+    display: none;
+}
+
+.game-over-title {
+    font-size: 42px;
+    -unity-font-style: bold;
+    color: rgb(167, 95, 59);
+    margin-bottom: 14px;
+}
+
+.game-over-line {
+    font-size: 20px;
+    color: rgb(217, 217, 217);
+    margin-top: 6px;
+}
+
+.game-over-prompt {
+    margin-top: 24px;
+    color: rgb(180, 188, 201);
+}

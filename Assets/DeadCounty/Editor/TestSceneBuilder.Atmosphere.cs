@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using DeadCounty.Core;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -16,12 +18,22 @@ namespace DeadCounty.EditorTools
         {
             var sun = Object.FindObjectsByType<Light>().First(l => l.type == LightType.Directional);
             sun.name = "Soleil";
-            sun.transform.rotation = Quaternion.Euler(28f, -50f, 0f);
-            sun.color = new Color(1f, 0.88f, 0.72f);
-            sun.intensity = 1.5f;
+            // Pose, color and intensity are owned by DayNightDirector (added below): no manual values here.
             sun.shadows = LightShadows.Soft;
 
             RenderSettings.sun = sun;
+            // Idempotent: Build starts from an empty scene, but a second call must not stack a Director.
+            // Picks RenderSettings.sun up in Awake; hour and length stay tweakable on the component.
+            if (Object.FindAnyObjectByType<DayNightDirector>() == null)
+                new GameObject("DayNight").AddComponent<DayNightDirector>();
+            // Same pattern for the night lamps: all spots built above, toggled by NightFactor.
+            if (Object.FindAnyObjectByType<NightLampController>() == null)
+            {
+                var nightLights = new GameObject("Eclairage_Nuit");
+                nightLights.SetActive(false);
+                nightLights.AddComponent<NightLampController>().Configure(new List<Light>(BuiltLamps));
+                nightLights.SetActive(true);
+            }
             RenderSettings.skybox = SkyMaterial();
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;

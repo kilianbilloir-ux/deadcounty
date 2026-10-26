@@ -10,6 +10,11 @@ namespace DeadCounty.Player
 
         public StaminaModel Model { get; private set; }
 
+        void OnValidate()
+        {
+            if (!float.IsFinite(settings.Max) || settings.Max <= 0f) settings.Max = StaminaSettings.Default.Max;
+        }
+
         void Awake() => Model = new StaminaModel(settings);
 
         public void ResetFull() => Model.Reset();

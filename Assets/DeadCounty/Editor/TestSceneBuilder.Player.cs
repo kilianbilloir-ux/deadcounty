@@ -5,12 +5,16 @@ using DeadCounty.Player;
 using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DeadCounty.EditorTools
 {
     public static partial class TestSceneBuilder
     {
         const string PlayerPrefabPath = "Assets/DeadCounty/Prefabs/PlayerRig.prefab";
+        const string HudPanelSettingsPath = "Assets/DeadCounty/UI/HudPanelSettings.asset";
+        const string HudUxmlPath = "Assets/DeadCounty/UI/Hud.uxml";
+        const string HudUssPath = "Assets/DeadCounty/UI/Hud.uss";
         static readonly Vector3 SpawnPosition = new(65.2f, 0.15f, -10f);
 
         // The prefab is only generated when missing, so Inspector tweaks survive scene rebuilds.
@@ -49,6 +53,10 @@ namespace DeadCounty.EditorTools
             target.SetParent(player.transform, false);
             target.localPosition = new Vector3(0f, 1.55f, 0f);
 
+            var spot = SpotLight(target, "Flashlight", new Vector3(0f, 0.05f, 0.25f), Quaternion.identity,
+                new Color(1f, 0.95f, 0.85f), 18f, 25f, 40f, false);
+            spot.enabled = false;
+
             // Own layer so camera probes and future AI sight checks can ignore the player's colliders.
             foreach (var t in player.GetComponentsInChildren<Transform>()) t.gameObject.layer = GameLayers.Player;
 
@@ -56,6 +64,11 @@ namespace DeadCounty.EditorTools
             var so = new SerializedObject(tpc);
             so.FindProperty("cameraTarget").objectReferenceValue = target;
             so.ApplyModifiedPropertiesWithoutUndo();
+
+            var flashlight = new SerializedObject(player.AddComponent<PlayerFlashlight>());
+            flashlight.FindProperty("spot").objectReferenceValue = spot;
+            flashlight.FindProperty("startOn").boolValue = false;
+            flashlight.ApplyModifiedPropertiesWithoutUndo();
 
             var animator = new SerializedObject(player.AddComponent<ProceduralHumanoidAnimator>());
             animator.FindProperty("controller").objectReferenceValue = tpc;
@@ -87,7 +100,9 @@ namespace DeadCounty.EditorTools
             follow.AvoidObstacles = obstacles;
             camera.AddComponent<PlayerCameraDirector>();
             rig.AddComponent<PlayerDebugOverlay>();
+            rig.AddComponent<UIDocument>();
             AddMissingPlayerComponents(rig, player);
+            AssignHudAssets(rig);
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(rig, PlayerPrefabPath);
             Object.DestroyImmediate(rig);
@@ -109,7 +124,9 @@ namespace DeadCounty.EditorTools
                 if (animator == null) throw new System.InvalidOperationException($"{path} has no ProceduralHumanoidAnimator");
                 var changed = AddMissingPlayerComponents(root, controller.gameObject);
                 changed |= AssignMissingGait(animator);
-                if (!changed) return prefabAsset;
+                changed |= AddMissing<UIDocument>(root);
+                AssignHudAssets(root);
+                // AssignHudAssets writes straight into the prefab contents; save unconditionally.
                 return PrefabUtility.SaveAsPrefabAsset(root, path);
             }
             finally
@@ -126,9 +143,63 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerHealth>(player);
             added |= AddMissing<PerceptionTarget>(player);
             added |= AddMissing<PlayerNoiseEmitter>(player);
+            added |= AddMissing<PlayerFlashlight>(player);
             added |= AddMissing<PlayerDeathFlow>(rig);
-            added |= AddMissing<PlayerHud>(rig);
+            added |= AddMissing<PlayerHudController>(rig);
+            added |= EnsureFlashlight(player);
             return added;
+        }
+
+        // Old rigs predate the flashlight: add the spot under the camera target and wire it.
+        static bool EnsureFlashlight(GameObject player)
+        {
+            var target = player.transform.Find("CameraTarget");
+            if (target == null) throw new System.InvalidOperationException("PlayerRig has no CameraTarget for the flashlight");
+            var flash = target.Find("Flashlight");
+            Light spot;
+            if (flash == null)
+            {
+                spot = SpotLight(target, "Flashlight", new Vector3(0f, 0.05f, 0.25f), Quaternion.identity,
+                    new Color(1f, 0.95f, 0.85f), 18f, 25f, 40f, false);
+                spot.enabled = false;
+            }
+            else
+            {
+                spot = flash.GetComponent<Light>();
+            }
+            var so = new SerializedObject(player.GetComponent<PlayerFlashlight>());
+            if (so.FindProperty("spot").objectReferenceValue != null) return flash == null;
+            so.FindProperty("spot").objectReferenceValue = spot;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return true;
+        }
+
+        // The HUD needs the UI Toolkit assets; kept in the project so the rig stays a plain prefab.
+        static void AssignHudAssets(GameObject rig)
+        {
+            var hud = rig.GetComponent<PlayerHudController>();
+            if (hud == null) return;
+            var so = new SerializedObject(hud);
+            var panel = LoadOrCreate<PanelSettings>(HudPanelSettingsPath);
+            // Laid out for 1080p and scaled with the screen, so the HUD keeps its proportions at any resolution.
+            panel.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+            panel.referenceResolution = new Vector2Int(1920, 1080);
+            panel.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
+            panel.match = 0.5f;
+            EditorUtility.SetDirty(panel);
+            so.FindProperty("panelSettings").objectReferenceValue = panel;
+            so.FindProperty("hudLayout").objectReferenceValue = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(HudUxmlPath);
+            so.FindProperty("hudStyles").objectReferenceValue = AssetDatabase.LoadAssetAtPath<StyleSheet>(HudUssPath);
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static T LoadOrCreate<T>(string path) where T : ScriptableObject
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (asset != null) return asset;
+            asset = ScriptableObject.CreateInstance<T>();
+            AssetDatabase.CreateAsset(asset, path);
+            return asset;
         }
 
         // Animators saved before GaitProfile existed get the survivor profile; an assigned profile is kept.

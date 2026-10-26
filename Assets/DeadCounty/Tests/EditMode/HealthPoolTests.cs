@@ -37,6 +37,25 @@ namespace DeadCounty.Tests
         }
 
         [Test]
+        public void ConstructorRejectsNonPositiveOrNonFiniteMax()
+        {
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new HealthPool(0f));
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new HealthPool(-5f));
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new HealthPool(float.NaN));
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new HealthPool(float.PositiveInfinity));
+        }
+
+        [Test]
+        public void NaNDamageIsIgnored()
+        {
+            var health = new HealthPool(100f);
+            Assert.That(health.Apply(float.NaN), Is.False);
+            Assert.That(health.Current, Is.EqualTo(100f));
+            Assert.That(health.IsDead, Is.False);
+            Assert.That(float.IsFinite(health.Normalized), Is.True);
+        }
+
+        [Test]
         public void ResetRestoresFullHealth()
         {
             var health = new HealthPool(100f);

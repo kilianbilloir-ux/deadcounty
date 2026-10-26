@@ -1,5 +1,6 @@
 using System.Collections;
 using DeadCounty.AI;
+using DeadCounty.Animation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -27,6 +28,49 @@ namespace DeadCounty.Tests
             Assert.That(distance, Is.InRange(attack.ContactDistance - 0.05f, attack.HitReach), "the zombie did not end its lunge in reach");
             Assert.That(World.Strikes.Count, Is.EqualTo(1));
             Assert.That(World.Strikes[0].Hit, Is.True);
+        }
+
+        // The revive warps the body back to spawn: without the snap that warp would read as a
+        // sprint and pitch the spine backward, so the test walks the zombie first to make it count.
+        [UnityTest]
+        public IEnumerator DeadZombieAnimatorStopsAndRestartsOnReset()
+        {
+            World = new ZombieTestWorld(4f);
+            World.Target.Visible = false;
+            var spawn = new Vector3(2f, 0f, 3f);
+            var zombie = World.SpawnZombie(spawn, 90f, withAnimator: true);
+            yield return ZombieTestWorld.Settle(zombie);
+            var animator = zombie.GetComponent<ProceduralHumanoidAnimator>();
+            Assert.That(animator, Is.Not.Null, "the test zombie has no animator");
+            Assert.That(animator.enabled, Is.True);
+
+            World.Target.Position = spawn + 8f * new Vector3(1f, 0f, 1f).normalized;
+            World.Target.Visible = true;
+            yield return ZombieTestWorld.WaitUntil(() => zombie.State == ZombieState.Chase, 6f);
+            yield return ZombieTestWorld.WaitUntil(() => ZombieTestWorld.PlanarDistance(zombie.Position, spawn) >= 2.5f, 10f);
+            Assert.That(ZombieTestWorld.PlanarDistance(zombie.Position, World.Target.Position), Is.GreaterThan(3f), "the zombie reached attack range before the kill");
+
+            Assert.That(zombie.Health.ApplyDamage(1000f, Vector3.zero), Is.True);
+            Assert.That(animator.enabled, Is.False, "the corpse kept animating");
+
+            World.Target.Visible = false;
+            var resets = zombie.MotionResetId;
+            zombie.ResetToSpawn();
+            yield return null;
+            Assert.That(zombie.MotionResetId, Is.EqualTo(resets + 1), "the revive did not snap the animator");
+            Assert.That(animator.enabled, Is.True, "the revived zombie never animates again");
+            var spine = zombie.transform.Find("Model/Hips/Spine");
+            for (var i = 0; i < 2; i++)
+            {
+                yield return null;
+                Assert.That(SignedPitch(spine), Is.GreaterThan(0f), $"backward lean spike at frame {i}");
+            }
+        }
+
+        static float SignedPitch(Transform joint)
+        {
+            var x = joint.localEulerAngles.x;
+            return x > 180f ? x - 360f : x;
         }
 
         [UnityTest]
