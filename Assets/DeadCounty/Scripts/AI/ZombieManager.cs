@@ -56,11 +56,23 @@ namespace DeadCounty.AI
         bool lodDirty;
         int senseCursor;
         int registrations;
+        bool frozen;
 
         public static ZombieManager Instance { get; private set; }
 
         // Set by tests to perceive a stand-in instead of the player.
         public IPerceivable TargetOverride { get; set; }
+
+        // Debug freeze: every zombie goes dormant where it stands until unfrozen.
+        public bool Frozen
+        {
+            get => frozen;
+            set
+            {
+                frozen = value;
+                lodDirty = true;
+            }
+        }
 
         public IPerceivable Target
         {
@@ -170,7 +182,7 @@ namespace DeadCounty.AI
         }
 
         // Prototype rule: when the player respawns, every zombie, dead or alive, starts over at its spawn.
-        void ResetAll()
+        public void ResetAll()
         {
             for (var i = 0; i < records.Count; i++)
             {
@@ -264,7 +276,7 @@ namespace DeadCounty.AI
                 // Without a target nothing is near or far: everyone competes for the budget equally.
                 var distance = hasTarget ? offset.magnitude : 0f;
                 lodDistances[i] = distance;
-                lodTiers[i] = DistanceTier(distance, agent.Lod);
+                lodTiers[i] = frozen ? ZombieLod.Dormant : DistanceTier(distance, agent.Lod);
                 if (lodTiers[i] != ZombieLod.Dormant) lodOrder[candidates++] = i;
             }
             if (candidates > activeBudget)
