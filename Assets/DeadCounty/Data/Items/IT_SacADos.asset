@@ -19,4 +19,5 @@ MonoBehaviour:
   Hunger: 0
   Thirst: 0
   Health: 0
+  StopsBleeding: 0
   CapacityBonus: 6

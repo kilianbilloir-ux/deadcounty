@@ -2,7 +2,6 @@
     <ui:VisualElement name="root" picking-mode="Ignore" class="root">
         <ui:VisualElement name="hit-flash" picking-mode="Ignore" class="hit-flash" />
         <ui:VisualElement name="hud" picking-mode="Ignore" class="hud">
-            <ui:Label name="encumbered" text="Surchargé" picking-mode="Ignore" class="encumbered" />
             <ui:VisualElement name="needs" picking-mode="Ignore" class="needs">
                 <ui:VisualElement name="hunger" picking-mode="Ignore" class="need">
                     <DeadCounty.UI.RadialGauge name="hunger-gauge" picking-mode="Ignore" class="need-gauge" />
@@ -44,6 +43,17 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label name="loot-toast" picking-mode="Ignore" class="loot-toast" />
+        <ui:VisualElement name="statuses" picking-mode="Ignore" class="statuses">
+            <ui:Label name="status-bleeding" text="SAIGNEMENT" picking-mode="Ignore" class="status status--danger" />
+            <ui:Label name="status-hungry" text="AFFAMÉ" picking-mode="Ignore" class="status" />
+            <ui:Label name="status-thirsty" text="ASSOIFFÉ" picking-mode="Ignore" class="status" />
+            <ui:Label name="status-tired" text="FATIGUÉ" picking-mode="Ignore" class="status" />
+            <ui:Label name="status-encumbered" text="SURCHARGÉ" picking-mode="Ignore" class="status" />
+        </ui:VisualElement>
+        <ui:VisualElement name="sleep" picking-mode="Ignore" class="sleep">
+            <ui:Label text="Vous dormez…" picking-mode="Ignore" class="sleep-title" />
+            <ui:Label name="sleep-time" picking-mode="Ignore" class="sleep-time" />
+        </ui:VisualElement>
         <ui:VisualElement name="inventory" class="inventory">
             <ui:VisualElement class="inventory-panel">
                 <ui:VisualElement class="inventory-status">

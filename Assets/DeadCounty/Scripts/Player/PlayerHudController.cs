@@ -15,9 +15,10 @@ namespace DeadCounty.Player
     // takes the danger colour when low, the stamina bar shows while not full and blinks when exhausted, the
     // flashlight and clock readouts show for a few seconds when they change, with the need gauges. The
     // interaction prompt sits next to what the player can use, its name above the key and the action (GDD 8.11,
-    // after Valheim), with a ring filling through a search; what was found shows for a moment below the middle of
-    // the screen; "Surchargé" shows while the inventory is too heavy. Also draws the hit flash and the game over
-    // screen from PlayerDeathFlow. The only allocations are texts rebuilt when they change.
+    // after Valheim), with a ring filling through a search; what was found, or why the player woke up, shows for a
+    // moment below the middle of the screen. Also draws the hit flash and the game over screen from
+    // PlayerDeathFlow. The only allocations are texts rebuilt when they change. Afflictions and the sleep screen
+    // are PlayerConditionHud's.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -46,12 +47,13 @@ namespace DeadCounty.Player
         PlayerDeathFlow deathFlow;
         PlayerInteractor interactor;
         PlayerInventory inventory;
+        PlayerSleep sleep;
         DayNightDirector director;
         VisualElement hud, healthRow, staminaRow, readouts, healthFill, staminaFill, flash, gameOver;
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
         RadialGauge hungerGauge, thirstGauge, fatigueGauge;
         VisualElement interaction;
-        Label interactionName, interactionAction, encumbered, toast;
+        Label interactionName, interactionAction, toast;
         RadialGauge interactionProgress;
         Interactable shownInteractable;
         string shownAction, interactKeys;
@@ -80,9 +82,10 @@ namespace DeadCounty.Player
             deathFlow = GetComponent<PlayerDeathFlow>();
             interactor = GetComponentInChildren<PlayerInteractor>(true);
             inventory = GetComponentInChildren<PlayerInventory>(true);
+            sleep = GetComponentInChildren<PlayerSleep>(true);
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null || needs == null || interactor == null || inventory == null)
-                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor and a PlayerInventory in its children");
+            if (health == null || stamina == null || needs == null || interactor == null || inventory == null || sleep == null)
+                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerInventory and a PlayerSleep in its children");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -108,7 +111,6 @@ namespace DeadCounty.Player
             interaction = Find<VisualElement>(root, "interaction");
             interactionName = Find<Label>(root, "interaction-name");
             interactionAction = Find<Label>(root, "interaction-action");
-            encumbered = Find<Label>(root, "encumbered");
             toast = Find<Label>(root, "loot-toast");
             interactionProgress = Find<RadialGauge>(root, "interaction-progress");
             interactKeys = InputPrompts.Keys("Player/Interact");
@@ -140,12 +142,14 @@ namespace DeadCounty.Player
         {
             health.Damaged += OnDamaged;
             inventory.Received += OnReceived;
+            sleep.WokeUp += ShowToast;
         }
 
         void OnDisable()
         {
             health.Damaged -= OnDamaged;
             inventory.Received -= OnReceived;
+            sleep.WokeUp -= ShowToast;
         }
 
         void OnReceived(IReadOnlyList<ItemStack> items)
@@ -157,7 +161,12 @@ namespace DeadCounty.Player
                 text.Append(i == 0 ? "Trouvé : " : ", ").Append(items[i].Item.DisplayName);
                 if (items[i].Count > 1) text.Append(" ×").Append(items[i].Count);
             }
-            toast.text = text.ToString();
+            ShowToast(text.ToString());
+        }
+
+        void ShowToast(string message)
+        {
+            toast.text = message;
             toastUntil = Time.time + ToastShowTime;
         }
 
@@ -206,7 +215,6 @@ namespace DeadCounty.Player
             UpdateNeed(hungerNeed, hungerGauge, ref hungerOpacity, needsModel.Hunger, alive, readoutsShown, dt);
             UpdateNeed(thirstNeed, thirstGauge, ref thirstOpacity, needsModel.Thirst, alive, readoutsShown, dt);
             UpdateNeed(fatigueNeed, fatigueGauge, ref fatigueOpacity, needsModel.Fatigue, alive, readoutsShown, dt);
-            encumbered.style.display = alive && inventory.Items.Overloaded ? DisplayStyle.Flex : DisplayStyle.None;
             Fade(toast, ref toastOpacity, alive && now < toastUntil, dt);
 
             flashValue = Mathf.Max(flashValue - dt / hitFlashTime, 0f);

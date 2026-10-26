@@ -1868,6 +1868,7 @@ GameObject:
   - component: {fileID: 9131007080392847135}
   - component: {fileID: 6630331365674300}
   - component: {fileID: 5654377057039098411}
+  - component: {fileID: 107859788260795814}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2055,6 +2056,8 @@ MonoBehaviour:
   knockbackDuration: 0.12
   staggerTime: 0.4
   staggerSpeedFactor: 0.4
+  bleedChance: 0.25
+  bleedDamagePerSecond: 0.5
 --- !u!114 &5878281340476389133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2116,6 +2119,8 @@ MonoBehaviour:
     StarvingDamagePerMinute: 33.333332
     DehydratedDamagePerMinute: 50
     ExhaustedStaminaCapacity: 0.5
+    RestMinutes: 3.3333333
+    SleepDrainFactor: 0.5
   exhaustionVolume: {fileID: 8573854563993322308}
 --- !u!114 &6630331365674300
 MonoBehaviour:
@@ -2151,6 +2156,24 @@ MonoBehaviour:
     Count: 1
   - Item: {fileID: 11400000, guid: a43dd927d28f04d8dab835ffe024928e, type: 2}
     Count: 1
+--- !u!114 &107859788260795814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c00961020c6d34851a7be10d80783981, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerSleep
+  timeScale: 20
+  sleepBelow: 0.5
+  healPerSecond: 0.2
+  wakeHour: 7
+  wakeNoiseRadius: 10
+  wakeZombieDistance: 6
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0
@@ -2598,6 +2621,7 @@ GameObject:
   - component: {fileID: 5721207825746083105}
   - component: {fileID: 5512533205525538230}
   - component: {fileID: 4494367367221273902}
+  - component: {fileID: 5611527466603091663}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -2708,6 +2732,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e238b165a2f4542e2b9e0e79f974171b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerInventoryScreen
+--- !u!114 &5611527466603091663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85d8ca3f740e048da8326964866d71e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerConditionHud
 --- !u!1 &6092803171642249547
 GameObject:
   m_ObjectHideFlags: 0

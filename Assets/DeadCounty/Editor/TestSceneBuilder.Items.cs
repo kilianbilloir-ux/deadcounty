@@ -45,6 +45,8 @@ namespace DeadCounty.EditorTools
                 item.Thirst = spec.Thirst;
                 item.Health = spec.Health;
                 item.CapacityBonus = spec.Capacity;
+                // The bandage, the only care item of the demo, stops bleeding (GDD 8.4).
+                item.StopsBleeding = spec.Category == ItemCategory.Medical;
                 EditorUtility.SetDirty(item);
                 items[spec.File] = item;
             }
