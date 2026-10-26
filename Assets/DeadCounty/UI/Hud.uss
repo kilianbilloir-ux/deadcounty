@@ -1,0 +1,103 @@
+/* Prototype HUD: desaturated palette, one accent (sodium) and one danger colour (dried blood). */
+.root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-grow: 1;
+}
+
+.hit-flash {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(133, 20, 14);
+    opacity: 0;
+}
+
+.hud {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding-left: 28px;
+    padding-bottom: 28px;
+    padding-top: 28px;
+    padding-right: 28px;
+    align-items: flex-start;
+}
+
+.bars {
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.bar-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.bar-label {
+    width: 76px;
+    margin-right: 8px;
+    -unity-text-align: middle-right;
+    font-size: 12px;
+    color: rgb(180, 188, 201);
+}
+
+.bar-frame {
+    width: 220px;
+    height: 12px;
+    background-color: rgba(26, 29, 34, 0.55);
+    border-width: 1px;
+    border-color: rgba(212, 185, 118, 0.35);
+}
+
+.bar-fill {
+    width: 50%;
+    height: 100%;
+}
+
+.health-fill {
+    background-color: rgb(167, 95, 59);
+}
+
+.stamina-fill {
+    background-color: rgb(212, 185, 118);
+}
+
+.stamina-row {
+    height: 6px;
+}
+
+.stamina-row .bar-frame {
+    height: 6px;
+}
+
+.readouts {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.readout {
+    font-size: 13px;
+    margin-right: 14px;
+    color: rgb(138, 143, 150);
+}
+
+.lamp-readout {
+    color: rgb(212, 185, 118);
+    opacity: 0.45;
+}
+
+.lamp-readout--on {
+    opacity: 1;
+}
+
+.time-readout {
+    color: rgb(180, 188, 201);
+}

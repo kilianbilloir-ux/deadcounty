@@ -27,6 +27,7 @@ namespace DeadCounty.Player
         PlayerHealth health;
         PlayerStamina stamina;
         ProceduralHumanoidAnimator animator;
+        InputAction jump;
         Transform model;
         Vector3 spawnPosition, collapseStartPosition;
         Quaternion spawnRotation, collapseStartRotation;
@@ -44,6 +45,7 @@ namespace DeadCounty.Player
             health = Require<PlayerHealth>();
             stamina = Require<PlayerStamina>();
             animator = Require<ProceduralHumanoidAnimator>();
+            jump = InputSystem.actions.FindAction("Player/Jump", true);
             model = controller.transform.Find("Model");
             if (model == null) throw new InvalidOperationException($"'{controller.name}' has no 'Model' child to collapse");
         }
@@ -90,7 +92,7 @@ namespace DeadCounty.Player
                 Vector3.Lerp(collapseStartPosition, Vector3.up * lyingLift, t),
                 Quaternion.Slerp(collapseStartRotation, Quaternion.Euler(lyingAngle, 0f, 0f), t));
 
-            if (elapsed >= restartDelay && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) Respawn();
+            if (elapsed >= restartDelay && jump.WasPressedThisFrame()) Respawn();
         }
 
         void Respawn()
@@ -134,7 +136,7 @@ namespace DeadCounty.Player
             GUI.Label(new Rect(0f, centerY - 50f, Screen.width, 60f), "Vous êtes mort", titleStyle);
             GUI.Label(new Rect(0f, centerY + 10f, Screen.width, 30f), survivedText, lineStyle);
             if (Time.time - deathTime >= restartDelay)
-                GUI.Label(new Rect(0f, centerY + 60f, Screen.width, 30f), "[Espace] Recommencer", lineStyle);
+                    GUI.Label(new Rect(0f, centerY + 60f, Screen.width, 30f), "[Espace / A] Recommencer", lineStyle);
         }
 
         // Domain reload is disabled on entering Play mode, so subscribers from the previous session must be dropped by hand.

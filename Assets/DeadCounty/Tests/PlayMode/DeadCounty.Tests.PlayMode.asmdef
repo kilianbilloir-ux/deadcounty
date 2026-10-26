@@ -4,7 +4,9 @@
     "references": [
         "DeadCounty.Runtime",
         "Unity.AI.Navigation",
-        "UnityEngine.TestRunner"
+        "Unity.InputSystem",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
