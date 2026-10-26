@@ -50,8 +50,6 @@ namespace DeadCounty.World
         float angle, targetAngle, swingSpeed, push, pushSide;
         float lastPushTime = float.NegativeInfinity;
 
-        public static IReadOnlyList<Door> All => all;
-
         public Doorway Doorway { get; private set; }
         // Source id of the door's noises.
         public int SourceId { get; private set; }
