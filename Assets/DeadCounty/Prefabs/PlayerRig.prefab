@@ -2537,7 +2537,6 @@ GameObject:
   - component: {fileID: 3012412907313332803}
   - component: {fileID: 2922239359997387129}
   - component: {fileID: 5939641845900695887}
-  - component: {fileID: 5259575293262474391}
   - component: {fileID: 5721207825746083105}
   - component: {fileID: 5512533205525538230}
   m_Layer: 0
@@ -2576,7 +2575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56b373e87f0174826a2cd4079491edf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeadCounty.Player.PlayerDebugOverlay
-  visible: 1
+  visible: 0
 --- !u!114 &5939641845900695887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2596,25 +2595,6 @@ MonoBehaviour:
   fadeOutTime: 0.6
   lyingAngle: 88
   lyingLift: 0.12
---- !u!114 &5259575293262474391
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5789988712029122297}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6065cbb8ba1b4de5bc1dcea633aab18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerHud
-  margin: 20
-  healthWidth: 220
-  healthHeight: 12
-  staminaWidth: 140
-  staminaHeight: 5
-  hitFlashTime: 0.3
-  hitFlashAlpha: 0.35
 --- !u!114 &5721207825746083105
 MonoBehaviour:
   m_ObjectHideFlags: 0
