@@ -1,5 +1,4 @@
 using System.Reflection;
-using DeadCounty.Perception;
 using DeadCounty.Player;
 using NUnit.Framework;
 using UnityEditor;
@@ -10,45 +9,40 @@ namespace DeadCounty.Tests
 {
     public class PlayerFlashlightTests
     {
-        const string RigPath = "Assets/DeadCounty/Prefabs/PlayerRig.prefab";
         const string ActionsPath = "Assets/InputSystem_Actions.inputactions";
 
         static void RunAwake(Component component) =>
             component.GetType().GetMethod("Awake", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Invoke(component, null);
 
+        // The flashlight owns the state; the spot and what zombies perceive follow it.
         [Test]
-        public void SetOnSyncsFlagAndSpot()
+        public void SpotAndPerceptionFollowTheSwitch()
         {
             var previous = InputSystem.actions;
             InputSystem.actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ActionsPath);
-            GameObject player = null;
-            GameObject spotGo = null;
+            var player = new GameObject("TestPlayer");
+            var spotObject = new GameObject("TestSpot");
             try
             {
-                player = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(RigPath));
-                var target = player.GetComponentInChildren<PerceptionTarget>();
-                var flash = target.gameObject.AddComponent<PlayerFlashlight>();
-                spotGo = new GameObject("TestSpot");
-                var spot = spotGo.AddComponent<Light>();
-                flash.Configure(spot, false);
-                RunAwake(flash);
+                var spot = spotObject.AddComponent<Light>();
+                var flashlight = player.AddComponent<PlayerFlashlight>();
+                flashlight.Configure(spot, false);
+                var target = player.AddComponent<PerceptionTarget>();
+                RunAwake(flashlight);
+                RunAwake(target);
+                Assert.That(spot.enabled || target.FlashlightOn, Is.False, "starts off");
 
-                flash.SetOn(true);
-                Assert.That(target.FlashlightOn, Is.True);
-                Assert.That(spot.enabled, Is.True);
-                Assert.That(flash.IsOn, Is.True);
+                flashlight.SetOn(true);
+                Assert.That(flashlight.IsOn && spot.enabled && target.FlashlightOn, Is.True);
 
-                flash.SetOn(false);
-                Assert.That(target.FlashlightOn, Is.False);
-                Assert.That(spot.enabled, Is.False);
-                Assert.That(flash.IsOn, Is.False);
+                flashlight.SetOn(false);
+                Assert.That(flashlight.IsOn || spot.enabled || target.FlashlightOn, Is.False);
             }
             finally
             {
-                if (player != null) Object.DestroyImmediate(player);
-                if (spotGo != null) Object.DestroyImmediate(spotGo);
+                Object.DestroyImmediate(player);
+                Object.DestroyImmediate(spotObject);
                 InputSystem.actions = previous;
-                NoiseSystem.ResetStatics();
             }
         }
     }

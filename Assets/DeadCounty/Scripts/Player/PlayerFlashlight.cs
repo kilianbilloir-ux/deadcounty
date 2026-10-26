@@ -3,18 +3,16 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Player flashlight: toggles the headlamp and the target's FlashlightOn flag the zombies read.
+    // Player flashlight: toggles the headlamp; zombies read it through PerceptionTarget.FlashlightOn.
     // A dumb switch on purpose: being seen from 25 m at night is the whole risk/reward.
-    [RequireComponent(typeof(PerceptionTarget))]
     public class PlayerFlashlight : MonoBehaviour
     {
         [SerializeField] Light spot;
         [SerializeField] bool startOn;
 
-        PerceptionTarget target;
-        InputAction flashlight;
+        InputAction toggle;
 
-        public bool IsOn => target != null && target.FlashlightOn;
+        public bool IsOn { get; private set; }
 
         // Code-built setup: call on the inactive GameObject before its first activation.
         public void Configure(Light spotLight, bool on)
@@ -25,19 +23,18 @@ namespace DeadCounty.Player
 
         void Awake()
         {
-            target = GetComponent<PerceptionTarget>();
-            flashlight = InputSystem.actions.FindAction("Player/Flashlight", true);
+            toggle = InputSystem.actions.FindAction("Player/Flashlight", true);
             SetOn(startOn);
         }
 
         void Update()
         {
-            if (flashlight.WasPressedThisFrame()) SetOn(!target.FlashlightOn);
+            if (toggle.WasPressedThisFrame()) SetOn(!IsOn);
         }
 
         public void SetOn(bool on)
         {
-            target.FlashlightOn = on;
+            IsOn = on;
             if (spot != null) spot.enabled = on;
         }
     }
