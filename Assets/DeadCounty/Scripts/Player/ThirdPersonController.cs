@@ -101,6 +101,13 @@ namespace DeadCounty.Player
         public bool Controllable => InputEnabled && !menuOpen && !Resting;
         // Carrying more than the inventory capacity (GDD 8.5).
         public bool Encumbered { get; set; }
+        // Options menu settings.
+        public float MouseSensitivity
+        {
+            get => mouseSensitivity;
+            set => mouseSensitivity = value;
+        }
+        public bool InvertLook { get; set; }
         // Actual horizontal velocity of the last move, after collisions.
         public Vector3 Velocity { get; private set; }
         // Increases on every Teleport so animators can snap instead of blending across the warp.
@@ -180,7 +187,7 @@ namespace DeadCounty.Player
             // Mouse delta is already per frame; stick values are a rate and need deltaTime.
             delta *= look.activeControl?.device is Pointer ? mouseSensitivity : stickSpeed * Time.deltaTime;
             yaw += delta.x;
-            pitch = Mathf.Clamp(pitch - delta.y, minPitch, maxPitch);
+            pitch = Mathf.Clamp(pitch + (InvertLook ? delta.y : -delta.y), minPitch, maxPitch);
         }
 
         void Move()
