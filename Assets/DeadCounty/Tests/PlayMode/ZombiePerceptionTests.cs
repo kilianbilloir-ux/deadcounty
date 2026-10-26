@@ -88,6 +88,23 @@ namespace DeadCounty.Tests
             Assert.That(alert.Reason, Is.EqualTo(TransitionReason.SawTarget));
         }
 
+        [UnityTest]
+        public IEnumerator WeakerNoiseInLaterSenseStillCounts()
+        {
+            var zombie = SpawnListener();
+            yield return ZombieTestWorld.Settle(zombie);
+
+            var t = Time.time;
+            NoiseSystem.Emit(new Vector3(8f, 0f, 0f), SprintNoise, NoiseKind.Footstep, NoiseSource);
+            zombie.Sense(World.Target, t);
+            NoiseSystem.Emit(new Vector3(4f, 0f, 0f), 5f, NoiseKind.Footstep, NoiseSource);
+            zombie.Sense(World.Target, t + 0.05f);
+            zombie.Think(ZombieTestWorld.FrameTime);
+
+            Assert.That(zombie.Perception.HeardNoise, Is.True);
+            Assert.That(zombie.Perception.NoisePosition.x, Is.EqualTo(4f).Within(1e-3f));
+        }
+
         // The target stands behind the zombie and is invisible, so only the noise can reach it.
         ZombieAgent SpawnListener()
         {

@@ -42,6 +42,7 @@ namespace DeadCounty.Core
 
         public StaminaModel(StaminaSettings settings)
         {
+            if (!float.IsFinite(settings.Max) || settings.Max <= 0f) throw new ArgumentOutOfRangeException(nameof(settings.Max), settings.Max, "StaminaModel needs a positive finite Max");
             this.settings = settings;
             Reset();
         }
