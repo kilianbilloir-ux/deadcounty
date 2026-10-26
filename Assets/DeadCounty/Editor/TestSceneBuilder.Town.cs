@@ -36,11 +36,11 @@ namespace DeadCounty.EditorTools
             var lamps = Group(parent, "Lampadaires");
             for (var z = 14f; z <= 114f; z += 25f)
             {
-                StreetLamp(lamps, new Vector3(MainStreetX - 5.6f, 0f, z), 90f);
-                StreetLamp(lamps, new Vector3(MainStreetX + 5.6f, 0f, z + 12.5f), -90f);
+                BuiltLamps.Add(StreetLamp(lamps, new Vector3(MainStreetX - 5.6f, 0f, z), 90f));
+                BuiltLamps.Add(StreetLamp(lamps, new Vector3(MainStreetX + 5.6f, 0f, z + 12.5f), -90f));
             }
-            StreetLamp(lamps, new Vector3(MainStreetX - 5.6f, 0f, -22f), 90f);
-            StreetLamp(lamps, new Vector3(MainStreetX + 5.6f, 0f, -34f), -90f);
+            BuiltLamps.Add(StreetLamp(lamps, new Vector3(MainStreetX - 5.6f, 0f, -22f), 90f));
+            BuiltLamps.Add(StreetLamp(lamps, new Vector3(MainStreetX + 5.6f, 0f, -34f), -90f));
         }
 
         // Residential lot around a house: driveway, garage, mailbox, fenced backyard with random yard props.

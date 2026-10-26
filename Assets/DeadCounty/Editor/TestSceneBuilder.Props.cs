@@ -197,23 +197,23 @@ namespace DeadCounty.EditorTools
         }
 
         // Street lamp whose arm points along the local +Z.
-        static void StreetLamp(Transform parent, Vector3 basePos, float yaw)
+        static Light StreetLamp(Transform parent, Vector3 basePos, float yaw)
         {
             var lamp = Group(parent, "Lampadaire", basePos, yaw);
             Post("Mat", lamp, Vector3.zero, 6.5f, 0.1f, "Metal");
             Box("Bras", lamp, new Vector3(0f, 6.4f, 0.9f), new Vector3(0.08f, 0.08f, 1.8f), "Metal", solid: false);
             Box("Tete", lamp, new Vector3(0f, 6.3f, 1.7f), new Vector3(0.35f, 0.12f, 0.6f), "LampGlow", solid: false);
-            SpotLight(lamp, "Lumiere_Sodium", new Vector3(0f, 6.2f, 1.7f), Quaternion.Euler(90f, 0f, 0f), new Color(1f, 0.78f, 0.45f), 12f, 16f, 120f, false);
+            return SpotLight(lamp, "Lumiere_Sodium", new Vector3(0f, 6.2f, 1.7f), Quaternion.Euler(90f, 0f, 0f), new Color(1f, 0.78f, 0.45f), 12f, 16f, 120f, false);
         }
 
-        static void Floodlight(Transform parent, Vector3 basePos, Vector3 target)
+        static Light Floodlight(Transform parent, Vector3 basePos, Vector3 target)
         {
             var mast = Group(parent, "Projecteur", basePos);
             Post("Mat", mast, Vector3.zero, 10f, 0.15f, "Metal");
             var head = mast.position + Vector3.up * 10f;
             var rot = Quaternion.LookRotation(target - head);
             Box("Tete", mast, Vector3.up * 10f, new Vector3(1.2f, 0.7f, 0.3f), "PanelGlow", rot, solid: false);
-            SpotLight(mast, "Lumiere", Vector3.up * 10f, rot, new Color(0.92f, 0.95f, 1f), 25f, 70f, 75f, true);
+            return SpotLight(mast, "Lumiere", Vector3.up * 10f, rot, new Color(0.92f, 0.95f, 1f), 25f, 70f, 75f, true);
         }
     }
 }
