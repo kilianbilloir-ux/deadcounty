@@ -11,14 +11,15 @@ using Object = UnityEngine.Object;
 namespace DeadCounty.Tests
 {
     // The generated player rig prefab on a bare floor, destroyed after each test so no second player leaks into
-    // the next one. Virtual devices drive the project-wide actions; keyboard events reach the game even while
-    // the Game view is unfocused.
+    // the next one. Virtual devices drive the project-wide actions; their events reach the game even while the
+    // Game view or the whole editor is unfocused.
     public abstract class PlayerRigTests
     {
         const string RigPath = "Assets/DeadCounty/Prefabs/PlayerRig.prefab";
 
         GameObject ground;
         InputSettings.EditorInputBehaviorInPlayMode savedEditorInput;
+        InputSettings.BackgroundBehavior savedBackground;
 
         private protected GameObject Rig;
         private protected PlayerHealth Health;
@@ -31,6 +32,9 @@ namespace DeadCounty.Tests
         {
             savedEditorInput = InputSystem.settings.editorInputBehaviorInPlayMode;
             InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            // Otherwise an editor in the background disables the virtual devices along with the real ones.
+            savedBackground = InputSystem.settings.backgroundBehavior;
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
             Keyboard = InputSystem.AddDevice<Keyboard>("TestKeyboard");
             Gamepad = InputSystem.AddDevice<Gamepad>("TestGamepad");
 
@@ -51,6 +55,7 @@ namespace DeadCounty.Tests
             InputSystem.RemoveDevice(Keyboard);
             InputSystem.RemoveDevice(Gamepad);
             InputSystem.settings.editorInputBehaviorInPlayMode = savedEditorInput;
+            InputSystem.settings.backgroundBehavior = savedBackground;
             yield return null;
         }
 
