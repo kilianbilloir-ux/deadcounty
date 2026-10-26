@@ -19,6 +19,7 @@ namespace DeadCounty.Items
         [Range(0f, 1f)] public float Hunger;
         [Range(0f, 1f)] public float Thirst;
         [Min(0f)] public float Health;
+        public bool StopsBleeding;
 
         [Tooltip("Carrying capacity added while the item is carried (backpack), in kg; only the largest counts.")]
         [Min(0f)] public float CapacityBonus;

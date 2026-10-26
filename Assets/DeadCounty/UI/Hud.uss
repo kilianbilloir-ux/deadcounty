@@ -182,12 +182,53 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.encumbered {
-    font-size: 16px;
-    margin-bottom: 8px;
+.statuses {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    align-items: flex-end;
+}
+
+/* Afflictions on the right, after The Long Dark; only the active ones show (GDD 8.4, moodles). */
+.status {
+    font-size: 14px;
     -unity-font-style: bold;
-    color: rgb(167, 95, 59);
+    color: rgb(217, 217, 217);
+    padding: 4px 10px;
+    margin-bottom: 6px;
+    background-color: rgba(26, 29, 34, 0.75);
+    border-right-width: 3px;
+    border-color: rgb(212, 185, 118);
     display: none;
+}
+
+.status--danger {
+    border-color: rgb(167, 95, 59);
+    color: rgb(230, 170, 140);
+}
+
+.sleep {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(5, 6, 8);
+    opacity: 0;
+    display: none;
+}
+
+.sleep-title {
+    font-size: 28px;
+    color: rgb(180, 188, 201);
+    margin-bottom: 10px;
+}
+
+.sleep-time {
+    font-size: 20px;
+    color: rgb(138, 143, 150);
 }
 
 .inventory {

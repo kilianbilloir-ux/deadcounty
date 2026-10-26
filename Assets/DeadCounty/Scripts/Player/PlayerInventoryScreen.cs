@@ -114,8 +114,8 @@ namespace DeadCounty.Player
 
         void Update()
         {
-            // Dead or on the death screen: no inventory.
-            if (!health.IsAlive || !controller.InputEnabled)
+            // Dead, on the death screen or asleep: no inventory.
+            if (!health.IsAlive || !controller.InputEnabled || controller.Resting)
             {
                 if (IsOpen) SetOpen(false);
                 return;
@@ -252,6 +252,7 @@ namespace DeadCounty.Player
             if (item.Hunger > 0f) text.Append(" · Faim +").Append(Mathf.RoundToInt(item.Hunger * 100f));
             if (item.Thirst > 0f) text.Append(" · Soif +").Append(Mathf.RoundToInt(item.Thirst * 100f));
             if (item.Health > 0f) text.Append(" · Santé +").Append(Mathf.RoundToInt(item.Health));
+            if (item.StopsBleeding) text.Append(" · Arrête le saignement");
             if (item.CapacityBonus > 0f) text.Append(" · Capacité +").Append(item.CapacityBonus.ToString("0.#", French)).Append(" kg");
             return text.ToString();
         }

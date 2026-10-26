@@ -1,3 +1,4 @@
+using DeadCounty.Player;
 using UnityEngine;
 
 namespace DeadCounty.EditorTools
@@ -128,7 +129,7 @@ namespace DeadCounty.EditorTools
             foreach (var (x, z) in new[] { (3.1f, 7.2f), (4.1f, 7.2f), (3.1f, 8.8f), (4.1f, 8.8f) })
                 Box("Chaise", f, new Vector3(x, 0.23f, z), new Vector3(0.45f, 0.46f, 0.45f), "Wood", solid: false);
             // Bedroom (x 7..12, z 5.5..10)
-            Box("Lit", f, new Vector3(10.5f, 0.25f, 8.5f), new Vector3(1.6f, 0.5f, 2.1f), "Furniture");
+            Box("Lit", f, new Vector3(10.5f, 0.25f, 8.5f), new Vector3(1.6f, 0.5f, 2.1f), "Furniture").AddComponent<Bed>();
             Box("Matelas", f, new Vector3(10.5f, 0.55f, 8.5f), new Vector3(1.5f, 0.15f, 2f), "Mattress", solid: false);
             Searchable(Box("Armoire", f, new Vector3(11.65f, 1f, 6.15f), new Vector3(0.6f, 2f, 1f), "Furniture"), "Armoire", "LT_Chambre");
             Searchable(Box("Commode", f, new Vector3(8.2f, 0.45f, 9.65f), new Vector3(1.2f, 0.9f, 0.45f), "Furniture"), "Commode", "LT_Chambre");

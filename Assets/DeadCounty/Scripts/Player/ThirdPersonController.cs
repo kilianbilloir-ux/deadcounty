@@ -95,8 +95,10 @@ namespace DeadCounty.Player
                 SetCursorLocked(!value);
             }
         }
+        // Asleep in a bed: the player lies still.
+        public bool Resting { get; set; }
         // Movement, jump, crouch and interaction input are read.
-        public bool Controllable => InputEnabled && !menuOpen;
+        public bool Controllable => InputEnabled && !menuOpen && !Resting;
         // Carrying more than the inventory capacity (GDD 8.5).
         public bool Encumbered { get; set; }
         // Actual horizontal velocity of the last move, after collisions.
