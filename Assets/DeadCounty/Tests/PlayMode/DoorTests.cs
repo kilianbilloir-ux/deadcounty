@@ -11,16 +11,19 @@ namespace DeadCounty.Tests
     // One door with its hinge at (-0.5, 0, 0): the opening is centred on the origin along X, its normal is -Z.
     public class DoorTests
     {
-        static readonly Vector3 User = new(0f, 0f, -1f);
+        static readonly Vector3 UserSide = new(0f, 0f, -1f);
         static readonly Vector3 OtherSide = new(0f, 0f, 1f);
 
         Door door;
         GameObject blocker;
+        Transform user;
 
         [UnitySetUp]
         public IEnumerator SetUpDoor()
         {
             door = TestDoor.Create(new Vector3(-0.5f, 0f, 0f), 90f);
+            user = new GameObject("TestUser").transform;
+            user.position = UserSide;
             yield return null;
         }
 
@@ -28,6 +31,7 @@ namespace DeadCounty.Tests
         public IEnumerator TearDownDoor()
         {
             Object.Destroy(door.gameObject);
+            Object.Destroy(user.gameObject);
             if (blocker != null) Object.Destroy(blocker);
             yield return null;
         }
@@ -46,7 +50,7 @@ namespace DeadCounty.Tests
         {
             Assert.That(door.IsShut);
             Assert.That(door.Action, Is.EqualTo("Ouvrir"));
-            door.Interact(User, false);
+            door.Interact(user, false);
             Assert.That(LatestNoise().Radius, Is.EqualTo(3f));
             yield return new WaitForSeconds(0.7f);
             Assert.That(door.IsShut, Is.False);
@@ -54,7 +58,7 @@ namespace DeadCounty.Tests
             Assert.That(LeafCenter.z, Is.GreaterThan(0.3f), "the leaf swung toward the user");
             Assert.That(door.Action, Is.EqualTo("Fermer"));
 
-            door.Interact(User, false);
+            door.Interact(user, false);
             yield return new WaitForSeconds(0.7f);
             Assert.That(door.Angle, Is.EqualTo(0f).Within(0.01f));
             Assert.That(door.IsShut);
@@ -63,7 +67,8 @@ namespace DeadCounty.Tests
         [UnityTest]
         public IEnumerator SprintingSlamsTheDoorFastAndLoud()
         {
-            door.Interact(OtherSide, true);
+            user.position = OtherSide;
+            door.Interact(user, true);
             var noise = LatestNoise();
             Assert.That(noise.Radius, Is.EqualTo(12f));
             Assert.That(noise.Kind, Is.EqualTo(NoiseKind.Door));
@@ -74,20 +79,20 @@ namespace DeadCounty.Tests
         [UnityTest]
         public IEnumerator ClosingWaitsForAClearDoorway()
         {
-            door.Interact(User, false);
+            door.Interact(user, false);
             yield return new WaitForSeconds(0.7f);
             blocker = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             blocker.layer = GameLayers.Zombie;
             blocker.transform.position = new Vector3(0f, 1f, 0.1f);
             Physics.SyncTransforms();
-            door.Interact(User, false);
+            door.Interact(user, false);
             yield return new WaitForSeconds(0.7f);
             Assert.That(door.IsShut, Is.False, "closed on a zombie standing in the doorway");
 
             Object.Destroy(blocker);
             yield return null;
             Physics.SyncTransforms();
-            door.Interact(User, false);
+            door.Interact(user, false);
             yield return new WaitForSeconds(0.7f);
             Assert.That(door.IsShut);
         }
