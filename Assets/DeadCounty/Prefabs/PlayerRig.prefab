@@ -2622,6 +2622,7 @@ GameObject:
   - component: {fileID: 5512533205525538230}
   - component: {fileID: 4494367367221273902}
   - component: {fileID: 5611527466603091663}
+  - component: {fileID: 6887185709559769939}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -2744,6 +2745,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85d8ca3f740e048da8326964866d71e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerConditionHud
+--- !u!114 &6887185709559769939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2bc766b4c279486dac48ff832f9989e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PauseMenu
 --- !u!1 &6092803171642249547
 GameObject:
   m_ObjectHideFlags: 0
