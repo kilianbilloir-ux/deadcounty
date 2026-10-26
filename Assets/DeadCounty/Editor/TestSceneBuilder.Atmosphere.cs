@@ -24,10 +24,10 @@ namespace DeadCounty.EditorTools
             RenderSettings.sun = sun;
             // Idempotent: Build starts from an empty scene, but a second call must not stack a Director.
             // Picks RenderSettings.sun up in Awake; hour and length stay tweakable on the component.
-            if (Object.FindFirstObjectByType<DayNightDirector>() == null)
+            if (Object.FindAnyObjectByType<DayNightDirector>() == null)
                 new GameObject("DayNight").AddComponent<DayNightDirector>();
             // Same pattern for the night lamps: all spots built above, toggled by NightFactor.
-            if (Object.FindFirstObjectByType<NightLampController>() == null)
+            if (Object.FindAnyObjectByType<NightLampController>() == null)
             {
                 var nightLights = new GameObject("Eclairage_Nuit");
                 nightLights.SetActive(false);
