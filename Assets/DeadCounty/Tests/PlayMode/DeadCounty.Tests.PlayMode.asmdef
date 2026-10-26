@@ -5,6 +5,7 @@
         "DeadCounty.Runtime",
         "Unity.AI.Navigation",
         "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Runtime",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

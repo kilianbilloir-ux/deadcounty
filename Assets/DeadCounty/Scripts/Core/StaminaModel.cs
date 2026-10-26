@@ -39,6 +39,7 @@ namespace DeadCounty.Core
     {
         readonly StaminaSettings settings;
         float sinceCost;
+        float capacity;
 
         public StaminaModel(StaminaSettings settings)
         {
@@ -69,8 +70,8 @@ namespace DeadCounty.Core
             sinceCost += dt;
             // Only the part of the frame past the delay regenerates, so the result does not depend on the frame rate.
             var regenTime = Mathf.Min(dt, sinceCost - settings.RegenDelay);
-            if (regenTime > 0f) Current = Mathf.Min(Current + regenRate * regenTime, settings.Max);
-            if (Exhausted && Current >= settings.ExhaustionRecoverThreshold) Exhausted = false;
+            if (regenTime > 0f) Current = Mathf.Min(Current + regenRate * regenTime, capacity);
+            if (Exhausted && Current >= Mathf.Min(settings.ExhaustionRecoverThreshold, capacity)) Exhausted = false;
         }
 
         public bool TryJump()
@@ -80,8 +81,16 @@ namespace DeadCounty.Core
             return true;
         }
 
+        // Share of Max that stamina can reach (fatigue lowers it); anything above is lost at once.
+        public void SetCapacity(float share)
+        {
+            capacity = Mathf.Clamp01(share) * settings.Max;
+            Current = Mathf.Min(Current, capacity);
+        }
+
         public void Reset()
         {
+            capacity = settings.Max;
             Current = settings.Max;
             Exhausted = false;
             sinceCost = settings.RegenDelay;
