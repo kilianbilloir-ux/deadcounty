@@ -1,6 +1,8 @@
 using System;
 using System.Text;
+using System.Collections.Generic;
 using DeadCounty.Core;
+using DeadCounty.Items;
 using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
@@ -11,10 +13,11 @@ namespace DeadCounty.Player
     // UI Toolkit HUD, nearly absent while all is well (GDD 8.11): each need gauge shows once the need is half
     // empty and takes the danger colour when low, the health bar shows while not full or just after a hit and
     // takes the danger colour when low, the stamina bar shows while not full and blinks when exhausted, the
-    // flashlight and clock readouts show for a few seconds when they change, with the need gauges. Also draws the
-    // hit flash and the game over screen from PlayerDeathFlow. The only allocations are the clock and survival
-    // time strings when they change. The interaction prompt sits next to what the player can use, its name
-    // above the key and the action (GDD 8.11, after Valheim); "Surchargé" shows while the inventory is too heavy.
+    // flashlight and clock readouts show for a few seconds when they change, with the need gauges. The
+    // interaction prompt sits next to what the player can use, its name above the key and the action (GDD 8.11,
+    // after Valheim), with a ring filling through a search; what was found shows for a moment below the middle of
+    // the screen; "Surchargé" shows while the inventory is too heavy. Also draws the hit flash and the game over
+    // screen from PlayerDeathFlow. The only allocations are texts rebuilt when they change.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -27,6 +30,7 @@ namespace DeadCounty.Player
         // Prompt offset from the projected interaction point, in panel pixels.
         const float PromptOffsetX = 16f;
         const float PromptOffsetY = -22f;
+        const float ToastShowTime = 3f;
 
         [SerializeField] PanelSettings panelSettings;
         [SerializeField] VisualTreeAsset hudLayout;
@@ -47,14 +51,15 @@ namespace DeadCounty.Player
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
         RadialGauge hungerGauge, thirstGauge, fatigueGauge;
         VisualElement interaction;
-        Label interactionName, interactionAction, encumbered;
+        Label interactionName, interactionAction, encumbered, toast;
+        RadialGauge interactionProgress;
         Interactable shownInteractable;
         string shownAction, interactKeys;
         Label flashlightLabel, time, gameOverTitle, gameOverTime, gameOverPrompt;
         StringBuilder text;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
         float healthOpacity, staminaOpacity, readoutOpacity, readoutsUntil;
-        float hungerOpacity, thirstOpacity, fatigueOpacity;
+        float hungerOpacity, thirstOpacity, fatigueOpacity, toastOpacity, toastUntil;
         int day = -1, hour = -1, minute = -1, phase = -1;
         bool flashlightWasOn, deathShown;
 
@@ -104,6 +109,8 @@ namespace DeadCounty.Player
             interactionName = Find<Label>(root, "interaction-name");
             interactionAction = Find<Label>(root, "interaction-action");
             encumbered = Find<Label>(root, "encumbered");
+            toast = Find<Label>(root, "loot-toast");
+            interactionProgress = Find<RadialGauge>(root, "interaction-progress");
             interactKeys = InputPrompts.Keys("Player/Interact");
             flashlightLabel = Find<Label>(root, "flashlight");
             time = Find<Label>(root, "time");
@@ -129,9 +136,30 @@ namespace DeadCounty.Player
             ShowReadouts();
         }
 
-        void OnEnable() => health.Damaged += OnDamaged;
+        void OnEnable()
+        {
+            health.Damaged += OnDamaged;
+            inventory.Received += OnReceived;
+        }
 
-        void OnDisable() => health.Damaged -= OnDamaged;
+        void OnDisable()
+        {
+            health.Damaged -= OnDamaged;
+            inventory.Received -= OnReceived;
+        }
+
+        void OnReceived(IReadOnlyList<ItemStack> items)
+        {
+            text.Clear();
+            if (items.Count == 0) text.Append("Rien trouvé");
+            for (var i = 0; i < items.Count; i++)
+            {
+                text.Append(i == 0 ? "Trouvé : " : ", ").Append(items[i].Item.DisplayName);
+                if (items[i].Count > 1) text.Append(" ×").Append(items[i].Count);
+            }
+            toast.text = text.ToString();
+            toastUntil = Time.time + ToastShowTime;
+        }
 
         void OnDamaged(PlayerHealth _) => flashValue = 1f;
 
@@ -179,6 +207,7 @@ namespace DeadCounty.Player
             UpdateNeed(thirstNeed, thirstGauge, ref thirstOpacity, needsModel.Thirst, alive, readoutsShown, dt);
             UpdateNeed(fatigueNeed, fatigueGauge, ref fatigueOpacity, needsModel.Fatigue, alive, readoutsShown, dt);
             encumbered.style.display = alive && inventory.Items.Overloaded ? DisplayStyle.Flex : DisplayStyle.None;
+            Fade(toast, ref toastOpacity, alive && now < toastUntil, dt);
 
             flashValue = Mathf.Max(flashValue - dt / hitFlashTime, 0f);
             flash.style.opacity = flashValue * hitFlashAlpha;
@@ -217,8 +246,11 @@ namespace DeadCounty.Player
                 shownInteractable = current;
                 shownAction = action;
                 interactionName.text = current.DisplayName;
-                interactionAction.text = InputPrompts.Prompt(interactKeys, action);
+                interactionAction.text = action == null ? "" : InputPrompts.Prompt(interactKeys, action);
+                interactionAction.style.display = action == null ? DisplayStyle.None : DisplayStyle.Flex;
             }
+            interactionProgress.style.display = interactor.Busy ? DisplayStyle.Flex : DisplayStyle.None;
+            if (interactor.Busy) interactionProgress.Value = interactor.UseProgress;
             var point = RuntimePanelUtils.CameraTransformWorldToPanel(interaction.panel, current.PromptPoint, view);
             interaction.style.left = point.x + PromptOffsetX;
             interaction.style.top = point.y + PromptOffsetY;

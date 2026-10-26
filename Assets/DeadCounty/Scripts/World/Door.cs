@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace DeadCounty.World
 {
-    // Hinged door in a wall opening (GDD 8.2): Interact opens it away from the player or closes it, a sprinting
-    // player slams it, zombies force it open after 5 s of pushing, several pushing together. This transform is
-    // the hinge: local +Z runs along the opening, a positive angle swings the leaf toward local +X. Closed doors
-    // are left out of the NavMesh, so paths cross them and ZombieAgent stops in front of a shut one.
+    // Hinged door in a wall opening (GDD 8.2): Interact opens it away from the player or closes it, a player in a
+    // hurry (Run or Sprint held) slams it, zombies force it open after 5 s of pushing, several pushing together.
+    // This transform is the hinge: local +Z runs along the opening, a positive angle swings the leaf toward local
+    // +X. Closed doors are left out of the NavMesh, so paths cross them and ZombieAgent stops in front of a shut one.
     public class Door : Interactable
     {
         // Past this angle zombies walk through and the door no longer blocks them.
@@ -17,7 +17,6 @@ namespace DeadCounty.World
         const float PromptHeight = 1.3f;
         const float RattleAngle = 1.5f;
         const float RattleFrequency = 40f;
-        const float RattleTime = 0.2f;
         // The doorway must be clear this far on each side for the door to close.
         const float ClearanceDepth = 0.35f;
         const int OccupantMask = (1 << GameLayers.Player) | (1 << GameLayers.Zombie);
@@ -48,7 +47,7 @@ namespace DeadCounty.World
         [SerializeField] float forcedNoise = 6f;
 
         float angle, targetAngle, swingSpeed, push, pushSide;
-        float lastPushTime = float.NegativeInfinity;
+        int lastPushFrame = -2;
 
         public Doorway Doorway { get; private set; }
         // Source id of the door's noises.
@@ -96,7 +95,7 @@ namespace DeadCounty.World
         {
             if (targetAngle != 0f) return;
             pushSide = Doorway.Side(from);
-            lastPushTime = Time.time;
+            lastPushFrame = Time.frameCount;
             push += dt;
             if (push < forceTime) return;
             push = 0f;
@@ -132,7 +131,8 @@ namespace DeadCounty.World
         {
             var dt = Time.deltaTime;
             angle = Mathf.MoveTowards(angle, targetAngle, swingSpeed * dt);
-            var pushed = Time.time - lastPushTime < RattleTime;
+            // Zombies push after this Update or before it in the same frame: a push from the last frame still counts.
+            var pushed = Time.frameCount - lastPushFrame <= 1;
             if (!pushed) push = Mathf.Max(push - forceRecovery * dt, 0f);
             // Pushed, the leaf knocks in its frame away from the zombies.
             var rattle = pushed ? -pushSide * RattleAngle * Mathf.Abs(Mathf.Sin(Time.time * RattleFrequency)) : 0f;

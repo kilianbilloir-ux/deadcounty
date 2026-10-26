@@ -124,9 +124,9 @@ namespace DeadCounty.Tests
                 yield return null;
             }
             Assert.That(door.ForceProgress, Is.EqualTo(0.6f).Within(0.02f));
-            // 0.2 s of grace after the last push, then 1 s of push lost per second.
+            // 1 s of push lost per second once nobody pushes.
             yield return new WaitForSeconds(2f);
-            Assert.That(door.ForceProgress, Is.EqualTo(0.24f).Within(0.03f));
+            Assert.That(door.ForceProgress, Is.EqualTo(0.2f).Within(0.03f));
             Assert.That(door.IsShut);
         }
     }

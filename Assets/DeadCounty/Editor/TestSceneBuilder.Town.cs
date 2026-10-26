@@ -116,26 +116,26 @@ namespace DeadCounty.EditorTools
             // Living room (x 0..7, z 0..6)
             Box("Canape", f, new Vector3(2f, 0.4f, 1.2f), new Vector3(2.2f, 0.8f, 0.9f), "Fabric");
             Box("Table_Basse", f, new Vector3(2f, 0.25f, 2.7f), new Vector3(1.2f, 0.5f, 0.6f), "Furniture");
-            Box("Meuble_TV", f, new Vector3(2f, 0.3f, 5.5f), new Vector3(1.8f, 0.6f, 0.45f), "Furniture");
+            Searchable(Box("Meuble_TV", f, new Vector3(2f, 0.3f, 5.5f), new Vector3(1.8f, 0.6f, 0.45f), "Furniture"), "Meuble TV", "LT_Salon");
             Box("TV", f, new Vector3(2f, 0.9f, 5.55f), new Vector3(1.2f, 0.62f, 0.08f), "CarBlack", solid: false);
             Box("Fauteuil", f, new Vector3(4.6f, 0.4f, 3.4f), new Vector3(0.9f, 0.8f, 0.9f), "Fabric");
             Box("Bibliotheque", f, new Vector3(0.3f, 1f, 2.8f), new Vector3(0.4f, 2f, 1.4f), "Furniture");
             // Kitchen (x 0..7, z 6..10)
-            Box("Plan_Travail", f, new Vector3(0.4f, 0.45f, 8.4f), new Vector3(0.6f, 0.9f, 3f), "Furniture");
+            Searchable(Box("Plan_Travail", f, new Vector3(0.4f, 0.45f, 8.4f), new Vector3(0.6f, 0.9f, 3f), "Furniture"), "Placards", "LT_Cuisine_Placard");
             Box("Placard_Haut", f, new Vector3(0.25f, 1.9f, 8.4f), new Vector3(0.35f, 0.7f, 3f), "Furniture");
-            Box("Frigo", f, new Vector3(0.5f, 0.9f, 6.5f), new Vector3(0.7f, 1.8f, 0.7f), "Porcelain");
+            Searchable(Box("Frigo", f, new Vector3(0.5f, 0.9f, 6.5f), new Vector3(0.7f, 1.8f, 0.7f), "Porcelain"), "Réfrigérateur", "LT_Cuisine_Frigo");
             Box("Table_Cuisine", f, new Vector3(3.6f, 0.38f, 8f), new Vector3(1.6f, 0.75f, 0.9f), "Furniture");
             foreach (var (x, z) in new[] { (3.1f, 7.2f), (4.1f, 7.2f), (3.1f, 8.8f), (4.1f, 8.8f) })
                 Box("Chaise", f, new Vector3(x, 0.23f, z), new Vector3(0.45f, 0.46f, 0.45f), "Wood", solid: false);
             // Bedroom (x 7..12, z 5.5..10)
             Box("Lit", f, new Vector3(10.5f, 0.25f, 8.5f), new Vector3(1.6f, 0.5f, 2.1f), "Furniture");
             Box("Matelas", f, new Vector3(10.5f, 0.55f, 8.5f), new Vector3(1.5f, 0.15f, 2f), "Mattress", solid: false);
-            Box("Armoire", f, new Vector3(11.65f, 1f, 6.15f), new Vector3(0.6f, 2f, 1f), "Furniture");
-            Box("Commode", f, new Vector3(8.2f, 0.45f, 9.65f), new Vector3(1.2f, 0.9f, 0.45f), "Furniture");
+            Searchable(Box("Armoire", f, new Vector3(11.65f, 1f, 6.15f), new Vector3(0.6f, 2f, 1f), "Furniture"), "Armoire", "LT_Chambre");
+            Searchable(Box("Commode", f, new Vector3(8.2f, 0.45f, 9.65f), new Vector3(1.2f, 0.9f, 0.45f), "Furniture"), "Commode", "LT_Chambre");
             // Bathroom (x 7..12, z 0..5.5)
             Box("Baignoire", f, new Vector3(10.8f, 0.3f, 0.6f), new Vector3(1.7f, 0.6f, 0.8f), "Porcelain");
             Box("Toilettes", f, new Vector3(11.6f, 0.25f, 4.4f), new Vector3(0.6f, 0.5f, 0.45f), "Porcelain");
-            Box("Meuble_SdB", f, new Vector3(7.4f, 0.45f, 4.6f), new Vector3(0.5f, 0.9f, 1f), "Furniture");
+            Searchable(Box("Meuble_SdB", f, new Vector3(7.4f, 0.45f, 4.6f), new Vector3(0.5f, 0.9f, 1f), "Furniture"), "Armoire à pharmacie", "LT_SalleDeBain");
         }
 
         // 6 x 6 m garage, front wall on z = 0 facing -Z.
@@ -150,7 +150,7 @@ namespace DeadCounty.EditorTools
             Wall(g, "Mur_Gauche", new Vector2(-3f, 6f), new Vector2(-3f, 0f), style);
             Roof(g, "Toit", new Vector3(0f, 2.8f, 3f), 6.6f, 6.6f, 1.4f, roof);
             Box("Etabli", g, new Vector3(-2.6f, 0.45f, 3.5f), new Vector3(0.6f, 0.9f, 2.4f), "Wood");
-            Box("Etagere", g, new Vector3(2.6f, 0.9f, 3.5f), new Vector3(0.5f, 1.8f, 2f), "Metal");
+            Searchable(Box("Etagere", g, new Vector3(2.6f, 0.9f, 3.5f), new Vector3(0.5f, 1.8f, 2f), "Metal"), "Étagère", "LT_Atelier");
         }
 
         // White wooden church facing Main Street, with steeple and a small graveyard on its south side.
