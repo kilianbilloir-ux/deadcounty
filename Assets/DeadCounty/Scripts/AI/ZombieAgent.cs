@@ -282,6 +282,8 @@ namespace DeadCounty.AI
             AimPitch = -Mathf.Atan2(look.y, planar) * Mathf.Rad2Deg;
         }
 
+        bool IZombieWorld.TryTakeAttackTurn(float turnInterval) => manager.TryTakeAttackTurn(Time.time, turnInterval);
+
         bool IZombieWorld.TryRandomPoint(Vector3 center, float radius, double random01a, double random01b, out Vector3 point)
         {
             var angle = (float)(random01a * 2.0 * Math.PI);

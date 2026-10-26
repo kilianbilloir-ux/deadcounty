@@ -57,6 +57,7 @@ namespace DeadCounty.AI
         int senseCursor;
         int registrations;
         bool frozen;
+        float lastAttackTurn = float.NegativeInfinity;
 
         public static ZombieManager Instance { get; private set; }
 
@@ -98,6 +99,14 @@ namespace DeadCounty.AI
         public int CountIn(ZombieState state) => stateCounts[(int)state];
 
         public ZombieRecord GetRecord(int index) => records[index];
+
+        // Every zombie hunts the same target, so one turn clock is enough.
+        internal bool TryTakeAttackTurn(float now, float turnInterval)
+        {
+            if (now - lastAttackTurn < turnInterval) return false;
+            lastAttackTurn = now;
+            return true;
+        }
 
         void Awake()
         {

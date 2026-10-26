@@ -12,6 +12,8 @@ namespace DeadCounty.Tests
     {
         public float Scale = 1f;
         public bool Fail;
+        public bool AttackTurnTaken;
+        public float LastTurnInterval;
         public Vector3 LastCenter;
         public float LastRadius;
 
@@ -22,6 +24,12 @@ namespace DeadCounty.Tests
             var angle = (float)(random01a * 2.0 * Math.PI);
             point = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * (radius * Scale * Mathf.Sqrt((float)random01b));
             return !Fail;
+        }
+
+        public bool TryTakeAttackTurn(float turnInterval)
+        {
+            LastTurnInterval = turnInterval;
+            return !AttackTurnTaken;
         }
     }
 

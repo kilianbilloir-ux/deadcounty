@@ -71,6 +71,7 @@ MonoBehaviour:
       TriggerMin: 1
       TriggerHalfAngle: 45
       Windup: 1
+      TurnInterval: 0.85
       ArmsUpAt: 0.6
       WindupTurnRate: 90
       LungeDistance: 0.6

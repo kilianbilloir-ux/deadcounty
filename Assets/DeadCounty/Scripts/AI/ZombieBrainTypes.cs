@@ -24,6 +24,8 @@ namespace DeadCounty.AI
     {
         // A reachable point within radius of center, picked from two uniform numbers in [0, 1).
         bool TryRandomPoint(Vector3 center, float radius, double random01a, double random01b, out Vector3 point);
+        // Takes the target's attack turn, refused while another zombie started a wind-up less than turnInterval ago.
+        bool TryTakeAttackTurn(float turnInterval);
     }
 
     // What the agent sensed this frame. Positions are at ground level. Target fields always hold the true values;

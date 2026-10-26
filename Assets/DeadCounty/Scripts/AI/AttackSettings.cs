@@ -15,6 +15,8 @@ namespace DeadCounty.AI
         public float TriggerMin;
         public float TriggerHalfAngle;
         public float Windup;
+        [Tooltip("Zombies around one target take turns: a wind-up starts at least this long after the previous one, so strikes do not all land inside the target's invulnerability window.")]
+        public float TurnInterval;
         [Tooltip("Time into the wind-up at which the arms come up, the visible tell.")]
         public float ArmsUpAt;
         [Tooltip("The zombie keeps tracking its target during the wind-up, no faster than this (deg/s).")]
@@ -37,6 +39,7 @@ namespace DeadCounty.AI
             TriggerMin = 1f,
             TriggerHalfAngle = 45f,
             Windup = 1f,
+            TurnInterval = 0.85f,
             ArmsUpAt = 0.6f,
             WindupTurnRate = 90f,
             LungeDistance = 0.6f,
