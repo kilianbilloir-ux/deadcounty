@@ -63,6 +63,13 @@ namespace DeadCounty.Core
             return (starving * settings.StarvingDamagePerMinute + dehydrated * settings.DehydratedDamagePerMinute) / 60f;
         }
 
+        // Eating and drinking: shares of a full gauge, capped at full.
+        public void Restore(float hunger, float thirst)
+        {
+            Hunger = Mathf.Clamp01(Hunger + hunger);
+            Thirst = Mathf.Clamp01(Thirst + thirst);
+        }
+
         public void Reset()
         {
             Hunger = 1f;
