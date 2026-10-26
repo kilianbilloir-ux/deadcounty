@@ -180,7 +180,14 @@ namespace DeadCounty.EditorTools
             var hud = rig.GetComponent<PlayerHudController>();
             if (hud == null) return;
             var so = new SerializedObject(hud);
-            so.FindProperty("panelSettings").objectReferenceValue = LoadOrCreate<PanelSettings>(HudPanelSettingsPath);
+            var panel = LoadOrCreate<PanelSettings>(HudPanelSettingsPath);
+            // Laid out for 1080p and scaled with the screen, so the HUD keeps its proportions at any resolution.
+            panel.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+            panel.referenceResolution = new Vector2Int(1920, 1080);
+            panel.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
+            panel.match = 0.5f;
+            EditorUtility.SetDirty(panel);
+            so.FindProperty("panelSettings").objectReferenceValue = panel;
             so.FindProperty("hudLayout").objectReferenceValue = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(HudUxmlPath);
             so.FindProperty("hudStyles").objectReferenceValue = AssetDatabase.LoadAssetAtPath<StyleSheet>(HudUssPath);
             so.ApplyModifiedPropertiesWithoutUndo();
