@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DeadCounty.Items;
 using UnityEngine;
 
@@ -27,6 +28,9 @@ namespace DeadCounty.Player
         PlayerNeeds needs;
 
         public Inventory Items { get; private set; }
+
+        // Items just found or picked up, for the HUD; empty after searching an empty piece of furniture.
+        public event Action<IReadOnlyList<ItemStack>> Received;
 
         void OnValidate()
         {
@@ -61,7 +65,11 @@ namespace DeadCounty.Player
             return true;
         }
 
-        public void Receive(ItemDefinition item, int count) => Items.Add(item, count);
+        public void Receive(IReadOnlyList<ItemStack> items)
+        {
+            foreach (var stack in items) Items.Add(stack.Item, stack.Count);
+            Received?.Invoke(items);
+        }
 
         public void ResetFull()
         {

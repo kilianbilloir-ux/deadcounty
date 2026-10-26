@@ -37,9 +37,13 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="interaction" picking-mode="Ignore" class="interaction">
-            <ui:Label name="interaction-name" picking-mode="Ignore" class="interaction-name" />
-            <ui:Label name="interaction-action" picking-mode="Ignore" class="interaction-action" />
+            <DeadCounty.UI.RadialGauge name="interaction-progress" picking-mode="Ignore" class="interaction-progress" />
+            <ui:VisualElement picking-mode="Ignore">
+                <ui:Label name="interaction-name" picking-mode="Ignore" class="interaction-name" />
+                <ui:Label name="interaction-action" picking-mode="Ignore" class="interaction-action" />
+            </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Label name="loot-toast" picking-mode="Ignore" class="loot-toast" />
         <ui:VisualElement name="inventory" class="inventory">
             <ui:VisualElement class="inventory-panel">
                 <ui:VisualElement class="inventory-status">

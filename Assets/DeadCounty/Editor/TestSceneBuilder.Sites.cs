@@ -47,8 +47,8 @@ namespace DeadCounty.EditorTools
             Box("Bandeau", shop, new Vector3(6f, 3.1f, 8.13f), new Vector3(12.2f, 0.45f, 0.06f), "SignRed", solid: false);
             Box("Toit", shop, new Vector3(6f, 3.7f, 4f), new Vector3(12.6f, 0.2f, 8.6f), "RoofGrey");
             foreach (var x in new[] { 3f, 5.5f, 8f })
-                Box("Rayon", shop, new Vector3(x, 0.75f, 3.6f), new Vector3(0.6f, 1.5f, 3.6f), "MetalLight");
-            Box("Comptoir", shop, new Vector3(10.4f, 0.5f, 6.2f), new Vector3(2.4f, 1f, 0.7f), "Furniture");
+                Searchable(Box("Rayon", shop, new Vector3(x, 0.75f, 3.6f), new Vector3(0.6f, 1.5f, 3.6f), "MetalLight"), "Rayon", "LT_Magasin_Rayon");
+            Searchable(Box("Comptoir", shop, new Vector3(10.4f, 0.5f, 6.2f), new Vector3(2.4f, 1f, 0.7f), "Furniture"), "Comptoir", "LT_Magasin_Comptoir");
             Box("Vitrine_Froide", shop, new Vector3(6f, 1f, 0.5f), new Vector3(7f, 2f, 0.7f), "Glass");
 
             Box("Mat_Enseigne", lot, new Vector3(-12f, 4f, 12f), new Vector3(0.35f, 8f, 0.35f), "Metal");
@@ -90,8 +90,8 @@ namespace DeadCounty.EditorTools
             Box("Enseigne", b, new Vector3(9f, 3.75f, 11.17f), new Vector3(6f, 0.8f, 0.1f), "SignGreen", solid: false);
             Box("Enseigne_Cadre", b, new Vector3(9f, 3.75f, 11.23f), new Vector3(5.6f, 0.5f, 0.02f), "SignWhite", solid: false);
             foreach (var x in new[] { 3f, 6f, 12f, 15f })
-                Box("Rayon", b, new Vector3(x, 0.8f, 5f), new Vector3(0.7f, 1.6f, 6f), "Furniture");
-            Box("Comptoir", b, new Vector3(4.5f, 0.5f, 9.6f), new Vector3(3f, 1f, 0.7f), "Furniture");
+                Searchable(Box("Rayon", b, new Vector3(x, 0.8f, 5f), new Vector3(0.7f, 1.6f, 6f), "Furniture"), "Rayon", "LT_Magasin_Rayon");
+            Searchable(Box("Comptoir", b, new Vector3(4.5f, 0.5f, 9.6f), new Vector3(3f, 1f, 0.7f), "Furniture"), "Comptoir", "LT_Magasin_Comptoir");
             Box("Congelateurs", b, new Vector3(9f, 0.6f, 0.6f), new Vector3(8f, 1.2f, 0.9f), "SignWhite");
 
             Car(lot, "Voiture_Parking", new Vector3(-5.8f, 0.06f, 2.5f), 90f, "CarGreen");

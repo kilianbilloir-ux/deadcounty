@@ -43,6 +43,7 @@ namespace DeadCounty.EditorTools
             BuiltLamps.Clear();
             DoorSpots.Clear();
             ConfigureProject();
+            EnsureLootTables(EnsureItems());
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var env = new GameObject("Environment").transform;
@@ -59,13 +60,13 @@ namespace DeadCounty.EditorTools
             BuildAIClearing(Group(env, "Clairiere_IA"));
             BuildRoadside(Group(env, "Bord_de_route"));
             BuildVegetation(Group(env, "Vegetation"));
+            GuaranteeStartingLoot(env);
 
             foreach (var t in env.GetComponentsInChildren<Transform>())
                 GameObjectUtility.SetStaticEditorFlags(t.gameObject, StaticEditorFlags.BatchingStatic);
 
             SetupAtmosphere();
             EnsureGaitProfiles();
-            EnsureItems();
             BuildPlayer();
             BakeNavMesh(env.gameObject);
             BuildDoors();

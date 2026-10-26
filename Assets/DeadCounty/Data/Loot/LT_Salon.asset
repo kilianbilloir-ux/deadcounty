@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b714f0a87bb47b0b9d26f12fe670dd, type: 3}
+  m_Name: LT_Salon
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Items.LootTable
+  Entries:
+  - Item: {fileID: 11400000, guid: e6927af0e3ee44db28f6c3e232257703, type: 2}
+    Weight: 1
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: 077621e9d4a49431d95ef9254a32f0ff, type: 2}
+    Weight: 1
+    Min: 1
+    Max: 1
+  MinDraws: 0
+  MaxDraws: 1

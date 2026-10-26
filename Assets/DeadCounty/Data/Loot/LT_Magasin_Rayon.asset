@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b714f0a87bb47b0b9d26f12fe670dd, type: 3}
+  m_Name: LT_Magasin_Rayon
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Items.LootTable
+  Entries:
+  - Item: {fileID: 11400000, guid: a43dd927d28f04d8dab835ffe024928e, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: 755358ef5c7f74e979a1f09f084e4c1b, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: d84f988b314ff46fd9c3769cb5124698, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: a7a0db6c853cd4e6cb3c333d0508157e, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: f41e929266c4849bb9b1e57907c7098d, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: 0a7a200d6e52648a68f6a709138033ac, type: 2}
+    Weight: 1
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: ef1767eed587b4e2fa2cf90c2a9e088c, type: 2}
+    Weight: 1
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: 514697f0faa71479d9788702c7cc97a9, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  - Item: {fileID: 11400000, guid: e6927af0e3ee44db28f6c3e232257703, type: 2}
+    Weight: 2
+    Min: 1
+    Max: 1
+  MinDraws: 1
+  MaxDraws: 3

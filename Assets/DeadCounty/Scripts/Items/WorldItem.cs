@@ -29,7 +29,7 @@ namespace DeadCounty.Items
         public override void Interact(Transform user, bool hurried)
         {
             if (!user.TryGetComponent<IItemReceiver>(out var receiver)) return;
-            receiver.Receive(item, count);
+            receiver.Receive(new[] { new ItemStack(item, count) });
             Destroy(gameObject);
         }
 

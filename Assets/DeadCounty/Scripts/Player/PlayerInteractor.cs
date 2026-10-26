@@ -5,11 +5,14 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Picks the interactable the player looks at within reach, for the HUD prompt, and uses it on Interact.
+    // Picks the interactable the player looks at within reach, for the HUD prompt, and uses it on Interact. Holding
+    // Run or Sprint hurries the use. A timed use (searching) runs while the player keeps still and is cancelled by
+    // moving, pressing Interact again, getting hit or leaving its reach.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerHealth))]
     public class PlayerInteractor : MonoBehaviour
     {
         const float EyeHeight = 1.5f;
+        const float MoveCancel = 0.1f;
 
         [SerializeField] float reach = 1.8f;
         [Tooltip("Widest angle between the camera heading and an interactable (deg).")]
@@ -17,21 +20,73 @@ namespace DeadCounty.Player
 
         ThirdPersonController controller;
         PlayerHealth health;
-        InputAction interact;
+        InputAction interact, move, run, sprint;
+        Interactable usedTarget;
+        float useTime, useElapsed, useStart;
+        bool useHurried;
 
         public Interactable Current { get; private set; }
+        public bool Busy => usedTarget != null;
+        // 0 to 1 through a timed use, 0 otherwise.
+        public float UseProgress => usedTarget != null ? useElapsed / useTime : 0f;
 
         void Awake()
         {
             controller = GetComponent<ThirdPersonController>();
             health = GetComponent<PlayerHealth>();
-            interact = InputSystem.actions.FindAction("Player/Interact", true);
+            var actions = InputSystem.actions;
+            interact = actions.FindAction("Player/Interact", true);
+            move = actions.FindAction("Player/Move", true);
+            run = actions.FindAction("Player/Run", true);
+            sprint = actions.FindAction("Player/Sprint", true);
         }
 
         void Update()
         {
+            if (usedTarget != null)
+            {
+                ContinueUse();
+                return;
+            }
             Current = health.IsAlive && controller.Controllable ? Pick() : null;
-            if (Current != null && interact.WasPressedThisFrame()) Current.Interact(transform, controller.IsSprinting);
+            if (Current == null || !interact.WasPressedThisFrame()) return;
+            var hurried = run.IsPressed() || sprint.IsPressed();
+            var time = Current.UseTime(hurried);
+            if (time <= 0f)
+            {
+                Current.Interact(transform, hurried);
+                return;
+            }
+            usedTarget = Current;
+            useTime = time;
+            useElapsed = 0f;
+            useStart = Time.time;
+            useHurried = hurried;
+            usedTarget.BeginUse(hurried);
+        }
+
+        void ContinueUse()
+        {
+            var cancelled = !health.IsAlive || !controller.Controllable || health.LastHitTime >= useStart
+                || move.ReadValue<Vector2>().sqrMagnitude > MoveCancel * MoveCancel
+                || interact.WasPressedThisFrame() || PlanarDistance(usedTarget) > reach;
+            if (cancelled)
+            {
+                usedTarget = null;
+                return;
+            }
+            useElapsed += Time.deltaTime;
+            if (useElapsed < useTime) return;
+            var target = usedTarget;
+            usedTarget = null;
+            target.Interact(transform, useHurried);
+        }
+
+        float PlanarDistance(Interactable target)
+        {
+            var offset = target.PromptPoint - transform.position;
+            offset.y = 0f;
+            return offset.magnitude;
         }
 
         // The candidate closest to the camera heading, weighted by distance, with nothing in between.
