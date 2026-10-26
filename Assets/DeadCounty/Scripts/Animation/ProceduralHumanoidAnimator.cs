@@ -1,4 +1,5 @@
 using System;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace DeadCounty.Animation
@@ -20,6 +21,8 @@ namespace DeadCounty.Animation
     // Temporary until a rigged character with Mixamo / Synty animations replaces it.
     public partial class ProceduralHumanoidAnimator : MonoBehaviour
     {
+        static readonly ProfilerMarker EvaluateMarker = new("DC.Anim.Humanoid");
+
         [Tooltip("Motion source implementing IHumanoidMotion.")]
         [SerializeField] MonoBehaviour controller;
         [SerializeField] GaitProfile gait;
@@ -131,7 +134,7 @@ namespace DeadCounty.Animation
             pendingDt += Time.deltaTime;
             if (++framesSinceUpdate < updateEvery) return;
             framesSinceUpdate = 0;
-            Evaluate(pendingDt);
+            using (EvaluateMarker.Auto()) Evaluate(pendingDt);
             pendingDt = 0f;
         }
 

@@ -29,6 +29,8 @@ namespace DeadCounty.Player
         public HealthPool Pool { get; private set; }
         public bool IsAlive => !Pool.IsDead;
         public float LastHitTime { get; private set; } = float.NegativeInfinity;
+        // Debug god mode: every hit is ignored.
+        public bool Invulnerable { get; set; }
 
         public event Action<PlayerHealth> Damaged;
         public event Action<PlayerHealth> Died;
@@ -43,7 +45,7 @@ namespace DeadCounty.Player
         // !(damage > 0) rejects NaN, where <= would let it through.
         public bool ApplyHit(float damage, Vector3 sourcePosition)
         {
-            if (!(damage > 0f) || !IsAlive || Time.time < invulnerableUntil) return false;
+            if (!(damage > 0f) || !IsAlive || Invulnerable || Time.time < invulnerableUntil) return false;
             var killed = Pool.Apply(damage);
             LastHitTime = Time.time;
             invulnerableUntil = Time.time + invulnerabilityTime;

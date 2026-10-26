@@ -43,6 +43,9 @@ namespace DeadCounty.Player
         {
             if (!visible) return;
             style ??= new GUIStyle(GUI.skin.box) { alignment = TextAnchor.UpperLeft, fontSize = 13, richText = true, padding = new RectOffset(10, 10, 8, 8) };
+            // IMGUI does not follow the screen resolution: scale the panel like a 1080p layout.
+            var scale = Mathf.Max(1f, Screen.height / 1080f);
+            GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1f));
             var state = !player.IsGrounded ? "en l'air"
                 : player.IsSliding ? "glisse"
                 : player.IsCrouching ? "accroupi"
@@ -59,6 +62,7 @@ namespace DeadCounty.Player
                 + $"Caméra : {follow.CameraDistance:0.0} m, épaule {(follow.CameraSide > 0.5f ? "droite" : "gauche")}\n"
                 + $"Confinement : {director.Confinement:0.00}";
             GUI.Box(new Rect(10f, 10f, 280f, 196f), text, style);
+            GUI.matrix = Matrix4x4.identity;
         }
 
         void OnDrawGizmos()
