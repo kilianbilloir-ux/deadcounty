@@ -148,6 +148,7 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerNoiseEmitter>(player);
             added |= AddMissing<PlayerFlashlight>(player);
             added |= AddMissing<PlayerNeeds>(player);
+            added |= AddMissing<PlayerInteractor>(player);
             added |= AddMissing<PlayerDeathFlow>(rig);
             added |= AddMissing<PlayerHudController>(rig);
             added |= EnsureFlashlight(player);
