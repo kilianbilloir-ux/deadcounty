@@ -2,6 +2,7 @@
 using System.Collections;
 using DeadCounty.Core;
 using DeadCounty.Player;
+using DeadCounty.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -63,6 +64,28 @@ namespace DeadCounty.Tests
             yield return new WaitForSeconds(0.6f);
             Assert.That(Opacity(readouts), Is.EqualTo(1f).Within(0.01f));
             Assert.That(flashlight.ClassListContains("flashlight-readout--on"), Is.True);
+        }
+
+        [UnityTest]
+        public IEnumerator NeedGaugesShowOnceHalfEmptyAndTurnDangerWhenLow()
+        {
+            var thirst = Element<VisualElement>("thirst");
+            var hunger = Element<VisualElement>("hunger");
+            var fatigue = Element<VisualElement>("fatigue");
+            var thirstGauge = Element<RadialGauge>("thirst-gauge");
+            var needs = Rig.GetComponentInChildren<PlayerNeeds>();
+            yield return new WaitForSeconds(5f);
+            Assert.That(Opacity(thirst), Is.EqualTo(0f).Within(0.01f), "full needs must fade with the readouts");
+
+            // Thirst 1/12, hunger 0.45, fatigue 0.56.
+            needs.Model.Tick(11f * 60f, false);
+            yield return new WaitForSeconds(0.6f);
+            Assert.That(Opacity(thirst), Is.EqualTo(1f).Within(0.01f));
+            Assert.That(Opacity(hunger), Is.EqualTo(1f).Within(0.01f));
+            Assert.That(Opacity(fatigue), Is.EqualTo(0f).Within(0.01f), "a need above half must stay hidden");
+            Assert.That(thirstGauge.Value, Is.EqualTo(needs.Model.Thirst).Within(0.01f));
+            Assert.That(thirstGauge.ClassListContains("need-gauge--low"), Is.True, "a low need must take the danger colour");
+            Assert.That(Element<RadialGauge>("hunger-gauge").ClassListContains("need-gauge--low"), Is.False);
         }
 
         [UnityTest]
