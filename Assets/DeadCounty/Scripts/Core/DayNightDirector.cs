@@ -15,8 +15,10 @@ namespace DeadCounty.Core
         float hour;
         bool awake;
 
-        // Debug/telemetry hook (gameplay reads NightFactor, not this).
+        // Clock shown by the HUD; gameplay reads WorldLighting.NightFactor.
         public float Hour => hour;
+        // Starts at 1 and counts every midnight.
+        public int Day { get; private set; } = 1;
 
         // Code-built setup: call on the inactive GameObject before its first activation.
         // Editor-built scenes leave the serialized fields and fall back to RenderSettings.sun.
@@ -65,7 +67,9 @@ namespace DeadCounty.Core
         {
             // Scaled time: pause freezes the sky, like the zombie manager freezes the horde.
             if (Time.deltaTime == 0f) return;
-            hour = DayNightModel.Advance(hour, Time.deltaTime, dayLengthSeconds);
+            var next = DayNightModel.Advance(hour, Time.deltaTime, dayLengthSeconds);
+            if (next < hour) Day++;
+            hour = next;
             Apply();
         }
 

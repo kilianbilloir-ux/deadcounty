@@ -1,25 +1,30 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="root" picking-mode="Ignore" class="root">
-        <ui:VisualElement name="hit-flash" class="hit-flash" />
-        <ui:VisualElement name="hud" class="hud">
-            <ui:VisualElement name="bars" class="bars">
-                <ui:VisualElement name="health-row" class="bar-row">
-                    <ui:Label name="health-label" text="Vie" class="bar-label" />
-                    <ui:VisualElement name="health-bar" class="bar-frame">
-                        <ui:VisualElement name="health-fill" class="bar-fill health-fill" />
+        <ui:VisualElement name="hit-flash" picking-mode="Ignore" class="hit-flash" />
+        <ui:VisualElement name="hud" picking-mode="Ignore" class="hud">
+            <ui:VisualElement name="bars" picking-mode="Ignore" class="bars">
+                <ui:VisualElement name="health-row" picking-mode="Ignore" class="bar-row">
+                    <ui:Label name="health-label" text="Vie" picking-mode="Ignore" class="bar-label" />
+                    <ui:VisualElement name="health-bar" picking-mode="Ignore" class="bar-frame">
+                        <ui:VisualElement name="health-fill" picking-mode="Ignore" class="bar-fill health-fill" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="stamina-row" class="bar-row">
-                    <ui:Label name="stamina-label" text="Endurance" class="bar-label" />
-                    <ui:VisualElement name="stamina-bar" class="bar-frame">
-                        <ui:VisualElement name="stamina-fill" class="bar-fill stamina-fill" />
+                <ui:VisualElement name="stamina-row" picking-mode="Ignore" class="bar-row stamina-row">
+                    <ui:Label name="stamina-label" text="Endurance" picking-mode="Ignore" class="bar-label" />
+                    <ui:VisualElement name="stamina-bar" picking-mode="Ignore" class="bar-frame">
+                        <ui:VisualElement name="stamina-fill" picking-mode="Ignore" class="bar-fill stamina-fill" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="readouts" class="readouts">
-                <ui:Label name="lamp" text="Lampes" class="readout lamp-readout" />
-                <ui:Label name="time" text="Jour 1 — 11:00" class="readout time-readout" />
+            <ui:VisualElement name="readouts" picking-mode="Ignore" class="readouts">
+                <ui:Label name="flashlight" text="Lampe" picking-mode="Ignore" class="readout flashlight-readout" />
+                <ui:Label name="time" text="Jour 1 — 11:00" picking-mode="Ignore" class="readout time-readout" />
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="game-over" picking-mode="Ignore" class="game-over">
+            <ui:Label name="game-over-title" text="Vous êtes mort" picking-mode="Ignore" class="game-over-title" />
+            <ui:Label name="game-over-time" text="Temps survécu : 00:00" picking-mode="Ignore" class="game-over-line" />
+            <ui:Label name="game-over-prompt" text="Recommencer" picking-mode="Ignore" class="game-over-line game-over-prompt" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

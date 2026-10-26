@@ -25,6 +25,7 @@ namespace DeadCounty.Tests
             var max = 0f;
             Quaternion last;
             float hour;
+            int day;
             // 90 frames at x4 with a 4 s cycle cover 1.5 cycles (19h to 7h): both extremes are hit.
             try
             {
@@ -36,6 +37,7 @@ namespace DeadCounty.Tests
                 }
                 last = sun.transform.rotation;
                 hour = director.Hour;
+                day = director.Day;
             }
             finally
             {
@@ -45,6 +47,7 @@ namespace DeadCounty.Tests
             Assert.That(max, Is.GreaterThan(0.95f), "the cycle never reached night");
             Assert.That(Quaternion.Angle(first, last), Is.GreaterThan(90f), "the sun never turned");
             Assert.That(hour, Is.EqualTo(7f).Within(1.5f), "the clock did not advance a cycle and a half");
+            Assert.That(day, Is.EqualTo(3), "each of the two midnights must start a new day");
         }
     }
 }
