@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DeadCounty.Core
 {
-    // Polls WorldLighting once per frame and flips the registry only on hysteresis fronts.
+    // Switches the built night lamps with NightFactor, only on hysteresis fronts.
     [DefaultExecutionOrder(-105)]
     public class NightLampController : MonoBehaviour
     {
@@ -22,19 +22,8 @@ namespace DeadCounty.Core
         void Awake()
         {
             awake = true;
-            foreach (var lamp in lamps) NightLamps.Register(lamp);
             lightsOn = NightLamps.ShouldBeOn(false, WorldLighting.NightFactor);
-            NightLamps.ApplyAll(lightsOn);
-        }
-
-        void OnEnable()
-        {
-            foreach (var lamp in lamps) NightLamps.Register(lamp);
-        }
-
-        void OnDisable()
-        {
-            foreach (var lamp in lamps) NightLamps.Unregister(lamp);
+            Apply();
         }
 
         void Update()
@@ -42,7 +31,13 @@ namespace DeadCounty.Core
             var want = NightLamps.ShouldBeOn(lightsOn, WorldLighting.NightFactor);
             if (want == lightsOn) return;
             lightsOn = want;
-            NightLamps.ApplyAll(lightsOn);
+            Apply();
+        }
+
+        void Apply()
+        {
+            for (var i = 0; i < lamps.Count; i++)
+                if (lamps[i] != null) lamps[i].enabled = lightsOn;
         }
     }
 }

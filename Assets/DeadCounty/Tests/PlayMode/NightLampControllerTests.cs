@@ -17,14 +17,12 @@ namespace DeadCounty.Tests
         public void SetUp()
         {
             savedNightFactor = WorldLighting.NightFactor;
-            NightLamps.ResetStatics();
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
             WorldLighting.NightFactor = savedNightFactor;
-            NightLamps.ResetStatics();
             foreach (var go in owned) if (go != null) Object.Destroy(go);
             owned.Clear();
             yield return null;
