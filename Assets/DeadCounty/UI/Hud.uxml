@@ -139,7 +139,14 @@
                     </ui:VisualElement>
                     <ui:ScrollView name="item-list" class="item-list" />
                     <ui:Label name="inventory-empty" text="Vous ne portez rien." picking-mode="Ignore" class="inventory-empty" />
-                    <ui:Label name="item-detail" picking-mode="Ignore" class="item-detail" />
+                    <ui:VisualElement name="item-detail" picking-mode="Ignore" class="item-detail">
+                        <ui:VisualElement name="item-detail-icon" picking-mode="Ignore" class="item-detail-icon" />
+                        <ui:VisualElement picking-mode="Ignore" class="item-detail-body">
+                            <ui:Label name="item-detail-name" picking-mode="Ignore" class="item-detail-name" />
+                            <ui:Label name="item-detail-meta" picking-mode="Ignore" class="item-detail-meta" />
+                            <ui:VisualElement name="item-effects" picking-mode="Ignore" class="item-effects" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
                     <ui:VisualElement name="inventory-hints" picking-mode="Ignore" class="hints" />
                 </ui:VisualElement>
             </ui:VisualElement>

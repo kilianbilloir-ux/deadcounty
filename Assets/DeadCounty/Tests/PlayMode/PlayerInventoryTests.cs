@@ -13,7 +13,8 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Tests
 {
-    // The generated rig's inventory: starting kit, eating, bandaging, dropping and picking up, overload, the screen.
+    // The generated rig's inventory: starting kit, eating, bandaging, dropping and picking up, overload, the screen
+    // and its item detail.
     public class PlayerInventoryTests : PlayerRigTests
     {
         const string ItemsDir = "Assets/DeadCounty/Data/Items/";
@@ -24,6 +25,14 @@ namespace DeadCounty.Tests
         ItemDefinition heavy;
 
         static ItemDefinition Load(string file) => AssetDatabase.LoadAssetAtPath<ItemDefinition>(ItemsDir + file + ".asset");
+
+        VisualElement Root => Rig.GetComponent<UIDocument>().rootVisualElement;
+
+        // "Faim 50 % → 85 %" for each effect line shown under the list.
+        string[] Effects() => Root.Q("item-effects").Children()
+            .Where(row => row.style.display.value == DisplayStyle.Flex)
+            .Select(row => string.Join(" ", row.Query<Label>().ToList().Select(label => label.text)))
+            .ToArray();
 
         [UnitySetUp]
         public IEnumerator SetUpInventory()
@@ -167,6 +176,70 @@ namespace DeadCounty.Tests
             screen.Select(0);
             yield return null;
             Assert.That(screen.Selected, Is.EqualTo(Load("IT_SacADos")));
+            screen.SetOpen(false);
+        }
+
+        [UnityTest]
+        public IEnumerator TheDetailShowsWhatUsingTheItemWouldChangeNow()
+        {
+            var screen = Rig.GetComponent<PlayerInventoryScreen>();
+            // Hunger 0.5, thirst 1/6.
+            needs.Model.Tick(10f * 60f, false);
+            screen.SetOpen(true);
+            screen.Select(1);
+            yield return null;
+            Assert.That(screen.Selected, Is.EqualTo(Load("IT_Haricots")));
+            Assert.That(Root.Q<Label>("item-detail-name").text, Is.EqualTo("Conserve de haricots"));
+            Assert.That(Root.Q<Label>("item-detail-meta").text, Is.EqualTo("Nourriture · 0,4 kg"));
+            Assert.That(Effects(), Is.EqualTo(new[] { "Faim 50\u00A0% → 85\u00A0%" }));
+
+            screen.Select(0);
+            yield return null;
+            Assert.That(Effects(), Is.EqualTo(new[] { "Soif 17\u00A0% → 67\u00A0%" }));
+
+            needs.Model.Restore(0f, 0.5f);
+            yield return null;
+            Assert.That(Effects(), Is.EqualTo(new[] { "Soif 67\u00A0% → 100\u00A0%" }), "the detail must follow the gauges while open");
+            screen.SetOpen(false);
+        }
+
+        [UnityTest]
+        public IEnumerator UsesThatWouldBeWastedShowInGrey()
+        {
+            var screen = Rig.GetComponent<PlayerInventoryScreen>();
+            var bandage = Load("IT_Bandage");
+            inventory.Items.Add(bandage, 1);
+            screen.SetOpen(true);
+            // Bandage, Bouteille d'eau, Conserve de haricots, Sac à dos.
+            screen.Select(0);
+            yield return null;
+            Assert.That(screen.Selected, Is.EqualTo(bandage));
+            Assert.That(Effects(), Is.EqualTo(new[] { "Santé 100\u00A0% → 100\u00A0%", "Saignement Aucun" }));
+            Assert.That(Root.Q("item-effects").Children().First().ClassListContains("item-effect--wasted"), "a bandage on a healthy player is wasted");
+
+            Health.Pool.Apply(50f);
+            yield return null;
+            Assert.That(Effects()[0], Is.EqualTo("Santé 50\u00A0% → 70\u00A0%"));
+            Assert.That(Root.Q("item-effects").Children().First().ClassListContains("item-effect--wasted"), Is.False);
+
+            screen.Select(3);
+            yield return null;
+            Assert.That(Effects(), Is.EqualTo(new[] { "Capacité +6 kg" }));
+            screen.SetOpen(false);
+        }
+
+        [UnityTest]
+        public IEnumerator RowsAndDetailShowTheItemPicture()
+        {
+            var water = Load("IT_Eau");
+            Assert.That(water.Icon, Is.Not.Null, "the builder renders a picture for every item");
+            var screen = Rig.GetComponent<PlayerInventoryScreen>();
+            screen.SetOpen(true);
+            yield return null;
+            Assert.That(screen.Selected, Is.EqualTo(water));
+            var firstRow = Root.Q("item-list").Q(className: "item-row");
+            Assert.That(firstRow.Q(className: "item-icon").style.backgroundImage.value.texture, Is.EqualTo(water.Icon));
+            Assert.That(Root.Q("item-detail-icon").style.backgroundImage.value.texture, Is.EqualTo(water.Icon));
             screen.SetOpen(false);
         }
     }
