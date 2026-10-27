@@ -129,6 +129,7 @@ namespace DeadCounty.EditorTools
             rig.AddComponent<UIDocument>();
             AddMissingPlayerComponents(rig, player);
             AssignHudAssets(rig);
+            EnsureUiSounds(rig);
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(rig, PlayerPrefabPath);
             Object.DestroyImmediate(rig);
@@ -153,6 +154,7 @@ namespace DeadCounty.EditorTools
                 changed |= AddBodyDetails(controller.transform.Find("Model"), SurvivorLook);
                 changed |= AddMissing<UIDocument>(root);
                 AssignHudAssets(root);
+                changed |= EnsureUiSounds(root);
                 // AssignHudAssets writes straight into the prefab contents; save unconditionally.
                 return PrefabUtility.SaveAsPrefabAsset(root, path);
             }

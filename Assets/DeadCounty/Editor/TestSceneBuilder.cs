@@ -74,6 +74,7 @@ namespace DeadCounty.EditorTools
             EnsureGaitProfiles();
             BuildPlayer();
             BuildTitleScreen();
+            BuildSoundscape();
             BakeNavMesh(env.gameObject);
             BuildDoors();
             BuildZombies();
