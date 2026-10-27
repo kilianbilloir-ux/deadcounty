@@ -14,11 +14,11 @@ namespace DeadCounty.Player
     // takes the danger colour when low, the stamina bar shows while not full and blinks when exhausted, the
     // flashlight and clock readouts show for a few seconds when they change, with the need gauges. The
     // interaction prompt sits next to what the player can use, its name above the key and the action (GDD 8.11,
-    // after Valheim), with a ring filling through a search; why the player woke up shows for a moment below the
-    // middle of the screen. A hit flashes the screen and leaves an arc around the centre that points at where it
-    // came from and follows the camera. Also draws the game over screen from PlayerDeathFlow, with what killed the
-    // player. The only allocations are texts rebuilt when they change. Afflictions and the sleep screen are
-    // PlayerConditionHud's, items taken PlayerPickupFeed's.
+    // after Valheim), with a ring filling through a search and the same key offered to stop it; why the player woke
+    // up shows for a moment below the middle of the screen. A hit flashes the screen and leaves an arc around the
+    // centre that points at where it came from and follows the camera. Also draws the game over screen from
+    // PlayerDeathFlow, with what killed the player. The only allocations are texts rebuilt when they change.
+    // Afflictions and the sleep screen are PlayerConditionHud's, items taken PlayerPickupFeed's.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -326,7 +326,8 @@ namespace DeadCounty.Player
                 shownInteractable = null;
                 return;
             }
-            var action = current.Action;
+            // Interact again stops a search: say so rather than repeat the action.
+            var action = interactor.Busy ? "Arrêter" : current.Action;
             if (current != shownInteractable || action != shownAction)
             {
                 shownInteractable = current;

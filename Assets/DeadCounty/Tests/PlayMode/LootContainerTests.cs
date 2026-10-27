@@ -106,6 +106,32 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
+        public IEnumerator ThePromptOffersToStopASearch()
+        {
+            // The prompt is projected next to the cupboard, which needs a camera.
+            var view = new GameObject("TestCamera", typeof(Camera)) { tag = "MainCamera" };
+            try
+            {
+                view.transform.SetPositionAndRotation(Health.transform.position + new Vector3(0f, 2f, -3f), Quaternion.identity);
+                var action = Rig.GetComponent<UIDocument>().rootVisualElement.Q<Label>("interaction-action");
+                yield return null;
+                Assert.That(action.text, Is.EqualTo("Fouiller"));
+
+                yield return Tap(Keyboard, new KeyboardState(Key.E), new KeyboardState());
+                Assert.That(interactor.Busy);
+                Assert.That(action.text, Is.EqualTo("Arrêter"), "Interact stops a search: the prompt must say so");
+
+                yield return Tap(Keyboard, new KeyboardState(Key.E), new KeyboardState());
+                Assert.That(interactor.Busy, Is.False);
+                Assert.That(action.text, Is.EqualTo("Fouiller"));
+            }
+            finally
+            {
+                Object.Destroy(view);
+            }
+        }
+
+        [UnityTest]
         public IEnumerator MovingCancelsTheSearch()
         {
             yield return Tap(Keyboard, new KeyboardState(Key.E), new KeyboardState());
