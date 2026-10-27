@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.Rendering;
 using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 namespace DeadCounty.Tests
 {
@@ -42,6 +43,31 @@ namespace DeadCounty.Tests
             finally
             {
                 GameSettings.ReduceFlashes = saved;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator TheWorldKeepsRunningSharpBehindTheInventory()
+        {
+            var view = new GameObject("TestCamera", typeof(Camera)) { tag = "MainCamera" };
+            try
+            {
+                yield return Tap(Keyboard, new KeyboardState(Key.Tab), new KeyboardState());
+                Assert.That(Rig.GetComponent<DeadCounty.Player.PlayerInventoryScreen>().IsOpen);
+                var before = Time.time;
+                yield return new WaitForSecondsRealtime(0.4f);
+                Assert.That(Time.timeScale, Is.EqualTo(1f), "the inventory must not stop the game");
+                Assert.That(Time.time, Is.GreaterThan(before + 0.2f));
+                Assert.That(Volume("MenuBlurVolume").weight, Is.Zero, "the world must stay sharp behind the inventory");
+
+                Health.ApplyHit(10f, Health.transform.position + Vector3.forward);
+                yield return null;
+                var marker = Rig.GetComponent<UIDocument>().rootVisualElement.Q("hit-markers")[0];
+                Assert.That(marker.style.opacity.value, Is.EqualTo(1f).Within(0.01f), "a hit taken in the inventory must show where it came from");
+            }
+            finally
+            {
+                Object.Destroy(view);
             }
         }
 
