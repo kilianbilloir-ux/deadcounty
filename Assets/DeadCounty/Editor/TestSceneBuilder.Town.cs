@@ -107,36 +107,58 @@ namespace DeadCounty.EditorTools
                     for (var k = 0; k < 3; k++)
                         Box("Planche", body, new Vector3(offset, 1.15f + k * 0.35f, -0.17f), new Vector3(1.5f, 0.16f, 0.04f), "WoodDark", Quaternion.Euler(0f, 0f, k == 1 ? -12f : 9f), solid: false);
 
-            Furnish(body);
+            Furnish(body, new System.Random(Mathf.RoundToInt(frontCenter.x * 73f + frontCenter.z * 31f)));
             return root;
         }
 
-        static void Furnish(Transform body)
+        // Rooms in the body frame: floor top at 0.1, living room x 0..7 z 0..6, kitchen x 0..7 z 6..10, bedroom
+        // x 7..12 z 5.5..10, bathroom x 7..12 z 0..5.5. Footprints match the former single boxes, so the NavMesh,
+        // the zombie spots and the searchable pieces stay where they were.
+        static void Furnish(Transform body, System.Random rng)
         {
+            const float floor = 0.1f;
+            Vector3 At(float x, float z) => new(x, floor, z);
             var f = Group(body, "Mobilier");
-            // Living room (x 0..7, z 0..6)
-            Box("Canape", f, new Vector3(2f, 0.4f, 1.2f), new Vector3(2.2f, 0.8f, 0.9f), "Fabric");
-            Box("Table_Basse", f, new Vector3(2f, 0.25f, 2.7f), new Vector3(1.2f, 0.5f, 0.6f), "Furniture");
-            Searchable(Box("Meuble_TV", f, new Vector3(2f, 0.3f, 5.5f), new Vector3(1.8f, 0.6f, 0.45f), "Furniture"), "Meuble TV", "LT_Salon");
-            Box("TV", f, new Vector3(2f, 0.9f, 5.55f), new Vector3(1.2f, 0.62f, 0.08f), "CarBlack", solid: false);
-            Box("Fauteuil", f, new Vector3(4.6f, 0.4f, 3.4f), new Vector3(0.9f, 0.8f, 0.9f), "Fabric");
-            Box("Bibliotheque", f, new Vector3(0.3f, 1f, 2.8f), new Vector3(0.4f, 2f, 1.4f), "Furniture");
-            // Kitchen (x 0..7, z 6..10)
-            Searchable(Box("Plan_Travail", f, new Vector3(0.4f, 0.45f, 8.4f), new Vector3(0.6f, 0.9f, 3f), "Furniture"), "Placards", "LT_Cuisine_Placard");
-            Box("Placard_Haut", f, new Vector3(0.25f, 1.9f, 8.4f), new Vector3(0.35f, 0.7f, 3f), "Furniture");
-            Searchable(Box("Frigo", f, new Vector3(0.5f, 0.9f, 6.5f), new Vector3(0.7f, 1.8f, 0.7f), "Porcelain"), "Réfrigérateur", "LT_Cuisine_Frigo");
-            Box("Table_Cuisine", f, new Vector3(3.6f, 0.38f, 8f), new Vector3(1.6f, 0.75f, 0.9f), "Furniture");
-            foreach (var (x, z) in new[] { (3.1f, 7.2f), (4.1f, 7.2f), (3.1f, 8.8f), (4.1f, 8.8f) })
-                Box("Chaise", f, new Vector3(x, 0.23f, z), new Vector3(0.45f, 0.46f, 0.45f), "Wood", solid: false);
-            // Bedroom (x 7..12, z 5.5..10)
-            Box("Lit", f, new Vector3(10.5f, 0.25f, 8.5f), new Vector3(1.6f, 0.5f, 2.1f), "Furniture").AddComponent<Bed>();
-            Box("Matelas", f, new Vector3(10.5f, 0.55f, 8.5f), new Vector3(1.5f, 0.15f, 2f), "Mattress", solid: false);
-            Searchable(Box("Armoire", f, new Vector3(11.65f, 1f, 6.15f), new Vector3(0.6f, 2f, 1f), "Furniture"), "Armoire", "LT_Chambre");
-            Searchable(Box("Commode", f, new Vector3(8.2f, 0.45f, 9.65f), new Vector3(1.2f, 0.9f, 0.45f), "Furniture"), "Commode", "LT_Chambre");
-            // Bathroom (x 7..12, z 0..5.5)
-            Box("Baignoire", f, new Vector3(10.8f, 0.3f, 0.6f), new Vector3(1.7f, 0.6f, 0.8f), "Porcelain");
-            Box("Toilettes", f, new Vector3(11.6f, 0.25f, 4.4f), new Vector3(0.6f, 0.5f, 0.45f), "Porcelain");
-            Searchable(Box("Meuble_SdB", f, new Vector3(7.4f, 0.45f, 4.6f), new Vector3(0.5f, 0.9f, 1f), "Furniture"), "Armoire à pharmacie", "LT_SalleDeBain");
+            string[] fabrics = { "Fabric", "FabricRust", "FabricOlive" };
+            var fabric = fabrics[rng.Next(fabrics.Length)];
+
+            // Living room: the sofa faces the TV against the kitchen wall.
+            Rug(f, new Vector3(2.2f, 0f, 2.6f), 0f, new Vector2(3f, 2f), rng.NextDouble() < 0.5 ? "Rug" : "RugBlue");
+            Sofa(f, "Canape", At(2f, 1.05f), 180f, 2.2f, fabric);
+            Table(f, "Table_Basse", At(2f, 2.7f), 0f, new Vector3(1.2f, 0.42f, 0.6f), "Furniture");
+            Searchable(TvStand(f, At(2f, 5.6f), 0f).gameObject, "Meuble TV", "LT_Salon");
+            Armchair(f, At(4.6f, 3.4f), 90f, fabric);
+            Bookcase(f, At(0.3f, 2.8f), -90f, rng);
+            Frame(f, new Vector3(4.6f, 1.6f, 5.88f), 0f, new Vector2(0.8f, 0.6f), "SidingSage");
+            CeilingLamp(f, new Vector3(3.5f, 0f, 3f));
+            Clutter(f, rng, Rect.MinMaxRect(3.4f, 0.8f, 6.4f, 2.4f), rng.Next(2, 5));
+
+            // Kitchen: worktop and fridge along the side wall, a table with its chairs, one knocked over.
+            Searchable(Counter(f, At(0.4f, 8.4f), -90f, 3f, true, rng).gameObject, "Placards", "LT_Cuisine_Placard");
+            Searchable(Fridge(f, At(0.5f, 6.5f), -90f).gameObject, "Réfrigérateur", "LT_Cuisine_Frigo");
+            Table(f, "Table_Cuisine", At(3.6f, 8f), 0f, new Vector3(1.6f, 0.75f, 0.9f), "Furniture");
+            Chair(f, At(3.1f, 7.25f), 180f);
+            Chair(f, At(4.1f, 7.25f), 180f);
+            Chair(f, At(3.1f, 8.75f), 0f);
+            if (rng.NextDouble() < 0.6) Chair(f, At(4.9f, 9.1f) + Vector3.up * 0.22f, Range(rng, 0f, 360f), Quaternion.Euler(90f, 0f, 0f));
+            else Chair(f, At(4.1f, 8.75f), 0f);
+            CeilingLamp(f, new Vector3(3.5f, 0f, 8f));
+            Clutter(f, rng, Rect.MinMaxRect(1.2f, 6.4f, 6.4f, 7.1f), rng.Next(1, 4));
+
+            // Bedroom: head of the bed against the back wall, a pulled-out drawer.
+            DoubleBed(f, At(10.5f, 8.8f), 0f, rng.NextDouble() < 0.5 ? "Blanket" : "BlanketRed").gameObject.AddComponent<Bed>();
+            Nightstand(f, At(9.25f, 9.65f), 0f);
+            Searchable(Wardrobe(f, At(11.6f, 6.15f), 90f).gameObject, "Armoire", "LT_Chambre");
+            Searchable(Dresser(f, At(8.2f, 9.67f), 0f).gameObject, "Commode", "LT_Chambre");
+            Frame(f, new Vector3(10.5f, 1.75f, 9.88f), 0f, new Vector2(0.6f, 0.45f), "Hay");
+            CeilingLamp(f, new Vector3(9.5f, 0f, 7.75f));
+            Clutter(f, rng, Rect.MinMaxRect(7.4f, 6f, 9.4f, 8.4f), rng.Next(1, 3));
+
+            // Bathroom.
+            Bathtub(f, At(11f, 0.5f), 0f);
+            Toilet(f, At(11.57f, 4.4f), 90f);
+            Searchable(BathroomCabinet(f, At(7.35f, 4.6f), -90f).gameObject, "Armoire à pharmacie", "LT_SalleDeBain");
+            CeilingLamp(f, new Vector3(9.5f, 0f, 2.75f));
         }
 
         // 6 x 6 m garage, front wall on z = 0 facing -Z.
@@ -150,8 +172,9 @@ namespace DeadCounty.EditorTools
             Wall(g, "Mur_Arriere", new Vector2(3f, 6f), new Vector2(-3f, 6f), style, Door(3f));
             Wall(g, "Mur_Gauche", new Vector2(-3f, 6f), new Vector2(-3f, 0f), style);
             Roof(g, "Toit", new Vector3(0f, 2.8f, 3f), 6.6f, 6.6f, 1.4f, roof);
-            Box("Etabli", g, new Vector3(-2.6f, 0.45f, 3.5f), new Vector3(0.6f, 0.9f, 2.4f), "Wood");
-            Searchable(Box("Etagere", g, new Vector3(2.6f, 0.9f, 3.5f), new Vector3(0.5f, 1.8f, 2f), "Metal"), "Étagère", "LT_Atelier");
+            var rng = new System.Random(Mathf.RoundToInt(frontCenter.x * 53f + frontCenter.z * 17f));
+            Workbench(g, new Vector3(-2.6f, 0.1f, 3.5f), -90f, rng);
+            Searchable(MetalShelf(g, new Vector3(2.6f, 0.1f, 3.5f), 90f, rng).gameObject, "Étagère", "LT_Atelier");
         }
 
         // White wooden church facing Main Street, with steeple and a small graveyard on its south side.
