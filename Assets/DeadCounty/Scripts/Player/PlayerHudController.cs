@@ -62,7 +62,7 @@ namespace DeadCounty.Player
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
         RadialGauge hungerGauge, thirstGauge, fatigueGauge;
         VisualElement interaction;
-        Label interactionName, interactionAction, interactionKey, gameOverKey, toast;
+        Label interactionName, interactionAction, interactionKey, gameOverKey, gameOverMenuKey, gameOverMenu, toast;
         VisualElement interactionRow;
         RadialGauge interactionProgress;
         Interactable shownInteractable;
@@ -135,6 +135,8 @@ namespace DeadCounty.Player
             gameOverTime = Find<Label>(root, "game-over-time");
             gameOverPrompt = Find<Label>(root, "game-over-prompt");
             gameOverKey = Find<Label>(root, "game-over-key");
+            gameOverMenu = Find<Label>(root, "game-over-menu");
+            gameOverMenuKey = Find<Label>(root, "game-over-menu-key");
             var markers = Find<VisualElement>(root, "hit-markers");
             for (var i = 0; i < HitMarkerCount; i++)
             {
@@ -151,11 +153,12 @@ namespace DeadCounty.Player
         T Find<T>(VisualElement root, string elementName) where T : VisualElement =>
             root.Q<T>(elementName) ?? throw new InvalidOperationException($"PlayerHudController on '{name}': the HUD has no '{elementName}' {typeof(T).Name}");
 
-        // Keys of the device in use; respawn is bound to Jump.
+        // Keys of the device in use; respawn is bound to Jump, the way back to the title to Cancel (GameMenu).
         void ShowKeys()
         {
             interactionKey.text = InputPrompts.Key("Player/Interact");
             gameOverKey.text = InputPrompts.Key("Player/Jump");
+            gameOverMenuKey.text = InputPrompts.CancelKey;
         }
 
         // Not in Awake: the pools are created in the health and stamina Awakes, which may run after this one.
@@ -381,6 +384,8 @@ namespace DeadCounty.Player
             var prompt = dead && deathFlow.CanRespawn ? DisplayStyle.Flex : DisplayStyle.None;
             gameOverPrompt.style.display = prompt;
             gameOverKey.style.display = prompt;
+            gameOverMenu.style.display = prompt;
+            gameOverMenuKey.style.display = prompt;
         }
     }
 }

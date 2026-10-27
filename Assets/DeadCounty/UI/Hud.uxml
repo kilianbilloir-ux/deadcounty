@@ -144,11 +144,24 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="title" class="title-screen">
+            <ui:VisualElement picking-mode="Ignore" class="title-column">
+                <ui:Label text="DEAD COUNTY" picking-mode="Ignore" class="title-name" />
+                <ui:Label text="DÉMO" picking-mode="Ignore" class="title-tagline" />
+                <ui:VisualElement picking-mode="Ignore" class="title-list">
+                    <ui:Label name="title-play" text="Jouer" class="menu-item title-item" />
+                    <ui:Label name="title-options" text="Options" class="menu-item title-item" />
+                    <ui:Label name="title-quit" text="Quitter" class="menu-item title-item" />
+                </ui:VisualElement>
+                <ui:VisualElement name="title-hints" picking-mode="Ignore" class="hints title-hints" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="pause" class="pause">
             <ui:VisualElement name="pause-main" class="menu">
                 <ui:Label text="PAUSE" picking-mode="Ignore" class="screen-title menu-title" />
                 <ui:Label name="pause-resume" text="Reprendre" class="menu-item" />
                 <ui:Label name="pause-options" text="Options" class="menu-item" />
+                <ui:Label name="pause-title" text="Menu principal" class="menu-item" />
                 <ui:Label name="pause-quit" text="Quitter" class="menu-item" />
             </ui:VisualElement>
             <ui:VisualElement name="pause-settings" class="menu">
@@ -186,9 +199,15 @@
         <ui:VisualElement name="game-over" picking-mode="Ignore" class="game-over">
             <ui:Label name="game-over-title" text="VOUS ÊTES MORT" picking-mode="Ignore" class="screen-title game-over-title" />
             <ui:Label name="game-over-time" text="Temps survécu : 00:00" picking-mode="Ignore" class="game-over-line" />
-            <ui:VisualElement picking-mode="Ignore" class="prompt-row game-over-prompt-row">
-                <ui:Label name="game-over-key" picking-mode="Ignore" class="keycap" />
-                <ui:Label name="game-over-prompt" text="Recommencer" picking-mode="Ignore" class="prompt-action" />
+            <ui:VisualElement picking-mode="Ignore" class="game-over-prompts">
+                <ui:VisualElement picking-mode="Ignore" class="prompt-row">
+                    <ui:Label name="game-over-key" picking-mode="Ignore" class="keycap" />
+                    <ui:Label name="game-over-prompt" text="Recommencer" picking-mode="Ignore" class="prompt-action" />
+                </ui:VisualElement>
+                <ui:VisualElement picking-mode="Ignore" class="prompt-row">
+                    <ui:Label name="game-over-menu-key" picking-mode="Ignore" class="keycap" />
+                    <ui:Label name="game-over-menu" text="Menu principal" picking-mode="Ignore" class="prompt-action" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

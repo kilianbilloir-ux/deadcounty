@@ -2,6 +2,7 @@ using System.IO;
 using DeadCounty.Animation;
 using DeadCounty.Core;
 using DeadCounty.Player;
+using DeadCounty.UI;
 using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
@@ -21,6 +22,9 @@ namespace DeadCounty.EditorTools
         const string InjuryProfilePath = ArtDir + "/VP_Injured.asset";
         const string MenuBlurProfilePath = ArtDir + "/VP_MenuBlur.asset";
         static readonly Vector3 SpawnPosition = new(65.2f, 0.15f, -10f);
+        // Behind the spawn and above head height, looking up the main street into the fog.
+        static readonly Vector3 TitleCameraPosition = new(64f, 3f, -17f);
+        static readonly Vector3 TitleCameraTarget = new(70f, 2f, 25f);
 
         // The prefab is only generated when missing, so Inspector tweaks survive scene rebuilds.
         // Delete it to regenerate it from this code.
@@ -32,6 +36,23 @@ namespace DeadCounty.EditorTools
             var rig = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             rig.transform.SetPositionAndRotation(SpawnPosition, Quaternion.identity);
             Camera.main.gameObject.AddComponent<CinemachineBrain>();
+        }
+
+        // The title camera lives in the scene, not in the rig: tests and other scenes start straight in the game.
+        static void BuildTitleScreen()
+        {
+            var title = new GameObject("TitleScreen");
+            var view = new GameObject("TitleCamera");
+            view.transform.SetParent(title.transform, false);
+            view.transform.SetPositionAndRotation(TitleCameraPosition, Quaternion.LookRotation(TitleCameraTarget - TitleCameraPosition));
+            var vcam = view.AddComponent<CinemachineCamera>();
+            vcam.Priority = 10;
+            vcam.Lens.FieldOfView = 45f;
+            vcam.Lens.NearClipPlane = 0.1f;
+            vcam.Lens.FarClipPlane = 600f;
+            var so = new SerializedObject(title.AddComponent<TitleScreen>());
+            so.FindProperty("titleCamera").objectReferenceValue = vcam;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static GameObject CreatePlayerPrefab()
@@ -157,7 +178,7 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerHudController>(rig);
             added |= AddMissing<PlayerInventoryScreen>(rig);
             added |= AddMissing<PlayerConditionHud>(rig);
-            added |= AddMissing<PauseMenu>(rig);
+            added |= AddMissing<GameMenu>(rig);
             added |= AddMissing<PlayerTips>(rig);
             added |= AddMissing<PlayerScreenEffects>(rig);
             added |= AddMissing<PlayerNoiseMeter>(rig);

@@ -125,6 +125,8 @@ namespace DeadCounty.Tests
             yield return new WaitForSeconds(0.3f);
             Assert.That(prompt.style.display.value, Is.EqualTo(DisplayStyle.Flex));
             Assert.That(prompt.text, Does.Contain("Recommencer"));
+            Assert.That(Element<Label>("game-over-menu").style.display.value, Is.EqualTo(DisplayStyle.Flex), "the way back to the title must show too");
+            Assert.That(Element<Label>("game-over-menu-key").text, Is.EqualTo("Échap"));
 
             yield return Tap(Keyboard, new KeyboardState(Key.Space), new KeyboardState());
             Assert.That(Health.IsAlive, Is.True);
