@@ -204,8 +204,9 @@ namespace DeadCounty.EditorTools
             Box("Parvis", root, new Vector3(0f, 0.1f, -1.5f), new Vector3(4f, 0.2f, 3f), "Concrete");
             for (var row = 0; row < 6; row++)
             foreach (var side in new[] { -1f, 1f })
-                Box("Banc", root, new Vector3(side * 2.1f, 0.45f, 4.5f + row * 1.6f), new Vector3(2.6f, 0.9f, 0.5f), "Wood");
+                Pew(root, new Vector3(side * 2.1f, 0f, 4.5f + row * 1.6f));
             Box("Autel", root, new Vector3(0f, 0.5f, 14.8f), new Vector3(3f, 1f, 1f), "Trim");
+            ChurchDetails(root);
 
             var rng = new System.Random(31);
             var graves = Group(root, "Cimetiere");
