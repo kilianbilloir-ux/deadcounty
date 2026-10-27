@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 using DeadCounty.Player;
+using DeadCounty.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -79,6 +80,33 @@ namespace DeadCounty.Tests
             yield return Press(Key.Escape);
             Assert.That(pause.InSettings, Is.False);
             Assert.That(pause.Paused, "Escape in the options must go back, not resume");
+        }
+
+        [UnityTest]
+        public IEnumerator OptionsChangeTheInterfaceSizeAndTheTips()
+        {
+            var savedScale = GameSettings.UiScale;
+            var savedTips = GameSettings.Tips;
+            try
+            {
+                GameSettings.UiScale = 1f;
+                yield return Press(Key.Escape);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                for (var i = 0; i < 3; i++) yield return Press(Key.DownArrow);
+                yield return Press(Key.RightArrow);
+                Assert.That(GameSettings.UiScale, Is.EqualTo(1.1f).Within(1e-4f));
+                Assert.That(Root.Q<Label>("option-ui-scale-value").text, Is.EqualTo("110\u00A0%"));
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                Assert.That(GameSettings.Tips, Is.EqualTo(!savedTips));
+                Assert.That(Root.Q<Label>("option-tips-value").text, Is.EqualTo(savedTips ? "Non" : "Oui"));
+            }
+            finally
+            {
+                GameSettings.UiScale = savedScale;
+                GameSettings.Tips = savedTips;
+            }
         }
 
         [UnityTest]

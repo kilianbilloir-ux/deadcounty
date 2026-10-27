@@ -22,6 +22,26 @@
     opacity: 0;
 }
 
+/* Arcs around the centre pointing at where hits came from; rotated about their own centre. */
+.hit-markers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hit-marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 500px;
+    height: 500px;
+    margin-left: -250px;
+    margin-top: -250px;
+    color: rgb(204, 110, 72);
+}
+
 /* Bottom left: needs, then health and stamina, then the clock and the flashlight. */
 .hud {
     position: absolute;
@@ -59,6 +79,7 @@
     font-size: 15px;
     color: rgb(138, 143, 150);
     -unity-text-align: middle-center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .need--low .need-label {
@@ -80,6 +101,7 @@
     font-size: 16px;
     color: rgb(180, 188, 201);
     -unity-text-align: middle-left;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .bar-frame {
@@ -125,6 +147,7 @@
     font-size: 16px;
     margin-right: 18px;
     color: rgb(138, 143, 150);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .time-readout {
@@ -206,6 +229,33 @@
     border-left-width: 3px;
     border-color: rgb(212, 185, 118);
     opacity: 0;
+}
+
+/* One-time tips at the top left, where the eye goes first and nothing else sits. */
+.tip {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    max-width: 460px;
+    padding: 12px 16px;
+    background-color: rgba(26, 29, 34, 0.88);
+    border-left-width: 3px;
+    border-color: rgb(212, 185, 118);
+    display: none;
+}
+
+.tip-title {
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 3px;
+    color: rgb(212, 185, 118);
+    margin-bottom: 6px;
+}
+
+.tip-text {
+    font-size: 17px;
+    color: rgb(217, 217, 217);
+    white-space: normal;
 }
 
 /* Afflictions on the right, after The Long Dark; only the active ones show (GDD 8.4, moodles). */
@@ -300,7 +350,7 @@
     bottom: 0;
     justify-content: center;
     align-items: center;
-    background-color: rgba(5, 6, 8, 0.7);
+    background-color: rgba(5, 6, 8, 0.5);
     display: none;
 }
 
@@ -460,6 +510,8 @@
     padding: 9px 12px;
     border-left-width: 3px;
     border-color: rgba(0, 0, 0, 0);
+    transition-property: background-color, border-color;
+    transition-duration: 0.12s;
 }
 
 .item-row:hover {
@@ -516,7 +568,7 @@
     text-shadow: none;
 }
 
-/* Pause (GDD 8.11, after Risk of Rain 2): a few centred text entries over the darkened game. */
+/* Pause (GDD 8.11, after Risk of Rain 2): a few centred text entries over the blurred, darkened game. */
 .pause {
     position: absolute;
     left: 0;
@@ -525,7 +577,7 @@
     bottom: 0;
     justify-content: center;
     align-items: center;
-    background-color: rgba(5, 6, 8, 0.9);
+    background-color: rgba(5, 6, 8, 0.6);
     display: none;
 }
 
@@ -547,6 +599,8 @@
     -unity-text-align: middle-center;
     border-left-width: 3px;
     border-color: rgba(0, 0, 0, 0);
+    transition-property: background-color, border-color, color;
+    transition-duration: 0.12s;
 }
 
 .menu-item--selected {

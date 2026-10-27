@@ -1,5 +1,6 @@
 using System;
 using DeadCounty.Core;
+using DeadCounty.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -60,8 +61,9 @@ namespace DeadCounty.Player
             var alive = health.IsAlive;
             var model = needs.Model;
             Show(bleeding, alive && health.Bleeding);
-            // Bleeding is the one affliction that kills fast: it pulses.
-            if (health.Bleeding) bleeding.style.opacity = 0.55f + 0.45f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * BleedingPulseRate));
+            // Bleeding is the one affliction that kills fast: it pulses, unless flashes are reduced.
+            if (health.Bleeding)
+                bleeding.style.opacity = GameSettings.ReduceFlashes ? 1f : 0.55f + 0.45f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * BleedingPulseRate));
             Show(hungry, alive && model.Hunger <= LowNeed);
             Show(thirsty, alive && model.Thirst <= LowNeed);
             Show(tired, alive && model.Fatigue <= LowNeed);

@@ -8,7 +8,8 @@ using UnityEngine.UIElements;
 namespace DeadCounty.Player
 {
     // Pause menu (GDD 8.11): Cancel freezes the game behind Reprendre, Options and Quitter. Options holds the mouse
-    // sensitivity, the vertical look inversion and full screen, kept in PlayerPrefs. Navigate moves the selection
+    // sensitivity, the vertical look inversion, full screen, the interface size, the one-time tips and reduced
+    // flashes, kept in PlayerPrefs (the last three through GameSettings). Navigate moves the selection
     // and changes an option sideways, Submit activates, Cancel goes back; the mouse can hover and click. Runs before
     // the inventory screen, which closes itself on Cancel: an open inventory is closed, not paused.
     [DefaultExecutionOrder(-10)]
@@ -21,6 +22,7 @@ namespace DeadCounty.Player
         const float MinSensitivity = 0.03f;
         const float MaxSensitivity = 0.4f;
         const float SensitivityStep = 0.01f;
+        const float UiScaleStep = 0.1f;
         const string SensitivityKey = "dc.mouseSensitivity";
         const string InvertKey = "dc.invertLook";
 
@@ -36,7 +38,7 @@ namespace DeadCounty.Player
         PlayerInventoryScreen inventoryScreen;
         InputAction cancel, submit, navigate;
         VisualElement screen, mainPage, settingsPage, sensitivityBar, sensitivityFill;
-        Label invertValue, fullscreenValue;
+        Label invertValue, fullscreenValue, uiScaleValue, tipsValue, flashesValue;
         KeyHint confirmHint, backHint;
         List<Item> mainItems, settingsItems, items;
         int selected;
@@ -78,6 +80,9 @@ namespace DeadCounty.Player
             sensitivityBar = sensitivityFill.parent;
             invertValue = Find<Label>(root, "option-invert-value");
             fullscreenValue = Find<Label>(root, "option-fullscreen-value");
+            uiScaleValue = Find<Label>(root, "option-ui-scale-value");
+            tipsValue = Find<Label>(root, "option-tips-value");
+            flashesValue = Find<Label>(root, "option-flashes-value");
 
             mainItems = new List<Item>
             {
@@ -90,6 +95,9 @@ namespace DeadCounty.Player
                 Entry(root, "option-sensitivity", null, step => SetSensitivity(controller.MouseSensitivity + step * SensitivityStep)),
                 Entry(root, "option-invert", ToggleInvert, _ => ToggleInvert()),
                 Entry(root, "option-fullscreen", ToggleFullScreen, _ => ToggleFullScreen()),
+                Entry(root, "option-ui-scale", CycleUiScale, StepUiScale),
+                Entry(root, "option-tips", ToggleTips, _ => ToggleTips()),
+                Entry(root, "option-flashes", ToggleFlashes, _ => ToggleFlashes()),
                 Entry(root, "option-back", () => ShowPage(mainItems)),
             };
             // Clicking along the bar sets the sensitivity there.
@@ -225,6 +233,37 @@ namespace DeadCounty.Player
             ShowValues();
         }
 
+        void StepUiScale(int step)
+        {
+            // Rounded so repeated steps land on whole tenths.
+            GameSettings.UiScale = Mathf.Round((GameSettings.UiScale + step * UiScaleStep) * 10f) / 10f;
+            ShowValues();
+        }
+
+        // A click has no direction: it goes up and wraps around to the smallest size.
+        void CycleUiScale()
+        {
+            if (GameSettings.UiScale < GameSettings.MaxUiScale - 0.01f)
+            {
+                StepUiScale(1);
+                return;
+            }
+            GameSettings.UiScale = GameSettings.MinUiScale;
+            ShowValues();
+        }
+
+        void ToggleTips()
+        {
+            GameSettings.Tips = !GameSettings.Tips;
+            ShowValues();
+        }
+
+        void ToggleFlashes()
+        {
+            GameSettings.ReduceFlashes = !GameSettings.ReduceFlashes;
+            ShowValues();
+        }
+
         // Screen.fullScreen only changes on the next frame: show the value asked for.
         void ToggleFullScreen()
         {
@@ -238,6 +277,9 @@ namespace DeadCounty.Player
             sensitivityFill.style.width = Length.Percent(Mathf.InverseLerp(MinSensitivity, MaxSensitivity, controller.MouseSensitivity) * 100f);
             invertValue.text = controller.InvertLook ? "Oui" : "Non";
             fullscreenValue.text = Screen.fullScreen ? "Oui" : "Non";
+            uiScaleValue.text = Mathf.RoundToInt(GameSettings.UiScale * 100f) + "\u00A0%";
+            tipsValue.text = GameSettings.Tips ? "Oui" : "Non";
+            flashesValue.text = GameSettings.ReduceFlashes ? "Oui" : "Non";
         }
     }
 }
