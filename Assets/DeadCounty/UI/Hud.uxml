@@ -201,6 +201,7 @@
                     <ui:Label name="option-flashes-value" picking-mode="Ignore" class="option-value" />
                 </ui:VisualElement>
                 <ui:Label name="option-controls" text="Contrôles" class="menu-item" />
+                <ui:Label name="option-audio" text="Audio" class="menu-item" />
                 <ui:Label name="option-back" text="Retour" class="menu-item" />
             </ui:VisualElement>
             <ui:VisualElement name="pause-controls" class="menu">
@@ -208,6 +209,40 @@
                 <ui:VisualElement name="controls-list" picking-mode="Ignore" class="controls-list" />
                 <ui:Label name="controls-reset" text="Réinitialiser" class="menu-item" />
                 <ui:Label name="controls-back" text="Retour" class="menu-item" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pause-audio" class="menu">
+                <ui:Label text="AUDIO" picking-mode="Ignore" class="screen-title menu-title" />
+                <ui:VisualElement name="option-volume-master" class="menu-item option-row">
+                    <ui:Label text="Volume général" picking-mode="Ignore" class="option-label" />
+                    <ui:VisualElement picking-mode="Ignore" class="option-bar">
+                        <ui:VisualElement name="option-volume-master-fill" picking-mode="Ignore" class="option-fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="option-volume-effects" class="menu-item option-row">
+                    <ui:Label text="Effets" picking-mode="Ignore" class="option-label" />
+                    <ui:VisualElement picking-mode="Ignore" class="option-bar">
+                        <ui:VisualElement name="option-volume-effects-fill" picking-mode="Ignore" class="option-fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="option-volume-ambience" class="menu-item option-row">
+                    <ui:Label text="Ambiance" picking-mode="Ignore" class="option-label" />
+                    <ui:VisualElement picking-mode="Ignore" class="option-bar">
+                        <ui:VisualElement name="option-volume-ambience-fill" picking-mode="Ignore" class="option-fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="option-volume-music" class="menu-item option-row">
+                    <ui:Label text="Musique" picking-mode="Ignore" class="option-label" />
+                    <ui:VisualElement picking-mode="Ignore" class="option-bar">
+                        <ui:VisualElement name="option-volume-music-fill" picking-mode="Ignore" class="option-fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="option-volume-interface" class="menu-item option-row">
+                    <ui:Label text="Interface" picking-mode="Ignore" class="option-label" />
+                    <ui:VisualElement picking-mode="Ignore" class="option-bar">
+                        <ui:VisualElement name="option-volume-interface-fill" picking-mode="Ignore" class="option-fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="audio-back" text="Retour" class="menu-item" />
             </ui:VisualElement>
             <ui:VisualElement name="pause-hints" picking-mode="Ignore" class="hints menu-hints" />
         </ui:VisualElement>
