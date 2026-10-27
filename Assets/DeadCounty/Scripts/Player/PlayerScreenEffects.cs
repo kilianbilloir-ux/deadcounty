@@ -7,7 +7,7 @@ namespace DeadCounty.Player
 {
     // Full-screen effects through global volumes: a dark red vignette that deepens as health drops under 40 % and
     // beats slowly, steady when flashes are reduced, and a blur behind the inventory and the pause menu (GDD 8.11,
-    // after Risk of Rain 2). The title keeps the world sharp: it is the backdrop.
+    // after Risk of Rain 2). The title page keeps the world sharp: it is the backdrop.
     public class PlayerScreenEffects : MonoBehaviour
     {
         const float InjuredBelow = 0.4f;
@@ -45,7 +45,7 @@ namespace DeadCounty.Player
             var injury = health.IsAlive ? Mathf.InverseLerp(InjuredBelow, FullInjuryAt, health.Pool.Normalized) : 0f;
             if (!GameSettings.ReduceFlashes) injury *= 1f - BeatDepth * 0.5f * (1f + Mathf.Sin(Time.unscaledTime * BeatRate * 2f * Mathf.PI));
             injuryVolume.weight = Mathf.MoveTowards(injuryVolume.weight, injury, InjuryFadeSpeed * dt);
-            menuBlurVolume.weight = Mathf.MoveTowards(menuBlurVolume.weight, controller.MenuOpen && !menu.OnTitle ? 1f : 0f, BlurFadeSpeed * dt);
+            menuBlurVolume.weight = Mathf.MoveTowards(menuBlurVolume.weight, controller.MenuOpen && !menu.TitleShown ? 1f : 0f, BlurFadeSpeed * dt);
         }
     }
 }

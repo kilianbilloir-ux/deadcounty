@@ -99,7 +99,7 @@ namespace DeadCounty.Player
             sortHint = new KeyHint(hints, "Trier");
             closeHint = new KeyHint(hints, "Fermer");
             ShowKeys();
-            InputPrompts.DeviceChanged += ShowKeys;
+            InputPrompts.KeysChanged += ShowKeys;
             sortName = Find<Label>(root, "sort-name");
             sortCategory = Find<Label>(root, "sort-category");
             sortWeight = Find<Label>(root, "sort-weight");
@@ -114,7 +114,7 @@ namespace DeadCounty.Player
         void OnDestroy()
         {
             if (inventory != null && inventory.Items != null) inventory.Items.Changed -= MarkDirty;
-            InputPrompts.DeviceChanged -= ShowKeys;
+            InputPrompts.KeysChanged -= ShowKeys;
         }
 
         void ShowKeys()

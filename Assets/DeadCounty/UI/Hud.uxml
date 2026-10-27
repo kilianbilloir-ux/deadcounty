@@ -192,7 +192,14 @@
                     <ui:Label text="Réduire les flashs" picking-mode="Ignore" class="option-label" />
                     <ui:Label name="option-flashes-value" picking-mode="Ignore" class="option-value" />
                 </ui:VisualElement>
+                <ui:Label name="option-controls" text="Contrôles" class="menu-item" />
                 <ui:Label name="option-back" text="Retour" class="menu-item" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pause-controls" class="menu">
+                <ui:Label text="CONTRÔLES" picking-mode="Ignore" class="screen-title menu-title" />
+                <ui:VisualElement name="controls-list" picking-mode="Ignore" class="controls-list" />
+                <ui:Label name="controls-reset" text="Réinitialiser" class="menu-item" />
+                <ui:Label name="controls-back" text="Retour" class="menu-item" />
             </ui:VisualElement>
             <ui:VisualElement name="pause-hints" picking-mode="Ignore" class="hints menu-hints" />
         </ui:VisualElement>
