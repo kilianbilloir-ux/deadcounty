@@ -184,6 +184,7 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerTips>(rig);
             added |= AddMissing<PlayerScreenEffects>(rig);
             added |= AddMissing<PlayerNoiseMeter>(rig);
+            added |= AddMissing<PlayerPickupFeed>(rig);
             added |= EnsureFlashlight(player);
             added |= EnsureExhaustionVolume(rig, player);
             added |= EnsureScreenEffectVolumes(rig);

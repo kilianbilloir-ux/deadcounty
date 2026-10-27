@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections;
+using System.Linq;
 using System.Reflection;
 using DeadCounty.Items;
 using DeadCounty.Perception;
@@ -99,8 +100,35 @@ namespace DeadCounty.Tests
             Assert.That(inventory.Items.Count(water), Is.EqualTo(2), "the starting bottle and the one found");
             Assert.That(cupboard.Action, Is.Null);
             Assert.That(cupboard.DisplayName, Does.EndWith("(fouillé)"));
-            var toast = Rig.GetComponent<UIDocument>().rootVisualElement.Q<Label>("loot-toast");
-            Assert.That(toast.text, Is.EqualTo("Trouvé : Bouteille d'eau"));
+            var feed = Rig.GetComponent<UIDocument>().rootVisualElement.Q("pickup-feed");
+            var listed = feed.Children().Where(row => row.style.display.value == DisplayStyle.Flex).Select(row => row.Q<Label>(className: "pickup-name").text);
+            Assert.That(listed, Is.EqualTo(new[] { "Bouteille d'eau" }), "what was found must be listed");
+        }
+
+        [UnityTest]
+        public IEnumerator ThePromptOffersToStopASearch()
+        {
+            // The prompt is projected next to the cupboard, which needs a camera.
+            var view = new GameObject("TestCamera", typeof(Camera)) { tag = "MainCamera" };
+            try
+            {
+                view.transform.SetPositionAndRotation(Health.transform.position + new Vector3(0f, 2f, -3f), Quaternion.identity);
+                var action = Rig.GetComponent<UIDocument>().rootVisualElement.Q<Label>("interaction-action");
+                yield return null;
+                Assert.That(action.text, Is.EqualTo("Fouiller"));
+
+                yield return Tap(Keyboard, new KeyboardState(Key.E), new KeyboardState());
+                Assert.That(interactor.Busy);
+                Assert.That(action.text, Is.EqualTo("Arrêter"), "Interact stops a search: the prompt must say so");
+
+                yield return Tap(Keyboard, new KeyboardState(Key.E), new KeyboardState());
+                Assert.That(interactor.Busy, Is.False);
+                Assert.That(action.text, Is.EqualTo("Fouiller"));
+            }
+            finally
+            {
+                Object.Destroy(view);
+            }
         }
 
         [UnityTest]

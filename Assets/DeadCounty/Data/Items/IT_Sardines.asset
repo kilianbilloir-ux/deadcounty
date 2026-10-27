@@ -22,3 +22,4 @@ MonoBehaviour:
   StopsBleeding: 0
   CapacityBonus: 0
   WorldModel: {fileID: 5004611176681901618, guid: a1270b85b29a3468c9d9b461386f9f6c, type: 3}
+  Icon: {fileID: 2800000, guid: 56cda633970bc4d268c528eaa398b808, type: 3}
