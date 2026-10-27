@@ -65,6 +65,7 @@ namespace DeadCounty.EditorTools
                 Box("Passage_Pieton", marks, new Vector3(MainStreetX - 3f + i, 0.049f, 6.3f), new Vector3(0.5f, 0.01f, 2.4f), "RoadLineWhite", solid: false);
             Box("Ligne_Stop", marks, new Vector3(MainStreetX - 1.75f, 0.049f, 8f), new Vector3(3.2f, 0.01f, 0.35f), "RoadLineWhite", solid: false);
             Box("Ligne_Stop", marks, new Vector3(MainStreetX + 1.75f, 0.049f, -8f), new Vector3(3.2f, 0.01f, 0.35f), "RoadLineWhite", solid: false);
+            RoadWear(parent);
 
             var walks = Group(parent, "Trottoirs");
             foreach (var side in new[] { -1f, 1f })
@@ -178,6 +179,7 @@ namespace DeadCounty.EditorTools
                 if (density > 0.4f && rng.NextDouble() < 0.35)
                     PlaceBush(bushes, ground + new Vector3(Range(rng, 1.5f, 3f), 0f, Range(rng, -2f, 2f)), rng);
             }
+            BuildUndergrowth(parent);
         }
 
         static void PlaceTree(Transform parent, Vector3 pos, System.Random rng, bool forest)
@@ -192,8 +194,12 @@ namespace DeadCounty.EditorTools
                 _ => "FoliageRust",
             };
             var scale = (pine ? 1.3f : 1f) * Range(rng, 0.8f, 1.4f);
-            var tree = MeshObject(pine ? "Pin" : "Arbre", parent, pine ? PineMesh(variant) : TreeMesh(variant), pos,
-                Quaternion.Euler(0f, rng.Next(0, 360), 0f), Vector3.one * scale, new[] { "Trunk", foliage }, false);
+            // Some green broadleaf trees are birches; decided from the draws above so the layout does not move.
+            var birch = !pine && variant == 0 && foliage == "Foliage";
+            var tree = birch
+                ? MeshObject("Bouleau", parent, BirchMesh(0), pos, Quaternion.Euler(0f, rng.Next(0, 360), 0f), Vector3.one * scale, new[] { "BirchBark", "BirchMark", "FoliageBirch" }, false)
+                : MeshObject(pine ? "Pin" : "Arbre", parent, pine ? PineMesh(variant) : TreeMesh(variant), pos,
+                    Quaternion.Euler(0f, rng.Next(0, 360), 0f), Vector3.one * scale, new[] { "Trunk", foliage }, false);
             var trunk = tree.AddComponent<CapsuleCollider>();
             trunk.radius = 0.3f;
             trunk.height = 4f;
