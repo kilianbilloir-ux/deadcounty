@@ -213,6 +213,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="game-over" picking-mode="Ignore" class="game-over">
             <ui:Label name="game-over-title" text="VOUS ÊTES MORT" picking-mode="Ignore" class="screen-title game-over-title" />
+            <ui:Label name="game-over-cause" picking-mode="Ignore" class="game-over-cause" />
             <ui:Label name="game-over-time" text="Temps survécu : 00:00" picking-mode="Ignore" class="game-over-line" />
             <ui:VisualElement picking-mode="Ignore" class="game-over-prompts">
                 <ui:VisualElement picking-mode="Ignore" class="prompt-row">

@@ -417,6 +417,12 @@
     color: rgb(167, 95, 59);
 }
 
+.game-over-cause {
+    font-size: 24px;
+    color: rgb(217, 217, 217);
+    margin-bottom: 10px;
+}
+
 .game-over-line {
     font-size: 22px;
     color: rgb(180, 188, 201);
