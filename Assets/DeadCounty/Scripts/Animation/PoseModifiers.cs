@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace DeadCounty.Animation
 {
-    // Expressive overlays on top of the gait, set each frame by the motion source (the zombie brain); the
-    // animator smooths them.
+    // Expressive overlays on top of the gait, set each frame by the motion source (zombie brain, player pose
+    // driver); the animator smooths them, except the flinch, which must snap.
     [Serializable]
     public struct PoseModifiers
     {
@@ -19,6 +19,13 @@ namespace DeadCounty.Animation
         [Range(0f, 1f)] public float Lunge;
         [Tooltip("Bent over a body on the ground.")]
         [Range(0f, 1f)] public float Feed;
+        [Tooltip("Hands digging through furniture, in turn.")]
+        [Range(0f, 1f)] public float Rummage;
+        [Tooltip("Out of breath: deeper, faster breathing, even on the move.")]
+        [Range(0f, 1f)] public float Pant;
+        [Tooltip("Recoil of the torso and head (deg), applied without smoothing: a hit, a zombie's spasm.")]
+        public float FlinchPitch;
+        public float FlinchRoll;
 
         public static PoseModifiers Neutral => new() { LookWeight = 1f };
     }

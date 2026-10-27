@@ -64,6 +64,21 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
+        public IEnumerator SearchingBendsTheBodyOverToDig()
+        {
+            var controller = Rig.GetComponentInChildren<ThirdPersonController>();
+            yield return Tap(Keyboard, new KeyboardState(Key.E), new KeyboardState());
+            Assert.That(interactor.Busy);
+            Assert.That(controller.Pose.Rummage, Is.EqualTo(1f));
+            Assert.That(controller.Pose.Hunch, Is.GreaterThan(15f));
+            Assert.That(controller.Pose.ArmsForward, Is.GreaterThan(0.3f));
+
+            yield return new WaitForSeconds(3f);
+            Assert.That(interactor.Busy, Is.False);
+            Assert.That(controller.Pose.Rummage, Is.Zero, "the search is over");
+        }
+
+        [UnityTest]
         public IEnumerator SearchingTakesTwoAndAHalfSecondsThenGivesEverything()
         {
             Assert.That(interactor.Current, Is.EqualTo(cupboard));

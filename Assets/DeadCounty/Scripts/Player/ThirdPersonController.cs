@@ -126,7 +126,8 @@ namespace DeadCounty.Player
         // Camera aim in world space, used to turn the character's head toward where the player looks.
         public float AimYaw => yaw;
         public float AimPitch => pitch;
-        public PoseModifiers Pose => PoseModifiers.Neutral;
+        // Set by PlayerPoseDriver: searching, out of breath, hit.
+        public PoseModifiers Pose { get; set; } = PoseModifiers.Neutral;
         // Radius within which zombies hear the player this frame, 0 when silent.
         public float NoiseRadius { get; private set; }
 
