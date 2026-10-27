@@ -57,6 +57,7 @@ namespace DeadCounty.Player
         PlayerInventory inventory;
         PlayerSleep sleep;
         ThirdPersonController controller;
+        GameMenu menu;
         DayNightDirector director;
         VisualElement hud, healthRow, staminaRow, readouts, healthFill, staminaFill, flash, gameOver;
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
@@ -95,9 +96,10 @@ namespace DeadCounty.Player
             inventory = GetComponentInChildren<PlayerInventory>(true);
             sleep = GetComponentInChildren<PlayerSleep>(true);
             controller = GetComponentInChildren<ThirdPersonController>(true);
+            menu = GetComponent<GameMenu>();
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null || needs == null || interactor == null || inventory == null || sleep == null || controller == null)
-                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerInventory, a PlayerSleep and a ThirdPersonController in its children");
+            if (health == null || stamina == null || needs == null || interactor == null || inventory == null || sleep == null || controller == null || menu == null)
+                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerInventory, a PlayerSleep and a ThirdPersonController in its children and a GameMenu next to it");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -267,7 +269,8 @@ namespace DeadCounty.Player
             flash.style.opacity = flashValue * hitFlashAlpha;
             // Menus cover it: the inventory shows the same stats, the pause hides the game.
             hud.style.display = alive && !controller.MenuOpen ? DisplayStyle.Flex : DisplayStyle.None;
-            UpdateHitMarkers(now, alive && !controller.MenuOpen);
+            // The inventory leaves the world running: a zombie can still strike, so its arc must show.
+            UpdateHitMarkers(now, alive && !menu.Shown);
             UpdateInteraction(alive);
             UpdateGameOver();
         }

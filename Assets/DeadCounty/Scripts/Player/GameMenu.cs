@@ -59,6 +59,8 @@ namespace DeadCounty.Player
         public bool OnTitle { get; private set; }
         // The title page itself, over the world it shows off.
         public bool TitleShown => items != null && items == titleItems;
+        // Any page on screen: the game clock is stopped.
+        public bool Shown => items != null;
         public bool Paused => items != null && !OnTitle;
         public bool InSettings => items == settingsItems;
         public bool InControls => items == controlsItems;
