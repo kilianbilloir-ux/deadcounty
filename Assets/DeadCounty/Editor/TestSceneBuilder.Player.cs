@@ -150,6 +150,7 @@ namespace DeadCounty.EditorTools
                 if (animator == null) throw new System.InvalidOperationException($"{path} has no ProceduralHumanoidAnimator");
                 var changed = AddMissingPlayerComponents(root, controller.gameObject);
                 changed |= AssignMissingGait(animator);
+                changed |= AddBodyDetails(controller.transform.Find("Model"), SurvivorLook);
                 changed |= AddMissing<UIDocument>(root);
                 AssignHudAssets(root);
                 // AssignHudAssets writes straight into the prefab contents; save unconditionally.
