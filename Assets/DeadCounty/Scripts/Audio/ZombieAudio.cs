@@ -26,6 +26,8 @@ namespace DeadCounty.Audio
         const float BangIntervalMax = 0.9f;
         // Zombies set off by the same call answer it one after the other, not on the same frame.
         const float AnswerDelayMax = 0.4f;
+        // Ahead of the pooled one-shots (128) when Unity runs out of real voices: the attack telegraph must play.
+        const int VoicePriority = 64;
 
         static readonly VoiceLimiter<ZombieAudio> Voices = new(ZombieVocals.MaxVoices);
 
@@ -56,6 +58,7 @@ namespace DeadCounty.Audio
             voice = GetComponent<AudioSource>();
             voice.playOnAwake = false;
             voice.loop = false;
+            voice.priority = VoicePriority;
             identity = ZombieVoice.FromSeed(agent.Seed);
             random = new System.Random(agent.Seed * 7349 + 101);
         }
