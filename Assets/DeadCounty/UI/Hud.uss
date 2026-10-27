@@ -247,7 +247,7 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
 }
 
-/* Short messages: found items, why the player woke up. */
+/* Short messages: why the player woke up. */
 .toast-row {
     position: absolute;
     left: 0;
@@ -264,6 +264,56 @@
     border-left-width: 3px;
     border-color: rgb(212, 185, 118);
     opacity: 0;
+}
+
+/* Items just taken, at the bottom right where nothing else sits, the newest at the bottom; an empty search in grey. */
+.pickup-feed {
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+    align-items: flex-end;
+}
+
+.pickup {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+    padding: 3px 16px 3px 8px;
+    background-color: rgba(26, 29, 34, 0.85);
+    border-left-width: 3px;
+    border-color: rgb(212, 185, 118);
+}
+
+.pickup-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.pickup-name {
+    font-size: 17px;
+    color: rgb(217, 217, 217);
+}
+
+.pickup-count {
+    margin-left: 8px;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: rgb(212, 185, 118);
+}
+
+.pickup--empty {
+    padding: 10px 16px;
+    border-color: rgb(138, 143, 150);
+}
+
+.pickup--empty .pickup-icon {
+    display: none;
+}
+
+.pickup--empty .pickup-name {
+    color: rgb(138, 143, 150);
 }
 
 /* One-time tips at the top left, where the eye goes first and nothing else sits. */

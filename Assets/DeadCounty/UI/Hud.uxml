@@ -58,6 +58,7 @@
         <ui:VisualElement picking-mode="Ignore" class="toast-row">
             <ui:Label name="loot-toast" picking-mode="Ignore" class="toast" />
         </ui:VisualElement>
+        <ui:VisualElement name="pickup-feed" picking-mode="Ignore" class="pickup-feed" />
         <ui:VisualElement name="tip" picking-mode="Ignore" class="tip">
             <ui:Label text="ASTUCE" picking-mode="Ignore" class="tip-title" />
             <ui:Label name="tip-text" picking-mode="Ignore" class="tip-text" />
