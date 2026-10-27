@@ -74,6 +74,7 @@ namespace DeadCounty.EditorTools
                 Box("Marquage", lot, new Vector3(-10f + i * 2.8f, 0.065f, 2.5f), new Vector3(0.12f, 0.01f, 5f), "RoadLineWhite", solid: false);
 
             var b = Group(lot, "Batiment", new Vector3(-9f, 0.06f, -13f));
+            Box("Sol", b, new Vector3(9f, 0.01f, 5.5f), new Vector3(18f, 0.02f, 11f), "StoreFloor", solid: false);
             var style = new WallStyle("Brick", 4.2f);
             var w1 = Window(3.5f, 5f, 0.8f, 2.8f);
             var w2 = Window(14.5f, 5f, 0.8f, 2.8f);
@@ -89,9 +90,10 @@ namespace DeadCounty.EditorTools
             Box("Store_Banne", b, new Vector3(9f, 3.1f, 12.1f), new Vector3(17f, 0.08f, 2.2f), "SignGreen", Quaternion.Euler(12f, 0f, 0f), solid: false);
             Box("Enseigne", b, new Vector3(9f, 3.75f, 11.17f), new Vector3(6f, 0.8f, 0.1f), "SignGreen", solid: false);
             Box("Enseigne_Cadre", b, new Vector3(9f, 3.75f, 11.23f), new Vector3(5.6f, 0.5f, 0.02f), "SignWhite", solid: false);
+            var stock = new System.Random(71);
             foreach (var x in new[] { 3f, 6f, 12f, 15f })
-                Searchable(Box("Rayon", b, new Vector3(x, 0.8f, 5f), new Vector3(0.7f, 1.6f, 6f), "Furniture"), "Rayon", "LT_Magasin_Rayon");
-            Searchable(Box("Comptoir", b, new Vector3(4.5f, 0.5f, 9.6f), new Vector3(3f, 1f, 0.7f), "Furniture"), "Comptoir", "LT_Magasin_Comptoir");
+                Searchable(GroceryShelf(b, new Vector3(x, 0f, 5f), 90f, stock).gameObject, "Rayon", "LT_Magasin_Rayon");
+            Searchable(Checkout(b, new Vector3(4.5f, 0f, 9.6f), 180f).gameObject, "Comptoir", "LT_Magasin_Comptoir");
             Box("Congelateurs", b, new Vector3(9f, 0.6f, 0.6f), new Vector3(8f, 1.2f, 0.9f), "SignWhite");
 
             Car(lot, "Voiture_Parking", new Vector3(-5.8f, 0.06f, 2.5f), 90f, "CarGreen");

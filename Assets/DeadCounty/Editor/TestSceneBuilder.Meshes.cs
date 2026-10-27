@@ -133,6 +133,21 @@ namespace DeadCounty.EditorTools
             return m.Save($"SM_Bush_{variant}");
         });
 
+        static Mesh TrashBagMesh() => Cached("SM_TrashBag", () =>
+        {
+            var m = new MeshBuilder().Sub();
+            AddBlob(m, new Vector3(0f, 0.28f, 0f), new Vector3(0.3f, 0.3f, 0.27f), 1, new System.Random(500), 0.18f);
+            AddBlob(m, new Vector3(0f, 0.58f, 0f), new Vector3(0.07f, 0.08f, 0.07f), 0, new System.Random(501), 0.1f);
+            return m.Save("SM_TrashBag");
+        });
+
+        static Mesh SandbagMesh() => Cached("SM_Sandbag", () =>
+        {
+            var m = new MeshBuilder().Sub();
+            AddBlob(m, Vector3.zero, new Vector3(0.3f, 0.13f, 0.22f), 1, new System.Random(502), 0.08f);
+            return m.Save("SM_Sandbag");
+        });
+
         static Mesh RockMesh(int variant) => Cached($"SM_Rock_{variant}", () =>
         {
             var m = new MeshBuilder().Sub();
