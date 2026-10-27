@@ -735,6 +735,31 @@
     background-color: rgb(212, 185, 118);
 }
 
+/* Keyboard keys: compact rows so the thirteen keys fit with the page title. */
+.controls-list {
+    margin-bottom: 12px;
+}
+
+.controls-row {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+}
+
+.controls-row .option-label {
+    font-size: 18px;
+}
+
+.controls-key {
+    min-width: 64px;
+    margin-right: 0;
+}
+
+.controls-key--waiting {
+    color: rgb(212, 185, 118);
+    border-color: rgb(212, 185, 118);
+}
+
 .menu-hints {
     position: absolute;
     bottom: 48px;

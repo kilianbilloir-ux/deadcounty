@@ -17,8 +17,9 @@ namespace DeadCounty.Player
 
         public static bool GamepadActive { get; private set; }
 
-        // Raised when the player switches between keyboard and gamepad, so prompts can be redrawn.
-        public static event Action DeviceChanged;
+        // Raised when the keys to show change, so prompts can be redrawn: the player switched between keyboard and
+        // gamepad, or rebound a key (KeyBindings).
+        public static event Action KeysChanged;
 
         // UI Submit and Cancel are generic bindings with no readable key name.
         public static string SubmitKey => GamepadActive ? "A" : "Entrée";
@@ -30,6 +31,11 @@ namespace DeadCounty.Player
             var action = InputSystem.actions?.FindAction(actionPath);
             return action == null ? null : French(action.GetBindingDisplayString(Options, GamepadActive ? GamepadGroup : KeyboardGroup));
         }
+
+        // The key of one binding, for the controls options.
+        public static string Key(InputAction action, int bindingIndex) => French(action.GetBindingDisplayString(bindingIndex, Options));
+
+        internal static void RaiseKeysChanged() => KeysChanged?.Invoke();
 
         // The Input System names keys in English.
         static string French(string key) => key switch
@@ -52,7 +58,7 @@ namespace DeadCounty.Player
             var gamepad = control.device is Gamepad;
             if (gamepad == GamepadActive) return;
             GamepadActive = gamepad;
-            DeviceChanged?.Invoke();
+            KeysChanged?.Invoke();
         });
 
         // Domain reload is disabled on entering Play mode: the previous session's listener must be dropped by hand.
@@ -62,7 +68,7 @@ namespace DeadCounty.Player
             listener?.Dispose();
             listener = null;
             GamepadActive = false;
-            DeviceChanged = null;
+            KeysChanged = null;
         }
     }
 }
