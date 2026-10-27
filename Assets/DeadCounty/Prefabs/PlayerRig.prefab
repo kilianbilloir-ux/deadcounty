@@ -2674,6 +2674,7 @@ GameObject:
   - component: {fileID: 6887185709559769939}
   - component: {fileID: 3163212225471992047}
   - component: {fileID: 2536389201600511191}
+  - component: {fileID: 8259299151959908222}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -2836,6 +2837,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerScreenEffects
   injuryVolume: {fileID: 6050607902340989495}
   menuBlurVolume: {fileID: 3222560353461916111}
+--- !u!114 &8259299151959908222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80bdd1ee98834427abe64d9325362ac2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerNoiseMeter
 --- !u!1 &6092803171642249547
 GameObject:
   m_ObjectHideFlags: 0
