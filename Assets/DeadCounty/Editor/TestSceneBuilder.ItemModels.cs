@@ -76,8 +76,9 @@ namespace DeadCounty.EditorTools
                     Box("Sac", m, new Vector3(0f, 0.21f, 0f), new Vector3(0.32f, 0.42f, 0.18f), "Backpack", solid: false);
                     Box("Rabat", m, new Vector3(0f, 0.38f, -0.005f), new Vector3(0.31f, 0.12f, 0.19f), "BackpackDark", solid: false);
                     Box("Poche", m, new Vector3(0f, 0.14f, -0.11f), new Vector3(0.24f, 0.16f, 0.05f), "BackpackDark", solid: false);
-                    foreach (var x in new[] { -0.08f, 0.08f })
-                        Box("Bretelle", m, new Vector3(x, 0.22f, 0.1f), new Vector3(0.05f, 0.36f, 0.02f), "Strap", solid: false);
+                    // Distinct names: saving over the prefab matches children by name and would swap twins on each build.
+                    foreach (var (x, name) in new[] { (-0.08f, "Bretelle_G"), (0.08f, "Bretelle_D") })
+                        Box(name, m, new Vector3(x, 0.22f, 0.1f), new Vector3(0.05f, 0.36f, 0.02f), "Strap", solid: false);
                     Box("Poignee", m, new Vector3(0f, 0.44f, 0.04f), new Vector3(0.08f, 0.03f, 0.03f), "Strap", solid: false);
                     break;
                 default:
