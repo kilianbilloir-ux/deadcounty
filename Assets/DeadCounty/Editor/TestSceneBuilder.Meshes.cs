@@ -29,6 +29,13 @@ namespace DeadCounty.EditorTools
                 return this;
             }
 
+            // Goes back to an earlier submesh, one per material.
+            public MeshBuilder Use(int index)
+            {
+                current = submeshes[index];
+                return this;
+            }
+
             // Flips the winding when needed so the face normal points along outward.
             public void Tri(Vector3 a, Vector3 b, Vector3 c, Vector3 outward)
             {

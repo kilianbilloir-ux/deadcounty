@@ -200,12 +200,19 @@ namespace DeadCounty.EditorTools
             return wall;
         }
 
+        // Sill, frame, a cross of muntins in the opening and shutters: a hole in the wall reads as a window from
+        // both sides. None of it is solid, so sight and noise go through as before.
         static void WindowTrim(Transform wall, Opening o, string shutter)
         {
             var x = WallThickness / 2f + 0.04f;
             var h = o.Top - o.Bottom;
             var y = (o.Bottom + o.Top) / 2f;
             Box("Appui", wall, new Vector3(x + 0.03f, o.Bottom - 0.03f, o.Offset), new Vector3(0.14f, 0.06f, o.Width + 0.2f), "Trim", solid: false);
+            Box("Linteau", wall, new Vector3(x - 0.01f, o.Top + 0.05f, o.Offset), new Vector3(0.06f, 0.1f, o.Width + 0.16f), "Trim", solid: false);
+            foreach (var side in new[] { -1f, 1f })
+                Box("Chambranle", wall, new Vector3(x - 0.01f, y, o.Offset + side * (o.Width / 2f + 0.04f)), new Vector3(0.06f, h, 0.08f), "Trim", solid: false);
+            Box("Croisillon", wall, new Vector3(0f, y, o.Offset), new Vector3(0.04f, h, 0.04f), "Trim", solid: false);
+            Box("Croisillon", wall, new Vector3(0f, y, o.Offset), new Vector3(0.04f, 0.04f, o.Width), "Trim", solid: false);
             Box("Volet", wall, new Vector3(x, y, o.Offset - o.Width / 2f - 0.3f), new Vector3(0.05f, h, 0.5f), shutter, solid: false);
             Box("Volet", wall, new Vector3(x, y, o.Offset + o.Width / 2f + 0.3f), new Vector3(0.05f, h, 0.5f), shutter, solid: false);
         }

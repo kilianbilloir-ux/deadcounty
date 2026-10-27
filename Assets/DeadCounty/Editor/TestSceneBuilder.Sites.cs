@@ -130,9 +130,11 @@ namespace DeadCounty.EditorTools
                 Box("Stalle", barn, new Vector3(side * 4.3f, 0.7f, 3f + i * 4f), new Vector3(5.2f, 1.4f, 0.15f), "Wood");
             Box("Ballots", barn, new Vector3(-4.5f, 0.9f, 19.5f), new Vector3(4f, 1.8f, 3f), "Hay");
             Box("Ballots", barn, new Vector3(4.5f, 0.6f, 19.5f), new Vector3(4f, 1.2f, 3f), "Hay");
+            BarnDetails(barn);
 
             Cylinder("Silo", parent, new Vector3(-84.5f, 7f, 110f), 2.8f, 14f, "MetalLight");
             MeshObject("Silo_Toit", parent, ConeMesh(12), new Vector3(-84.5f, 14f, 110f), Quaternion.identity, new Vector3(3f, 2.4f, 3f), new[] { "RoofGrey" }, false);
+            SiloDetails(parent, new Vector3(-84.5f, 0f, 110f), 2.8f, 14f);
             Tractor(parent, new Vector3(-80f, 0f, 90f), 30f);
             Cylinder("Cuve_Fioul", parent, new Vector3(-101f, 1.4f, 82f), 0.8f, 3f, "MetalLight", Quaternion.Euler(0f, 0f, 90f));
             for (var i = 0; i < 4; i++) HayBale(parent, new Vector3(-93f + i * 1.6f, 0f, 80.5f), 90f);
@@ -142,9 +144,17 @@ namespace DeadCounty.EditorTools
             for (var i = 0; i < 5; i++) HayBale(parent, new Vector3(Range(rng, -123f, -111f), 0f, Range(rng, 78f, 120f)), rng.Next(0, 180));
 
             var fields = Group(parent, "Champs");
+            var rowIndex = 0;
             for (var x = -125.3f; x < -92f; x += 1.4f)
-                Box("Rang_Mais", fields, new Vector3(x, 1.1f, 38f), new Vector3(0.55f, 2.2f, 46f), "Corn");
-            Box("Champ_Ble", fields, new Vector3(-61f, 0.35f, 47f), new Vector3(38f, 0.7f, 30f), "Wheat", solid: false);
+            {
+                // The box stays as the collider that blocks sight and movement; plants are drawn instead of it.
+                var row = Box("Rang_Mais", fields, new Vector3(x, 1.1f, 38f), new Vector3(0.55f, 2.2f, 46f), "Corn");
+                Object.DestroyImmediate(row.GetComponent<MeshRenderer>());
+                Object.DestroyImmediate(row.GetComponent<MeshFilter>());
+                MeshObject("Plants_Mais", fields, CornRowMesh(rowIndex++ % 3, 46f), new Vector3(x, 0f, 38f), Quaternion.identity, Vector3.one, new[] { "Corn", "Hay" }, false);
+            }
+            Box("Champ_Ble", fields, new Vector3(-61f, 0.02f, 47f), new Vector3(38f, 0.04f, 30f), "WheatDark", solid: false);
+            MeshObject("Ble", fields, WheatFieldMesh(new Vector2(38f, 30f)), new Vector3(-61f, 0.04f, 47f), Quaternion.identity, Vector3.one, new[] { "Wheat", "WheatDark" }, false);
             Box("Chaume", fields, new Vector3(-61f, 0.02f, 23f), new Vector3(38f, 0.04f, 18f), "Dirt");
             for (var i = 0; i < 9; i++)
                 HayBale(fields, new Vector3(Range(rng, -78f, -45f), 0f, Range(rng, 16f, 30f)), rng.Next(0, 180));
