@@ -43,7 +43,9 @@ namespace DeadCounty.EditorTools
             BuiltLamps.Clear();
             DoorSpots.Clear();
             ConfigureProject();
-            EnsureLootTables(EnsureItems());
+            var items = EnsureItems();
+            EnsureItemModels(items);
+            EnsureLootTables(items);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var env = new GameObject("Environment").transform;
