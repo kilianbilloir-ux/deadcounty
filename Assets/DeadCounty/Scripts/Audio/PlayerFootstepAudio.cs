@@ -40,6 +40,10 @@ namespace DeadCounty.Audio
         float lastY, lastVerticalSpeed, lastYaw, quietUntil;
         int resetId;
 
+        // Footsteps played since enabled and the ground of the last one; read by tests.
+        public int StepCount { get; private set; }
+        public Surface LastSurface { get; private set; }
+
         void Awake()
         {
             controller = GetComponent<ThirdPersonController>();
@@ -99,7 +103,7 @@ namespace DeadCounty.Audio
             var speed = controller.CurrentSpeed;
             var shuffling = speed < MinStepSpeed;
             if (shuffling && yawRate < TurnStepYawRate) return;
-            var surface = (int)GroundSurface.At(transform.position);
+            var surface = GroundSurface.At(transform.position);
             var running = !controller.IsCrouching && !shuffling && controller.Gait is Gait.Run or Gait.Sprint;
             var volume = controller.IsCrouching ? crouchVolume : controller.Gait switch
             {
@@ -109,7 +113,9 @@ namespace DeadCounty.Audio
             };
             if (shuffling) volume *= 0.5f;
             var pitch = controller.IsSprinting ? 1.04f : controller.IsCrouching ? 0.96f : 1f;
-            Sfx.Play((running ? runSteps : steps)[surface], transform.position + transform.right * (side * FootSpacing), volume, pitch);
+            Sfx.Play((running ? runSteps : steps)[(int)surface], transform.position + transform.right * (side * FootSpacing), volume, pitch);
+            StepCount++;
+            LastSurface = surface;
         }
 
         void Jumped()

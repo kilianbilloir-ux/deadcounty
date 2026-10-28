@@ -1,3 +1,4 @@
+using System;
 using DeadCounty.World;
 using UnityEngine;
 
@@ -25,6 +26,9 @@ namespace DeadCounty.Audio
         Door door;
         float lastAngle, lastDelta, swingSpeed;
 
+        // Every cue the door plays, with its volume scale; observed by tests.
+        public event Action<SoundCue, float> Played;
+
         void Awake() => door = GetComponent<Door>();
 
         void Start() => lastAngle = door.Angle;
@@ -48,31 +52,33 @@ namespace DeadCounty.Audio
         void Started(float from, float to, float speed)
         {
             swingSpeed = speed;
-            var at = Position;
             var opening = Mathf.Abs(to) > Mathf.Abs(from);
             if (opening)
             {
                 if (Mathf.Abs(from) < ShutAngle)
                 {
-                    if (speed >= ForcedSpeed && speed < SlamSpeed) Sfx.Play(burst, at);
-                    else Sfx.Play(latch, at);
+                    if (speed >= ForcedSpeed && speed < SlamSpeed) Play(burst);
+                    else Play(latch);
                 }
-                if (speed < ForcedSpeed) Sfx.Play(creak, at);
-                else if (speed >= SlamSpeed) Sfx.Play(creak, at, 0.5f, 1.3f);
+                if (speed < ForcedSpeed) Play(creak);
+                else if (speed >= SlamSpeed) Play(creak, 0.5f, 1.3f);
             }
             else if (speed < SlamSpeed)
             {
-                Sfx.Play(creak, at, 0.8f);
+                Play(creak, 0.8f);
             }
         }
 
         void Stopped(float angle)
         {
-            var at = Position;
-            if (Mathf.Abs(angle) < ShutAngle) Sfx.Play(swingSpeed >= SlamSpeed ? slam : shut, at);
-            else if (swingSpeed >= ForcedSpeed) Sfx.Play(slam, at, 0.5f, 1.1f);
+            if (Mathf.Abs(angle) < ShutAngle) Play(swingSpeed >= SlamSpeed ? slam : shut);
+            else if (swingSpeed >= ForcedSpeed) Play(slam, 0.5f, 1.1f);
         }
 
-        Vector3 Position => door.Doorway.Center + Vector3.up * SoundHeight;
+        void Play(SoundCue cue, float volume = 1f, float pitch = 1f)
+        {
+            Sfx.Play(cue, door.Doorway.Center + Vector3.up * SoundHeight, volume, pitch);
+            Played?.Invoke(cue, volume);
+        }
     }
 }
