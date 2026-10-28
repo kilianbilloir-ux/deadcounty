@@ -175,6 +175,83 @@ namespace DeadCounty.EditorTools
             }
         }
 
+        // Struck mode: a damped sine starting at `at` that reaches -60 dB after `decay`. glide starts it that much
+        // higher in pitch and settles within an eighth of the decay, which gives thumps their punch.
+        public static void Ring(float[] b, float at, float hz, float decay, float gain, float glide = 0f)
+        {
+            var start = (int)Math.Round(at * Rate);
+            var count = (int)(decay * Rate);
+            var attack = Math.Max(1, Math.Min(Rate / 1000, count / 16));
+            var settle = Math.Max(1e-4, decay / 8.0);
+            var phase = 0.0;
+            for (var i = 0; i < count; i++)
+            {
+                var j = start + i;
+                if (j >= b.Length) break;
+                var t = i / (double)Rate;
+                phase += hz * (1.0 + glide * Math.Exp(-t / settle)) / Rate;
+                if (j < 0) continue;
+                var amplitude = Math.Exp(-6.9078 * t / decay) * Math.Min(1.0, (i + 1) / (double)attack);
+                b[j] += gain * (float)(amplitude * Math.Sin(2.0 * Math.PI * phase));
+            }
+        }
+
+        // White noise with a linear attack and a decay to -60 dB, as its own buffer to filter before mixing.
+        public static float[] Burst(Random rng, float attack, float decay)
+        {
+            var b = Buffer(attack + decay);
+            White(b, rng);
+            Envelope(b, attack, 0f, decay);
+            return b;
+        }
+
+        // `count` tiny struck particles (pebbles, dry stems, crumbs) over `seconds`, placed by density(t) in 0..1
+        // (uniform when null): damped sines log-spread between lowHz and highHz, 1 to 4 ms long, mostly quiet.
+        public static float[] Grains(Random rng, float seconds, int count, float lowHz, float highHz, Func<float, float> density = null)
+        {
+            var b = Buffer(seconds + 0.005f);
+            for (var n = 0; n < count; n++)
+            {
+                var t = (float)rng.NextDouble() * seconds;
+                for (var tries = 0; density != null && tries < 64 && rng.NextDouble() > density(t); tries++)
+                    t = (float)rng.NextDouble() * seconds;
+                var hz = lowHz * Math.Pow(highHz / lowHz, rng.NextDouble());
+                var amplitude = rng.NextDouble() * rng.NextDouble() * (rng.NextDouble() < 0.5 ? -1.0 : 1.0);
+                Ring(b, t, (float)hz, 0.001f + 0.003f * (float)rng.NextDouble(), (float)amplitude);
+            }
+            return b;
+        }
+
+        // Impulses at a rate following hz(t), each period jittered by up to ±jitter (fraction): the excitation of a
+        // voice, a creaking hinge or a stick-slip squeak once filtered through resonances.
+        public static void Pulses(float[] b, Random rng, Func<float, float> hz, float jitter, float gain = 1f, float start = 0f, float end = -1f)
+        {
+            var to = end < 0f ? b.Length : Math.Min(b.Length, (int)(end * Rate));
+            var t = (double)start;
+            while (true)
+            {
+                var i = (int)(t * Rate);
+                if (i >= to) break;
+                if (i >= 0) b[i] += gain;
+                var period = 1.0 / Math.Max(1f, hz((float)t));
+                t += period * (1.0 + jitter * (rng.NextDouble() * 2.0 - 1.0));
+            }
+        }
+
+        // Smooth random curve in [-1, 1] that changes `hz` times a second, for pitch jitter and slow wobbles.
+        public static Func<float, float> Drift(Random rng, float hz, float seconds)
+        {
+            var points = new float[(int)(seconds * hz) + 3];
+            for (var i = 0; i < points.Length; i++) points[i] = (float)(rng.NextDouble() * 2.0 - 1.0);
+            return t =>
+            {
+                var x = Math.Max(0f, t * hz);
+                var i = Math.Min((int)x, points.Length - 2);
+                var w = (1f - (float)Math.Cos(Math.Min(1f, x - i) * Math.PI)) / 2f;
+                return points[i] * (1f - w) + points[i + 1] * w;
+            };
+        }
+
         // Soft clipping (tanh), level-compensated so small signals keep their gain: grit for impacts and voices.
         public static void Saturate(float[] b, float drive)
         {
@@ -195,6 +272,47 @@ namespace DeadCounty.EditorTools
             if (max <= 0f) return;
             var scale = peak / max;
             for (var i = 0; i < b.Length; i++) b[i] *= scale;
+        }
+
+        // Rough A-weighted loudness in dBFS: the loudest 50 ms RMS once band-limited to 400 Hz - 10 kHz, where the
+        // ear is most sensitive. Peaks say little about how loud a click or a swish sounds.
+        public static float Loudness(float[] b)
+        {
+            var w = (float[])b.Clone();
+            HighPass(w, 400f, 0.6f);
+            LowPass(w, 10000f, 0.6f);
+            var window = Math.Min(Rate / 20, w.Length);
+            double sum = 0.0, best = 0.0;
+            for (var i = 0; i < w.Length; i++)
+            {
+                sum += w[i] * w[i];
+                if (i >= window) sum -= w[i - window] * w[i - window];
+                best = Math.Max(best, sum);
+            }
+            return (float)(20.0 * Math.Log10(Math.Max(Math.Sqrt(best / window), 1e-9)));
+        }
+
+        // Scales to the target loudness, or less if the peak would pass maxPeak.
+        public static void NormalizeLoudness(float[] b, float targetDb, float maxPeak = 0.95f)
+        {
+            var gain = (float)Math.Pow(10.0, (targetDb - Loudness(b)) / 20.0);
+            var peak = Peak(b) * gain;
+            if (peak > maxPeak) gain *= maxPeak / peak;
+            for (var i = 0; i < b.Length; i++) b[i] *= gain;
+        }
+
+        // Copy without the tail that stays below floorDb under the peak, ending on a 5 ms fade.
+        public static float[] Trim(float[] b, float floorDb = -60f)
+        {
+            var floor = Peak(b) * (float)Math.Pow(10.0, floorDb / 20.0);
+            var end = b.Length;
+            while (end > 1 && Math.Abs(b[end - 1]) <= floor) end--;
+            var fade = Rate / 200;
+            end = Math.Min(b.Length, end + fade);
+            var trimmed = new float[end];
+            Array.Copy(b, trimmed, end);
+            for (var i = 0; i < Math.Min(fade, end); i++) trimmed[end - 1 - i] *= i / (float)fade;
+            return trimmed;
         }
 
         // Splices a copy of the middle of the buffer across the seam: the tail crossfades (equal power) into the
