@@ -47,6 +47,7 @@ namespace DeadCounty.EditorTools
             BloodStain(root, new Vector3(MainStreetX + 2.5f, 0f, 3.5f), rng);
             BloodStain(root, new Vector3(MainStreetX - 0.5f, 0f, 46.5f), rng);
             BuildStreetFurniture(root);
+            BuildEvacuationTraces(root);
         }
 
         // Main Street closed to the north: barriers across the road with gaps a person can squeeze through,
