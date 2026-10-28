@@ -21,7 +21,7 @@ namespace DeadCounty.EditorTools
                 MeshObject("Marque_Fouille", Body(lot, east), SearchMarkMesh(victims), new Vector3(7.2f, 1.55f, paint), Quaternion.identity, Vector3.one, new[] { "Spray" }, false);
 
             var help = Body(2, false);
-            Label(help, "HELP", new Vector3(7.2f, 1.65f, paint), Vector3.back, 0.14f, "SignRed");
+            Label(help, "HELP", new Vector3(7.1f, 1.65f, paint), Vector3.back, 0.12f, "SignRed");
             RoofLabel(help, "HELP", 0.2f);
             BoardUp(help, rng);
             TornTape(help);
