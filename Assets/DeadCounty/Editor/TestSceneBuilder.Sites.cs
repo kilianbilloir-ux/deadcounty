@@ -125,7 +125,7 @@ namespace DeadCounty.EditorTools
             Wall(barn, "Mur_E", new Vector2(7f, 0f), new Vector2(7f, 22f), red, high);
             Wall(barn, "Mur_Arriere", new Vector2(7f, 22f), new Vector2(-7f, 22f), red, Door(7f, 3f, 3f));
             Wall(barn, "Mur_O", new Vector2(-7f, 22f), new Vector2(-7f, 0f), red, high);
-            Roof(barn, "Toit", new Vector3(0f, 6f, 11f), 22.8f, 14.8f, 5.5f, "RoofRust", 90f);
+            GableRoof(barn, new Vector3(0f, 6f, 11f), 22.8f, 14.8f, 5.5f, 90f, new Vector2(11f + WallThickness / 2f, 7f + WallThickness / 2f), "RoofRust", "BarnRed", "WoodDark");
             Box("Encadrement", barn, new Vector3(0f, 4.75f, -0.12f), new Vector3(4.9f, 0.2f, 0.06f), "Trim", solid: false);
             Box("Encadrement", barn, new Vector3(-2.35f, 2.3f, -0.12f), new Vector3(0.2f, 4.6f, 0.06f), "Trim", solid: false);
             Box("Encadrement", barn, new Vector3(2.35f, 2.3f, -0.12f), new Vector3(0.2f, 4.6f, 0.06f), "Trim", solid: false);

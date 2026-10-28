@@ -212,6 +212,23 @@ namespace DeadCounty.EditorTools
             }
         }
 
+        static void AddCuboid(MeshBuilder m, Vector3 center, Vector3 size, Quaternion rotation)
+        {
+            var half = size / 2f;
+            for (var axis = 0; axis < 3; axis++)
+            foreach (var sign in new[] { -1f, 1f })
+            {
+                var n = Vector3.zero;
+                var u = Vector3.zero;
+                var v = Vector3.zero;
+                n[axis] = sign;
+                u[(axis + 1) % 3] = 1f;
+                v[(axis + 2) % 3] = 1f;
+                Vector3 C(float a, float b) => center + rotation * Vector3.Scale(half, n + u * a + v * b);
+                m.Quad(C(-1f, -1f), C(1f, -1f), C(1f, 1f), C(-1f, 1f), rotation * n);
+            }
+        }
+
         static void AddBlob(MeshBuilder m, Vector3 center, Vector3 radii, int subdivisions, System.Random rng, float jitter)
         {
             var (verts, tris) = Icosphere(subdivisions);
