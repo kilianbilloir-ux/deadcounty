@@ -116,19 +116,21 @@ namespace DeadCounty.EditorTools
             Filtered(b, Burst(rng, 0.001f, 0.04f), at, gain * 0.5f, f => LowPass(f, 300f));
         }
 
-        // Stick-slip squeak of a board or a hinge: jittered pulses through a few narrow resonances.
-        public static void Creak(float[] b, Random rng, float at, float seconds, float gain)
+        // Stick-slip of a board (slow, rough pulses: a croak) or a hinge (fast pulses that ring into a squeal):
+        // jittered pulses through a few narrow resonances, the rate wandering as the pressure changes.
+        public static void Creak(float[] b, Random rng, float at, float seconds, float gain, bool hinge = false)
         {
             var creak = Buffer(seconds);
-            var drift = Drift(rng, 12f, seconds);
-            var rate = R(rng, 40f, 90f);
-            Pulses(creak, rng, t => rate * (1f + 0.35f * drift(t)), 0.25f);
-            var body = R(rng, 600f, 900f);
+            var drift = Drift(rng, hinge ? 4f : 12f, seconds);
+            var rate = hinge ? R(rng, 160f, 340f) : R(rng, 40f, 90f);
+            Pulses(creak, rng, t => rate * (1f + (hinge ? 0.3f : 0.35f) * drift(t)), hinge ? 0.06f : 0.25f);
+            var body = hinge ? R(rng, 500f, 800f) : R(rng, 600f, 900f);
+            var sharpness = hinge ? 3f : 1f;
             var resonance = Buffer(seconds);
             foreach (var (ratio, q, g) in new[] { (1f, 6f, 1f), (2.1f, 8f, 0.6f), (3.3f, 10f, 0.35f) })
             {
                 var copy = (float[])creak.Clone();
-                BandPass(copy, body * ratio, q);
+                BandPass(copy, body * ratio, q * sharpness);
                 Mix(resonance, copy, 0f, g);
             }
             Shape(resonance, t => (float)Math.Sin(Math.PI * Math.Min(1f, t / seconds)));

@@ -163,7 +163,7 @@ namespace DeadCounty.EditorTools
         {
             var seconds = R(rng, 0.4f, 0.7f);
             var b = Buffer(seconds + 0.05f);
-            Creak(b, rng, 0.01f, seconds, 1f);
+            Creak(b, rng, 0.01f, seconds, 1f, true);
             HighPass(b, 200f);
             Normalize(b, rng.NextDouble() < 0.35 ? 0.4f : 0.7f);
             return b;
