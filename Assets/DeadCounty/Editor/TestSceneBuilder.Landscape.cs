@@ -116,6 +116,10 @@ namespace DeadCounty.EditorTools
             var signs = Group(parent, "Panneaux");
             StopSign(signs, new Vector3(MainStreetX - 5.2f, 0f, 8.5f), 0f);
             StopSign(signs, new Vector3(MainStreetX + 5.2f, 0f, -8.5f), 180f);
+            SpeedLimitSign(signs, new Vector3(26f, 0f, -6.2f), -90f, "35");
+            SpeedLimitSign(signs, new Vector3(113f, 0f, 6.2f), 90f, "35");
+            SpeedLimitSign(signs, new Vector3(MainStreetX + 6.4f, 0f, -41f), 180f, "25");
+            EvacuationSign(signs, new Vector3(MainStreetX + 4.2f, 0.15f, 5.2f), 180f);
             var welcome = Group(signs, "Panneau_Village", new Vector3(36f, 0f, -6.5f), -90f);
             Post("Pied", welcome, new Vector3(-0.9f, 0f, 0f), 2.4f, 0.05f, "Wood", solid: false);
             Post("Pied", welcome, new Vector3(0.9f, 0f, 0f), 2.4f, 0.05f, "Wood", solid: false);
@@ -138,12 +142,6 @@ namespace DeadCounty.EditorTools
 
         static void Cable(Transform parent, Vector3 a, Vector3 b)
             => Box("Cable", parent, (a + b) / 2f, new Vector3(0.03f, 0.03f, Vector3.Distance(a, b)), "CarBlack", Quaternion.LookRotation(b - a), solid: false);
-
-        static void StopSign(Transform parent, Vector3 basePos, float yaw)
-        {
-            Post("Panneau_Stop", parent, basePos, 2.3f, 0.04f, "Metal", solid: false);
-            Cylinder("Stop", parent, basePos + Vector3.up * 2.15f, 0.38f, 0.04f, "SignRed", Quaternion.Euler(90f, yaw, 0f), solid: false);
-        }
 
         static float ForestDensity(float x, float z)
         {

@@ -43,6 +43,7 @@ namespace DeadCounty.EditorTools
             Wall(shop, "Mur_S", new Vector2(0f, 0f), new Vector2(12f, 0f), style, Door(10f));
             Wall(shop, "Mur_E", new Vector2(12f, 0f), new Vector2(12f, 8f), style);
             Box("Bandeau", shop, new Vector3(6f, 3.1f, 8.13f), new Vector3(12.2f, 0.45f, 0.06f), "SignRed", solid: false);
+            Label(shop, "FOOD MART", new Vector3(6f, 3.1f, 8.166f), Vector3.forward, 0.07f, "SignWhite");
             Box("Toit", shop, new Vector3(6f, 3.7f, 4f), new Vector3(12.6f, 0.2f, 8.6f), "RoofGrey");
             foreach (var x in new[] { 3f, 5.5f, 8f })
                 Searchable(GroceryShelf(shop, new Vector3(x, 0f, 3.6f), 90f, rng, 3.6f).gameObject, "Rayon", "LT_Magasin_Rayon");
@@ -52,6 +53,8 @@ namespace DeadCounty.EditorTools
             Box("Mat_Enseigne", lot, new Vector3(-12f, 4f, 12f), new Vector3(0.35f, 8f, 0.35f), "Metal");
             Box("Enseigne", lot, new Vector3(-12f, 7.4f, 12f), new Vector3(0.4f, 1.8f, 2.6f), "SignRed", solid: false);
             Box("Enseigne_Face", lot, new Vector3(-12f, 7.4f, 12f), new Vector3(0.44f, 1.2f, 2f), "PanelGlow", solid: false);
+            foreach (var side in new[] { -1f, 1f })
+                Label(lot, "GAS", new Vector3(-12f + side * 0.226f, 7.4f, 12f), new Vector3(side, 0f, 0f), 0.16f, "SignRed");
             Box("Prix", lot, new Vector3(-12f, 5.9f, 12f), new Vector3(0.3f, 1f, 2f), "SignWhite", solid: false);
             PriceDigits(lot, new Vector3(-12f, 5.9f, 12f));
             IceChest(lot, new Vector3(-1.5f, 0.1f, -4.9f));
@@ -91,6 +94,7 @@ namespace DeadCounty.EditorTools
             Box("Store_Banne", b, new Vector3(9f, 3.1f, 12.1f), new Vector3(17f, 0.08f, 2.2f), "SignGreen", Quaternion.Euler(12f, 0f, 0f), solid: false);
             Box("Enseigne", b, new Vector3(9f, 3.75f, 11.17f), new Vector3(6f, 0.8f, 0.1f), "SignGreen", solid: false);
             Box("Enseigne_Cadre", b, new Vector3(9f, 3.75f, 11.23f), new Vector3(5.6f, 0.5f, 0.02f), "SignWhite", solid: false);
+            Label(b, "GENERAL STORE", new Vector3(9f, 3.75f, 11.246f), Vector3.forward, 0.065f, "SignGreen");
             var stock = new System.Random(71);
             foreach (var x in new[] { 3f, 6f, 12f, 15f })
                 Searchable(GroceryShelf(b, new Vector3(x, 0f, 5f), 90f, stock).gameObject, "Rayon", "LT_Magasin_Rayon");
