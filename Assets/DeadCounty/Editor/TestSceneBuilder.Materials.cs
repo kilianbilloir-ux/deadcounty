@@ -42,7 +42,7 @@ namespace DeadCounty.EditorTools
             ["FabricRust"] = Rgb(0x7A4C3A), ["FabricOlive"] = Rgb(0x5C6146), ["Linen"] = Rgb(0xB8B2A4), ["Blanket"] = Rgb(0x6E5A48),
             ["BlanketRed"] = Rgb(0x6E3530), ["Rug"] = Rgb(0x6B4A3C), ["RugBlue"] = Rgb(0x3F4D5E), ["Countertop"] = Rgb(0xB5AFA2),
             ["Lampshade"] = Rgb(0xC9BC9C), ["Water"] = Rgb(0x9DBBC8), ["Paper"] = Rgb(0xB9B2A2), ["Burlap"] = Rgb(0x857456), ["StoreFloor"] = Rgb(0xA9A69C),
-            ["Headstone"] = Rgb(0x8E8E8A), ["Crate"] = Rgb(0x8C734C),
+            ["Headstone"] = Rgb(0x8E8E8A), ["Crate"] = Rgb(0x8C734C), ["Spray"] = Rgb(0xD0612A), ["SignBlue"] = Rgb(0x24508A),
             ["Marker"] = Rgb(0xEDEDED), ["MarkerMajor"] = Rgb(0xC03A2E), ["Accent"] = Rgb(0xF2CC1A),
             ["Skin"] = Rgb(0xC69C7A), ["Hair"] = Rgb(0x2A211B), ["Eye"] = Rgb(0x151515), ["Jacket"] = Rgb(0x5C6340),
             ["JacketDark"] = Rgb(0x434A30), ["Jeans"] = Rgb(0x34404F), ["Boots"] = Rgb(0x3B2F25), ["Backpack"] = Rgb(0x6E5B3D),

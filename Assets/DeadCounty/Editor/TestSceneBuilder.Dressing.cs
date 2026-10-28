@@ -47,6 +47,7 @@ namespace DeadCounty.EditorTools
             BloodStain(root, new Vector3(MainStreetX + 2.5f, 0f, 3.5f), rng);
             BloodStain(root, new Vector3(MainStreetX - 0.5f, 0f, 46.5f), rng);
             BuildStreetFurniture(root);
+            BuildEvacuationTraces(root);
         }
 
         // Main Street closed to the north: barriers across the road with gaps a person can squeeze through,
@@ -56,6 +57,7 @@ namespace DeadCounty.EditorTools
             foreach (var x in new[] { -2.4f, 2.4f })
                 Sawhorse(root, new Vector3(MainStreetX + x, 0f, RoadblockZ), 0f);
             PoliceCar(root, new Vector3(MainStreetX + 0.8f, 0f, RoadblockZ + 4.5f), 168f);
+            RoadClosedSign(root, new Vector3(MainStreetX - 2.4f, 0f, RoadblockZ - 0.045f), 180f);
             Box("Herse", root, new Vector3(MainStreetX, 0.03f, RoadblockZ - 1.6f), new Vector3(6.4f, 0.04f, 0.3f), "CarBlack", solid: false);
             foreach (var side in new[] { -1f, 1f })
                 SandbagWall(root, new Vector3(MainStreetX + side * 4.75f, 0f, RoadblockZ), 2.4f, rng);
