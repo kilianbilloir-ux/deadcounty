@@ -146,11 +146,12 @@ namespace DeadCounty.Audio
             }
         }
 
-        // Scaled time: the pause and the title stop the world, its calls included.
+        // Stopped with the clock (pause, title), but in real time while it runs: sleep's fast-forward must not turn
+        // the calls into a chorus.
         void Update()
         {
-            var dt = Time.deltaTime;
-            if (dt <= 0f) return;
+            if (Time.deltaTime <= 0f) return;
+            var dt = Time.unscaledDeltaTime;
             elapsed += dt;
             if (elapsed >= probeAt)
             {
