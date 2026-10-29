@@ -14,13 +14,14 @@ namespace DeadCounty.Player
     //   TitleScreen in the scene asks for it; without one the game starts at once.
     // - Pause, on Cancel: Reprendre, Options, Menu principal, Quitter, with the clock stopped.
     // - Options: mouse sensitivity, vertical look inversion, full screen, interface size, one-time tips and reduced
-    //   flashes, kept in PlayerPrefs (the last three through GameSettings), and the keyboard keys (KeyBindings):
-    //   Submit on a key waits for the new one, Escape cancels.
+    //   flashes, kept in PlayerPrefs (the last three through GameSettings), the keyboard keys (KeyBindings):
+    //   Submit on a key waits for the new one, Escape cancels, and the five volumes (Audio, GameSettings).
+    // Every move, choice and change raises Feedback for the interface sounds.
     // Menu principal, from the pause or with Cancel on the death screen, reloads the scene, which brings the title
     // back. Runs before the inventory screen, which closes itself on Cancel: an open inventory is closed, not paused.
     [DefaultExecutionOrder(-10)]
     [RequireComponent(typeof(UIDocument))]
-    public class GameMenu : MonoBehaviour
+    public partial class GameMenu : MonoBehaviour
     {
         const float NavigateThreshold = 0.5f;
         const float RepeatDelay = 0.35f;
@@ -32,11 +33,14 @@ namespace DeadCounty.Player
         const string SensitivityKey = "dc.mouseSensitivity";
         const string InvertKey = "dc.invertLook";
 
+        public enum MenuFeedback { Move, Confirm, Back, Step, Toggle, Open, Close }
+
         sealed class Item
         {
             public VisualElement Element;
             public Action Activate;
             public Action<int> Adjust;
+            public MenuFeedback Sound;
         }
 
         ThirdPersonController controller;
@@ -45,11 +49,11 @@ namespace DeadCounty.Player
         PlayerInventoryScreen inventoryScreen;
         InputAction cancel, submit, navigate;
         readonly List<Label> keyLabels = new();
-        VisualElement titleScreen, pauseScreen, mainPage, settingsPage, controlsPage, sensitivityBar, sensitivityFill;
+        VisualElement titleScreen, pauseScreen, mainPage, settingsPage, controlsPage, audioPage, sensitivityBar, sensitivityFill;
         Label invertValue, fullscreenValue, uiScaleValue, tipsValue, flashesValue;
         KeyHint titleConfirmHint, confirmHint, backHint;
         // The page on screen, null while every menu is closed; settingsReturn is the page Options was opened from.
-        List<Item> titleItems, mainItems, settingsItems, controlsItems, items, settingsReturn;
+        List<Item> titleItems, mainItems, settingsItems, controlsItems, audioItems, items, settingsReturn;
         int selected;
         Vector2Int held;
         float repeatAt, timeScaleBefore = 1f;
@@ -64,9 +68,12 @@ namespace DeadCounty.Player
         public bool Paused => items != null && !OnTitle;
         public bool InSettings => items == settingsItems;
         public bool InControls => items == controlsItems;
+        public bool InAudio => items == audioItems;
 
         // Jouer was chosen on the title.
         public event Action Started;
+        // What the player just did in a menu, for the interface sounds.
+        public event Action<MenuFeedback> Feedback;
 
         void Awake()
         {
@@ -100,6 +107,7 @@ namespace DeadCounty.Player
             mainPage = Find<VisualElement>(root, "pause-main");
             settingsPage = Find<VisualElement>(root, "pause-settings");
             controlsPage = Find<VisualElement>(root, "pause-controls");
+            audioPage = Find<VisualElement>(root, "pause-audio");
             sensitivityFill = Find<VisualElement>(root, "option-sensitivity-fill");
             sensitivityBar = sensitivityFill.parent;
             invertValue = Find<Label>(root, "option-invert-value");
@@ -116,7 +124,7 @@ namespace DeadCounty.Player
             };
             mainItems = new List<Item>
             {
-                Entry(root, "pause-resume", Resume),
+                Entry(root, "pause-resume", Resume, sound: MenuFeedback.Close),
                 Entry(root, "pause-options", OpenSettings),
                 Entry(root, "pause-title", ReturnToTitle),
                 Entry(root, "pause-quit", Quit),
@@ -126,19 +134,24 @@ namespace DeadCounty.Player
                 Entry(root, "option-sensitivity", null, step => SetSensitivity(controller.MouseSensitivity + step * SensitivityStep)),
                 Entry(root, "option-invert", ToggleInvert, _ => ToggleInvert()),
                 Entry(root, "option-fullscreen", ToggleFullScreen, _ => ToggleFullScreen()),
-                Entry(root, "option-ui-scale", CycleUiScale, StepUiScale),
+                Entry(root, "option-ui-scale", CycleUiScale, StepUiScale, MenuFeedback.Step),
                 Entry(root, "option-tips", ToggleTips, _ => ToggleTips()),
                 Entry(root, "option-flashes", ToggleFlashes, _ => ToggleFlashes()),
                 Entry(root, "option-controls", () => ShowPage(controlsItems)),
-                Entry(root, "option-back", () => ShowPage(settingsReturn)),
+                Entry(root, "option-audio", () => ShowPage(audioItems)),
+                Entry(root, "option-back", () => ShowPage(settingsReturn), sound: MenuFeedback.Back),
             };
             controlsItems = BuildControls(Find<VisualElement>(root, "controls-list"));
             controlsItems.Add(Entry(root, "controls-reset", KeyBindings.ResetAll));
-            controlsItems.Add(Entry(root, "controls-back", () => ShowPage(settingsItems)));
+            controlsItems.Add(Entry(root, "controls-back", () => ShowPage(settingsItems), sound: MenuFeedback.Back));
+            audioItems = BuildAudio(root);
             // Clicking along the bar sets the sensitivity there.
             sensitivityBar.pickingMode = PickingMode.Position;
             sensitivityBar.RegisterCallback<ClickEvent>(e =>
-                SetSensitivity(Mathf.Lerp(MinSensitivity, MaxSensitivity, e.localPosition.x / sensitivityBar.resolvedStyle.width)));
+            {
+                SetSensitivity(Mathf.Lerp(MinSensitivity, MaxSensitivity, e.localPosition.x / sensitivityBar.resolvedStyle.width));
+                Feedback?.Invoke(MenuFeedback.Step);
+            });
 
             titleConfirmHint = new KeyHint(Find<VisualElement>(root, "title-hints"), "Valider");
             var hints = Find<VisualElement>(root, "pause-hints");
@@ -161,22 +174,36 @@ namespace DeadCounty.Player
         T Find<T>(VisualElement root, string elementName) where T : VisualElement =>
             root.Q<T>(elementName) ?? throw new InvalidOperationException($"GameMenu on '{name}': the HUD has no '{elementName}' {typeof(T).Name}");
 
-        Item Entry(VisualElement root, string elementName, Action activate, Action<int> adjust = null) =>
-            Entry(Find<VisualElement>(root, elementName), activate, adjust);
+        // Options that both toggle on Submit and change sideways sound as toggles, sideways-only ones as steps.
+        Item Entry(VisualElement root, string elementName, Action activate, Action<int> adjust = null, MenuFeedback? sound = null) =>
+            Entry(Find<VisualElement>(root, elementName), activate, adjust, sound);
 
-        Item Entry(VisualElement element, Action activate, Action<int> adjust = null)
+        Item Entry(VisualElement element, Action activate, Action<int> adjust = null, MenuFeedback? sound = null)
         {
-            var item = new Item { Element = element, Activate = activate, Adjust = adjust };
+            var item = new Item
+            {
+                Element = element,
+                Activate = activate,
+                Adjust = adjust,
+                Sound = sound ?? (adjust == null ? MenuFeedback.Confirm : activate == null ? MenuFeedback.Step : MenuFeedback.Toggle),
+            };
             element.RegisterCallback<PointerEnterEvent>(_ =>
             {
                 var index = items?.IndexOf(item) ?? -1;
-                if (index >= 0) Select(index);
+                if (index >= 0) MoveTo(index);
             });
             element.RegisterCallback<ClickEvent>(_ =>
             {
-                if (!KeyBindings.Rebinding) item.Activate?.Invoke();
+                if (!KeyBindings.Rebinding) Activate(item);
             });
             return item;
+        }
+
+        void Activate(Item item)
+        {
+            if (item.Activate == null) return;
+            Feedback?.Invoke(item.Sound);
+            item.Activate();
         }
 
         // One row per rebindable key: what it does, then the key in its frame.
@@ -237,13 +264,15 @@ namespace DeadCounty.Player
             // The title has nothing to go back to.
             if (cancel.WasPressedThisFrame())
             {
-                if (InControls) ShowPage(settingsItems);
+                if (InControls || InAudio) ShowPage(settingsItems);
                 else if (InSettings) ShowPage(settingsReturn);
                 else if (Paused) Resume();
+                else return;
+                Feedback?.Invoke(items == null ? MenuFeedback.Close : MenuFeedback.Back);
                 return;
             }
             Navigate();
-            if (submit.WasPressedThisFrame()) items[selected].Activate?.Invoke();
+            if (submit.WasPressedThisFrame()) Activate(items[selected]);
         }
 
         // Called by the scene's TitleScreen, possibly before this Start has built the pages.
@@ -263,6 +292,7 @@ namespace DeadCounty.Player
         {
             Freeze();
             ShowPage(mainItems);
+            Feedback?.Invoke(MenuFeedback.Open);
         }
 
         public void Resume()
@@ -314,10 +344,11 @@ namespace DeadCounty.Player
         {
             items = page;
             titleScreen.style.display = page == titleItems ? DisplayStyle.Flex : DisplayStyle.None;
-            pauseScreen.style.display = page == mainItems || page == settingsItems || page == controlsItems ? DisplayStyle.Flex : DisplayStyle.None;
+            pauseScreen.style.display = page == mainItems || page == settingsItems || page == controlsItems || page == audioItems ? DisplayStyle.Flex : DisplayStyle.None;
             mainPage.style.display = page == mainItems ? DisplayStyle.Flex : DisplayStyle.None;
             settingsPage.style.display = page == settingsItems ? DisplayStyle.Flex : DisplayStyle.None;
             controlsPage.style.display = page == controlsItems ? DisplayStyle.Flex : DisplayStyle.None;
+            audioPage.style.display = page == audioItems ? DisplayStyle.Flex : DisplayStyle.None;
             held = Vector2Int.zero;
             if (page == null) return;
             Select(0);
@@ -328,6 +359,14 @@ namespace DeadCounty.Player
         {
             selected = Mathf.Clamp(index, 0, items.Count - 1);
             for (var i = 0; i < items.Count; i++) items[i].Element.EnableInClassList("menu-item--selected", i == selected);
+        }
+
+        // Navigation and hover: a sound only when the selection really moves.
+        void MoveTo(int index)
+        {
+            var before = selected;
+            Select(index);
+            if (selected != before) Feedback?.Invoke(MenuFeedback.Move);
         }
 
         // Up and down move the selection, left and right change the selected option; both repeat while held.
@@ -346,8 +385,12 @@ namespace DeadCounty.Player
             if (step == held && Time.unscaledTime < repeatAt) return;
             repeatAt = Time.unscaledTime + (step == held ? RepeatInterval : RepeatDelay);
             held = step;
-            if (step.y != 0) Select(selected + step.y);
-            else items[selected].Adjust?.Invoke(step.x);
+            if (step.y != 0) MoveTo(selected + step.y);
+            else if (items[selected].Adjust != null)
+            {
+                Feedback?.Invoke(items[selected].Sound == MenuFeedback.Toggle ? MenuFeedback.Toggle : MenuFeedback.Step);
+                items[selected].Adjust(step.x);
+            }
         }
 
         void SetSensitivity(float value)
@@ -411,6 +454,7 @@ namespace DeadCounty.Player
             uiScaleValue.text = Mathf.RoundToInt(GameSettings.UiScale * 100f) + "\u00A0%";
             tipsValue.text = GameSettings.Tips ? "Oui" : "Non";
             flashesValue.text = GameSettings.ReduceFlashes ? "Oui" : "Non";
+            ShowVolumes();
         }
     }
 }

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Bird
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 66701b888f0cb4d639f0e4a0cb3a1b70, type: 3}
+  - {fileID: 8300000, guid: 6bc6cd493e55d449490ef68d11a0653f, type: 3}
+  - {fileID: 8300000, guid: 638eaa82787d248d4be92c655226c517, type: 3}
+  - {fileID: 8300000, guid: 0195b21cfa4e14f4cb5bda6ea8a092e9, type: 3}
+  - {fileID: 8300000, guid: 5865be6d5acb1432484f0525a6b83bd0, type: 3}
+  - {fileID: 8300000, guid: 3961ae6f27a6b41d4bf66f70da68f0f2, type: 3}
+  volume: 0.35
+  pitch: {x: 0.94, y: 1.06}
+  channel: 1
+  minDistance: 60
+  maxDistance: 300

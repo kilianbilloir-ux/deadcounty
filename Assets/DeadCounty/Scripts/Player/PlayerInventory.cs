@@ -31,6 +31,8 @@ namespace DeadCounty.Player
 
         // Items just found or picked up, for the HUD; empty after searching an empty piece of furniture.
         public event Action<IReadOnlyList<ItemStack>> Received;
+        public event Action<ItemDefinition> Used;
+        public event Action<ItemDefinition> Dropped;
 
         void OnValidate()
         {
@@ -55,6 +57,7 @@ namespace DeadCounty.Player
             needs.Model.Restore(item.Hunger, item.Thirst);
             health.Heal(item.Health);
             if (item.StopsBleeding) health.StopBleeding();
+            Used?.Invoke(item);
             return true;
         }
 
@@ -63,6 +66,7 @@ namespace DeadCounty.Player
             if (!Items.Remove(item)) return false;
             var forward = transform.forward;
             WorldItem.Spawn(item, 1, transform.position + forward * DropDistance, Quaternion.LookRotation(forward));
+            Dropped?.Invoke(item);
             return true;
         }
 

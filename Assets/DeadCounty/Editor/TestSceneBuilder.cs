@@ -46,6 +46,7 @@ namespace DeadCounty.EditorTools
             var items = EnsureItems();
             EnsureItemModels(items);
             EnsureLootTables(items);
+            EnsureSounds();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             EnsureItemIcons(items);
@@ -73,6 +74,7 @@ namespace DeadCounty.EditorTools
             EnsureGaitProfiles();
             BuildPlayer();
             BuildTitleScreen();
+            BuildSoundscape();
             BakeNavMesh(env.gameObject);
             BuildDoors();
             BuildZombies();

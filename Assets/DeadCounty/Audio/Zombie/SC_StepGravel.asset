@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_StepGravel
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: fbec1628e1ce54361ac59cf96399d9eb, type: 3}
+  - {fileID: 8300000, guid: e598da81dac86427b83e0cf13ad2531b, type: 3}
+  - {fileID: 8300000, guid: ef491ba3e285c4fa8ba495d10d0fff34, type: 3}
+  - {fileID: 8300000, guid: b391bf6727f534cfb94b2de4e94baa05, type: 3}
+  volume: 0.35
+  pitch: {x: 0.92, y: 1.08}
+  channel: 0
+  minDistance: 1
+  maxDistance: 12
