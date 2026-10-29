@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Growl
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: df6d850ed85e74708b08a3c89d6dbe05, type: 3}
+  - {fileID: 8300000, guid: 2e22f28c61f0a41979ef54150b09f178, type: 3}
+  - {fileID: 8300000, guid: 452cc53eedee34bf2b782403b5f0f0dc, type: 3}
+  - {fileID: 8300000, guid: 08c9c7e6c626346f7853cac0c37ad6db, type: 3}
+  volume: 0.8
+  pitch: {x: 0.95, y: 1.05}
+  channel: 0
+  minDistance: 2
+  maxDistance: 30
