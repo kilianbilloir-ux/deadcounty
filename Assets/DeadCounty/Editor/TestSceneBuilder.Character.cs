@@ -86,7 +86,7 @@ namespace DeadCounty.EditorTools
             return joints;
         }
 
-        // Adds only what is missing, so bodies saved in older prefabs get the details too; true when anything was added.
+        // Adds only what is missing, so older prefabs get the details too; true when anything was added.
         static bool AddBodyDetails(Transform model, BodyLook look)
         {
             var added = false;

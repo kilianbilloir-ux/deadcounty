@@ -137,8 +137,8 @@ namespace DeadCounty.EditorTools
         }
 
         // Rooms in the body frame: floor top at 0.1, living room x 0..7 z 0..6, kitchen x 0..7 z 6..10, bedroom
-        // x 7..12 z 5.5..10, bathroom x 7..12 z 0..5.5. Footprints match the former single boxes, so the NavMesh,
-        // the zombie spots and the searchable pieces stay where they were.
+        // x 7..12 z 5.5..10, bathroom x 7..12 z 0..5.5. The NavMesh, the zombie spots and the searchable pieces rely
+        // on these footprints.
         static void Furnish(Transform body, System.Random rng)
         {
             const float floor = 0.1f;

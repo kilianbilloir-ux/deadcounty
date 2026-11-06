@@ -205,7 +205,7 @@ namespace DeadCounty.EditorTools
         }
 
         // Sill, frame, a cross of muntins in the opening and shutters: a hole in the wall reads as a window from
-        // both sides. None of it is solid, so sight and noise go through as before.
+        // both sides. None of it is solid, so sight and noise still go through.
         static void WindowTrim(Transform wall, Opening o, string shutter)
         {
             var x = WallThickness / 2f + 0.04f;

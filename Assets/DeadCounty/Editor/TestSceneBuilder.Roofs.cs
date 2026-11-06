@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // The former prism stays under each roof as its invisible collider, so physics, the NavMesh and the camera see
-    // the same roof as before. Nothing added here is solid.
+    // A plain prism under each roof is its invisible collider, so physics, the NavMesh and the camera see a simple
+    // roof. Nothing added here is solid.
     public static partial class TestSceneBuilder
     {
         const float ClapboardHeight = 0.23f;
@@ -26,7 +26,7 @@ namespace DeadCounty.EditorTools
                 Quaternion.Euler(0f, yaw, 0f), Vector3.one, mats, false);
         }
 
-        // Origin on the wall tops, ridge along X, the top of the slopes on the former prism. Submeshes: roof, trim,
+        // Origin on the wall tops, ridge along X, the top of the slopes on the collider prism. Submeshes: roof, trim,
         // gables, ceiling.
         static Mesh GableRoofMesh(float length, float span, float height, Vector2 walls, bool clapboard, bool ceiling)
         {

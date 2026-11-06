@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // The hook for combat: nothing damages zombies yet. ZombieAgent handles Died and ResetToSpawn.
+    // The hook for combat: nothing damages zombies yet. ZombieAgent reacts to Died and restores it in ResetToSpawn.
     [DisallowMultipleComponent]
     public class ZombieHealth : MonoBehaviour
     {
