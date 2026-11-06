@@ -5,9 +5,8 @@ using UnityEngine;
 
 namespace DeadCounty.UI
 {
-    // Title screen over the game world (GDD 8.11, after Risk of Rain 2): on load the player's menu shows Jouer,
-    // Options and Quitter with the game clock stopped, while this camera sways slowly over the town. Jouer hands
-    // the view back to the player camera through the Cinemachine blend.
+    // GDD 8.11, after Risk of Rain 2: the player's GameMenu draws the title while this camera sways over the town;
+    // Jouer hands the view back through the Cinemachine blend.
     public class TitleScreen : MonoBehaviour
     {
         [SerializeField] CinemachineCamera titleCamera;

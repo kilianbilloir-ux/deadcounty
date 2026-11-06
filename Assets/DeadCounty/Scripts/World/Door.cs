@@ -6,10 +6,8 @@ using UnityEngine;
 
 namespace DeadCounty.World
 {
-    // Hinged door in a wall opening (GDD 8.2): Interact opens it away from the player or closes it, a player in a
-    // hurry (Run or Sprint held) slams it, zombies force it open after 5 s of pushing, several pushing together.
-    // This transform is the hinge: local +Z runs along the opening, a positive angle swings the leaf toward local
-    // +X. Closed doors are left out of the NavMesh, so paths cross them and ZombieAgent stops in front of a shut one.
+    // GDD 8.2. This transform is the hinge: local +Z runs along the opening, a positive angle swings the leaf toward
+    // local +X. Closed doors are left out of the NavMesh; ZombieAgent stops in front of a shut one.
     public class Door : Interactable
     {
         // Past this angle zombies walk through and the door no longer blocks them.
@@ -50,7 +48,6 @@ namespace DeadCounty.World
         int lastPushFrame = -2;
 
         public Doorway Doorway { get; private set; }
-        // Source id of the door's noises.
         public int SourceId { get; private set; }
         public float Angle => angle;
         public bool IsShut => Mathf.Abs(angle) < ShutAngle;
