@@ -38,9 +38,6 @@ namespace DeadCounty.Audio
         float effort, nextBreath, nextBeat;
         bool inhaleNext = true;
 
-        // 0 calm to 1 exhausted, smoothed; read by tests.
-        public float Effort => effort;
-
         void Awake()
         {
             controller = GetComponent<ThirdPersonController>();

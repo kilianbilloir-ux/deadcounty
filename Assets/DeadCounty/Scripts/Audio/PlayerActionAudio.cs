@@ -33,8 +33,6 @@ namespace DeadCounty.Audio
         float rummageVolume, lastProgress;
         bool flashlightWasOn, wasAsleep;
 
-        public bool Rummaging => rummageSource != null && rummageSource.isPlaying;
-
         void Awake()
         {
             interactor = GetComponent<PlayerInteractor>();

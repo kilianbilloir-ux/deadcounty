@@ -46,7 +46,6 @@ namespace DeadCounty.Audio
         float nextVocal, nextBang, answerAt = float.PositiveInfinity;
         bool leftPlanted, rightPlanted;
 
-        public ZombieVoice Identity => identity;
         public bool IsSpeaking => Voices.IsSpeaking(this, Time.time);
 
         void Awake()

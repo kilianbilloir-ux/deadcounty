@@ -1,4 +1,3 @@
-using System;
 using DeadCounty.Animation;
 using UnityEngine;
 

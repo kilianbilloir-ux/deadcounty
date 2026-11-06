@@ -106,7 +106,6 @@ namespace DeadCounty.Player
         public int MotionResetId { get; private set; }
         public float WalkSpeed => walkSpeed;
         public float RunSpeed => runSpeed;
-        public float SprintSpeed => sprintSpeed;
         public Gait Gait { get; private set; }
         // Actual horizontal speed after collisions, so walking into a wall reads as standing still.
         public float CurrentSpeed { get; private set; }
