@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // What the survivor handles: the rummage loop while searching furniture (faster and louder when hurried), items
-    // picked up, used (eaten, drunk, bandaged) and dropped, the flashlight switch and lying down on a bed.
     [RequireComponent(typeof(PlayerInteractor), typeof(PlayerInventory))]
     public class PlayerActionAudio : MonoBehaviour
     {

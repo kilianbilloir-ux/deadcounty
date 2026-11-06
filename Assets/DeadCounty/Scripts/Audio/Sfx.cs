@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // Fire-and-forget playback of sound cues on a pool of voices kept across scene loads, plus the channel volumes
-    // and the pause of world audio. Owners of looping sources apply a cue with Configure and re-run it on
+    // The pooled voices survive scene loads. Owners of looping sources apply a cue with Configure and re-run it on
     // GameSettings.Changed.
     public static class Sfx
     {

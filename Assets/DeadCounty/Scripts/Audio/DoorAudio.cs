@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // Sounds of a door's own swing, read from its angle so the door needs no hook: the latch and a hinge creak when
-    // it starts to open, a creak when it starts to close, the thud (or slam) when it shuts, the frame splintering
-    // when zombies force it and the leaf banging into its stop after a violent swing. Swing speeds tell a calm use
-    // from a slam (player in a hurry) or a forced door; the zombies' knocking while they push is ZombieAudio's.
+    // Read from the door's angle so the door needs no hook; swing speeds tell a calm use from a slam or a forced
+    // door. The zombies' knocking while they push is ZombieAudio's.
     [RequireComponent(typeof(Door))]
     public class DoorAudio : MonoBehaviour
     {

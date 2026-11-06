@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // Footsteps on each foot plant of the procedural animator, picked by the ground underfoot, plus jump and landing.
-    // Loudness follows the gait like the noise the zombies hear (PlayerNoiseEmitter): crouched steps are barely
-    // audible, sprinting ones hard and sharp. Presentation only: no NoiseSystem event is emitted here.
-    // Runs after the animator's LateUpdate, which sets the plant flags.
+    // Presentation only: no NoiseSystem event is emitted here. Runs after the animator's LateUpdate, which sets the
+    // plant flags.
     [DefaultExecutionOrder(100)]
     [RequireComponent(typeof(ThirdPersonController), typeof(ProceduralHumanoidAnimator))]
     public class PlayerFootstepAudio : MonoBehaviour

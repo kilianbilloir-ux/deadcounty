@@ -5,10 +5,8 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // Everything a zombie sounds like. Its voice (one AudioSource that follows it) reacts to the brain's
-    // transitions and speaks now and then on its own, through a shared limiter of ZombieVocals.MaxVoices voices;
-    // the attack, its feet and the doors it pushes play pooled one-shots. Silent while dormant or dead.
-    // Runs after the animator's LateUpdate, which sets the feet.
+    // The voice goes through a limiter of ZombieVocals.MaxVoices voices shared by every zombie; everything else plays
+    // pooled one-shots. Runs after the animator's LateUpdate, which sets the feet.
     [DefaultExecutionOrder(100)]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ZombieAgent), typeof(AudioSource))]
