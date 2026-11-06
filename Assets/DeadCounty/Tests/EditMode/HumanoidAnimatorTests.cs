@@ -103,11 +103,6 @@ namespace DeadCounty.Tests
             Assert.That(slip, Is.LessThanOrEqualTo(0.003f));
         }
 
-        // Turning while walking banks the body, so the rising ankle of a toeing-off boot reads as slip:
-        // only measure while the boot is flat (|roll| <= 3 deg needs moving ~= 1). The toe pivoting about
-        // its contact (~0.16 m/s at 60 deg/s) is out of scope. N > 1 LOD is untested on purpose: with the
-        // rotate-then-move integration the rig and the game agree frame by frame, but an accumulated
-        // multi-frame step has no exact single-frame correction (second order in yaw x travel).
         // Entering a turn banks the body within a few frames; planted feet must ride it, not jump.
         // Flat-foot gated like WalkWhileTurning: the re-step itself moves ankles, only the excess counts.
         // Measured 0.05 with the transport; the un-transported bank drag alone adds ~0.16.
@@ -146,6 +141,12 @@ namespace DeadCounty.Tests
                 frames++;
             }
         }
+
+        // Turning while walking banks the body, so the rising ankle of a toeing-off boot reads as slip:
+        // only measure while the boot is flat (|roll| <= 3 deg needs moving ~= 1). The toe pivoting about
+        // its contact (~0.16 m/s at 60 deg/s) is out of scope. N > 1 LOD is untested on purpose: with the
+        // rotate-then-move integration the rig and the game agree frame by frame, but an accumulated
+        // multi-frame step has no exact single-frame correction (second order in yaw x travel).
         [TestCase(60f)]
         [TestCase(-60f)]
         public void WalkWhileTurningKeepsFlatFootPlanted(float yawRate)

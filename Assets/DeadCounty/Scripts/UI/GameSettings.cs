@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace DeadCounty.UI
 {
-    // Display, accessibility and sound options kept between sessions in PlayerPrefs: interface size, one-time tips,
-    // reduced flashes and the volumes (0..1). Mouse sensitivity and look inversion live on the controller, which the
-    // pause menu loads.
+    // Volumes are 0..1. Mouse sensitivity and look inversion live on the controller, which the pause menu loads.
     public static class GameSettings
     {
         public const float MinUiScale = 0.8f;

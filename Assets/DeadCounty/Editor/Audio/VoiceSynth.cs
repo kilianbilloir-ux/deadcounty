@@ -2,11 +2,8 @@ using System;
 
 namespace DeadCounty.EditorTools
 {
-    // Source-filter synthesis of the zombie voices, plus the percussive layers of their bodies. The source is a
-    // glottal flow pulse train perturbed pulse by pulse (jitter, shimmer, period doubling, creak at low pitch)
-    // with aspiration noise gated by the open glottis; a cascade of formant resonators plays the vocal tract.
-    // Rough voices owe their character to subharmonics and irregular periods more than to noise, so those carry
-    // most of the zombie timbre. System-only, like Synth.
+    // Source-filter synthesis. Rough voices owe their character to subharmonics and irregular periods more than to
+    // noise, so those carry most of the zombie timbre. System-only, like Synth.
     public static class VoiceSynth
     {
         const int FormantUpdate = 16;

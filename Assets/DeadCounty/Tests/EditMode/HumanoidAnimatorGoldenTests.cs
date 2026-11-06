@@ -7,11 +7,9 @@ using UnityEngine;
 
 namespace DeadCounty.Tests
 {
-    // Regression guard of the player's procedural animation: with the default (GP_Survivor) profile, every
-    // joint the animator writes, sampled at fixed frames of 3 s runs at constant speed (idle, walk, run,
-    // sprint, crouch, a walking turn with the head aimed away until it recenters, a turn on the spot), must
-    // match HumanoidAnimatorGolden. After an intended change of the player's animation, run Record and paste
-    // its output into HumanoidAnimatorGolden.cs.
+    // Every joint the animator writes, sampled at fixed frames of 3 s runs with the default profile, must match
+    // HumanoidAnimatorGolden. After an intended change of the player's animation, run Record and paste its output
+    // into HumanoidAnimatorGolden.cs.
     public class HumanoidAnimatorGoldenTests
     {
         const int Frames = 180;

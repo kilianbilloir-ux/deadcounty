@@ -4,8 +4,7 @@ namespace DeadCounty.EditorTools
 {
     public static partial class TestSceneBuilder
     {
-        // Vehicles point along their local +X. Pillars in the paint colour cut the glass block into windows; door
-        // seams, mirrors, grille and plates make the box read as a car. An abandoned car may keep its driver door open.
+        // Vehicles point along their local +X. An abandoned car may keep its driver door open.
         static Transform Car(Transform parent, string name, Vector3 pos, float yaw, string paint, bool burnt = false, float tilt = 0f, bool doorOpen = false)
         {
             var car = Group(parent, name, pos, yaw);

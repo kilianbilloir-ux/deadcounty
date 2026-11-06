@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // The player's items: using one applies its effect on needs and health, dropping one leaves it on the ground,
-    // carrying more than the capacity encumbers the controller. Respawning starts again from the starting items.
+    // Carrying more than the capacity encumbers the controller (GDD 8.5); respawning restores the starting items.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerHealth), typeof(PlayerNeeds))]
     public class PlayerInventory : MonoBehaviour, IItemReceiver
     {

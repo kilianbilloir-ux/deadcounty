@@ -9,12 +9,8 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
 {
-    // Inventory screen (GDD 8.5), drawn in the HUD document: the character's state on the left, the items on the
-    // right as a list with their pictures, sortable by name, category or weight, with the carried weight against the
-    // capacity, red when overloaded. Under the list, the selected item in large with what using it would do to the
-    // gauges as they are now. Inventory opens and closes it, Cancel closes it; the player stands still with a free
-    // cursor meanwhile, the world keeps running. Up and down pick an item, Interact uses it, Drop leaves it on the
-    // ground, Previous and Next change the sort; the mouse can click rows and column headers, and double-click to use.
+    // GDD 8.5, drawn in the HUD document. The player stands still with a free cursor while it is open, but the world
+    // keeps running.
     [RequireComponent(typeof(UIDocument))]
     public class PlayerInventoryScreen : MonoBehaviour
     {
@@ -187,7 +183,6 @@ namespace DeadCounty.Player
             dirty = true;
         }
 
-        // Up and down step through the list, repeating while held.
         void Navigate()
         {
             var y = move.ReadValue<Vector2>().y;

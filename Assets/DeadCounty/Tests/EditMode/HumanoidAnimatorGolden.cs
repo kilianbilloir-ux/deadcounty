@@ -2,16 +2,7 @@ using System.Collections.Generic;
 
 namespace DeadCounty.Tests
 {
-    // Recorded by HumanoidAnimatorGoldenTests.Record, layout in HumanoidTestRig.Sample. The GaitProfile
-    // refactor matched the pre-refactor recording within 1e-4 on every value; since then the planted-foot IK
-    // fix turned the stretched stance leg's hip by up to 0.7 deg and pitched its boot by 2.3 deg (walk),
-    // 5.4 deg (run) and 8.5 deg (sprint) at toe-off, and feet that keep their place through speed changes
-    // moved only frame 50 of Crouch and TurnInPlace (still speeding up, legs and arms by a few degrees) and of
-    // Sprint (the foot taking off out of reach is lifted instead of pulled in, about 5 deg at hip and ankle).
-    // The bank-aware foothold transport then moved only WalkTurn frame 50 (turn entry, legs/arms by a few
-    // millidegrees); frames 120/179 and every other case matched within 1e-4.
-    // The turn compensation (footholds rotate with the body, slide by actual travel) then re-recorded
-    // WalkTurn and TurnInPlace only; every other case matched within 1e-4.
+    // Recorded by HumanoidAnimatorGoldenTests.Record, layout in HumanoidTestRig.Sample.
     static class HumanoidAnimatorGolden
     {
         public static readonly Dictionary<string, float[][]> Samples = new()

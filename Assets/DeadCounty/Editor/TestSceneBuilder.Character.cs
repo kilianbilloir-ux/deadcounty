@@ -86,9 +86,7 @@ namespace DeadCounty.EditorTools
             return joints;
         }
 
-        // Thumbs and ears on every body; a zipped jacket, thigh pockets and eyebrows on the survivor; blood
-        // around a zombie's mouth. Adds only what is missing, so bodies saved in older prefabs get them too.
-        // Returns whether anything was added.
+        // Adds only what is missing, so older prefabs get the details too; true when anything was added.
         static bool AddBodyDetails(Transform model, BodyLook look)
         {
             var added = false;

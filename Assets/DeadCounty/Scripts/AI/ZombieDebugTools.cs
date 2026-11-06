@@ -9,11 +9,9 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.AI
 {
-    // Development tools for the zombies, next to the ZombieManager. Direct device reads, not gameplay actions:
-    // F2 AI panel, event log and gizmos (Gizmos must be on in the Game view) · F3 clock between noon and 23:00 ·
-    // F5 ghost (zombies neither see nor hear the player) · F6 freeze every zombie · F7 spawn a zombie where the
-    // camera points, or a few metres ahead · F8 reset every zombie to its spawn · F9 god mode · F10 slow motion ·
-    // N + 1..4 test noise of 4, 6, 12 or 20 m at the player.
+    // F2 panel and gizmos, F3 noon/night, F5 ghost, F6 freeze, F7 spawn, F8 reset, F9 god mode, F10 slow motion,
+    // N + 1..4 test noise. Direct device reads: debug keys do not belong in the gameplay action map. The F2 gizmos
+    // need Gizmos on in the Game view.
     [RequireComponent(typeof(ZombieManager))]
     public class ZombieDebugTools : MonoBehaviour
     {
@@ -221,7 +219,6 @@ namespace DeadCounty.AI
             text.Append($"vu {OnOff(nearest.Perception.TargetVisible)} · murs au dernier bruit {nearest.LastNoiseWalls}\n");
         }
 
-        // Sight cones coloured by state, the last known position of hunted targets, anchors, recent noises.
         void OnDrawGizmos()
         {
             if (!visible || manager == null || !Application.isPlaying) return;

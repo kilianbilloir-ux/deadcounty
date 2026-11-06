@@ -5,9 +5,8 @@ using UnityEngine.AI;
 
 namespace DeadCounty.AI
 {
-    // Moves a zombie body along NavMesh paths with the shared PlanarLocomotion physics. The NavMeshAgent only plans
-    // paths and avoidance: the body follows its desired velocity at its own acceleration and turn rate, always
-    // along its heading, then goes back through nextPosition, which keeps it on the mesh at the mesh height.
+    // The NavMeshAgent only plans paths and avoidance: the body moves with the shared PlanarLocomotion physics, then
+    // goes back through nextPosition, which keeps it on the mesh at the mesh height.
     public class ZombieMotor
     {
         const float WanderStoppingDistance = 0.4f;

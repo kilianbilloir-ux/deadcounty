@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DeadCounty.Core
 {
-    // Hit points shared by the player and the zombies. Damage stops applying once dead.
+    // Shared by the player and the zombies.
     public class HealthPool
     {
         public HealthPool(float max)

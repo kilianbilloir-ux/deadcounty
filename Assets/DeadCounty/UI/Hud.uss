@@ -437,8 +437,8 @@
     margin: 0 16px;
 }
 
-/* Inventory (GDD 8.5): the character's state on the left, the list on the right. The game keeps running, so the
-   panel sits on the right over an undimmed world, leaving the character and what comes at it in view. */
+/* Inventory (GDD 8.5). The game keeps running, so the panel sits on the right over an undimmed world, leaving the
+   character and what comes at it in view. */
 .inventory {
     position: absolute;
     left: 0;
@@ -651,8 +651,7 @@
     margin: 14px 15px;
 }
 
-/* The selected item: its picture on a dark tile, then what using it would do to the gauges as they are now,
-   in amber, or in grey when it would be wasted. */
+/* The selected item and what using it would do: amber, or grey when it would be wasted. */
 .item-detail {
     flex-direction: row;
     min-height: 102px;
@@ -725,8 +724,7 @@
     text-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 
-/* Title (GDD 8.11, after Risk of Rain 2): a list of text entries on the left over the game world, the help line
-   under it. A shade fading to the right keeps the text readable on any part of the town. */
+/* Title (GDD 8.11, after Risk of Rain 2). A shade fading to the right keeps the text readable over the town. */
 .title-screen {
     position: absolute;
     left: 0;

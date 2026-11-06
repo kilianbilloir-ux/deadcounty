@@ -3,10 +3,7 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Traces of the evacuation on the village houses, readable from the street: search marks sprayed by the front
-    // door of the houses that were checked, HELP on the wall and the roof of the barricaded house O3, KEEP OUT on
-    // E5, the side and back windows of both boarded up too, police tape torn across the porch of O3. Separate seed
-    // from the other passes; none of it is solid.
+    // Traces of the evacuation, readable from the street. Separate seed from the other passes; none of it is solid.
     public static partial class TestSceneBuilder
     {
         static void BuildEvacuationTraces(Transform parent)

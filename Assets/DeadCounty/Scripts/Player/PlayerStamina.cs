@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // Holds the player's StaminaModel. ThirdPersonController ticks it every frame and gates gaits and jumps on it.
+    // ThirdPersonController ticks the model and gates gaits and jumps on it.
     public class PlayerStamina : MonoBehaviour
     {
         [SerializeField] StaminaSettings settings = StaminaSettings.Default;

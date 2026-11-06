@@ -8,17 +8,8 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
 {
-    // The game's menus (GDD 8.11), typographic lists all driven the same way: Navigate moves the selection and
-    // changes an option sideways, Submit activates, Cancel goes back, the mouse can hover and click.
-    // - Title: Jouer, Options, Quitter over the game world with the clock stopped, shown on load when a
-    //   TitleScreen in the scene asks for it; without one the game starts at once.
-    // - Pause, on Cancel: Reprendre, Options, Menu principal, Quitter, with the clock stopped.
-    // - Options: mouse sensitivity, vertical look inversion, full screen, interface size, one-time tips and reduced
-    //   flashes, kept in PlayerPrefs (the last three through GameSettings), the keyboard keys (KeyBindings):
-    //   Submit on a key waits for the new one, Escape cancels, and the five volumes (Audio, GameSettings).
-    // Every move, choice and change raises Feedback for the interface sounds.
-    // Menu principal, from the pause or with Cancel on the death screen, reloads the scene, which brings the title
-    // back. Runs before the inventory screen, which closes itself on Cancel: an open inventory is closed, not paused.
+    // GDD 8.11. Without a TitleScreen in the scene the game starts at once. Runs before the inventory screen, which
+    // closes itself on Cancel: an open inventory is closed, not paused.
     [DefaultExecutionOrder(-10)]
     [RequireComponent(typeof(UIDocument))]
     public partial class GameMenu : MonoBehaviour
@@ -61,7 +52,7 @@ namespace DeadCounty.Player
 
         // From ShowTitle until Jouer, Options included.
         public bool OnTitle { get; private set; }
-        // The title page itself, over the world it shows off.
+        // The title page itself, not Options opened from it.
         public bool TitleShown => items != null && items == titleItems;
         // Any page on screen: the game clock is stopped.
         public bool Shown => items != null;
@@ -206,7 +197,6 @@ namespace DeadCounty.Player
             item.Activate();
         }
 
-        // One row per rebindable key: what it does, then the key in its frame.
         List<Item> BuildControls(VisualElement list)
         {
             var rows = new List<Item>();
@@ -369,7 +359,6 @@ namespace DeadCounty.Player
             if (selected != before) Feedback?.Invoke(MenuFeedback.Move);
         }
 
-        // Up and down move the selection, left and right change the selected option; both repeat while held.
         // Real time: the game clock is stopped.
         void Navigate()
         {

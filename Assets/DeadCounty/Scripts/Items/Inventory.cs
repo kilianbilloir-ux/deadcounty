@@ -17,8 +17,7 @@ namespace DeadCounty.Items
         public float Weight => Item.Weight * Count;
     }
 
-    // Items carried by the player, one stack per kind, in pickup order. The weight may exceed the capacity: the
-    // player is then overloaded and slowed (GDD 8.5). A carried container (backpack) raises the capacity.
+    // One stack per kind, in pickup order. The weight may exceed the capacity: the player is then slowed (GDD 8.5).
     public class Inventory
     {
         readonly List<ItemStack> stacks = new();

@@ -6,9 +6,8 @@ using UnityEngine.AI;
 
 namespace DeadCounty.AI
 {
-    // One zombie in the scene: turns what it senses into a PerceptionSnapshot for its ZombieBrain, executes the
-    // brain's commands through a ZombieMotor and exposes the resulting motion to its animator. It has no Update:
-    // the ZombieManager calls Sense on its time slice, then Think and Move every frame unless it is dormant.
+    // Scene side of one zombie, between its pure ZombieBrain and its ZombieMotor. No Update: the ZombieManager calls
+    // Sense on its time slice, then Think and Move every frame unless the zombie is dormant.
     [RequireComponent(typeof(NavMeshAgent), typeof(ZombieHealth))]
     public partial class ZombieAgent : MonoBehaviour, IHumanoidMotion, IZombieWorld
     {
@@ -64,8 +63,8 @@ namespace DeadCounty.AI
         public bool IsCrouching => false;
         public float AimYaw { get; private set; }
         public float AimPitch { get; private set; }
-        // The brain's pose plus a short convulsive jerk of the torso and head every few seconds, timed and signed by
-        // the seed; test zombies keep still for repeatable measurements.
+        // The brain's pose plus a seeded convulsive jerk every few seconds; deterministic zombies keep still for
+        // repeatable measurements.
         public PoseModifiers Pose
         {
             get
@@ -173,7 +172,7 @@ namespace DeadCounty.AI
             if (commands.StrikeNow) Strike();
         }
 
-        // Back to the recorded spawn pose, calm and at full health; revives a dead zombie.
+        // Also revives a dead zombie.
         public void ResetToSpawn()
         {
             if (!isActiveAndEnabled) throw new InvalidOperationException($"{name}: ResetToSpawn on a disabled or inactive zombie");
@@ -292,7 +291,7 @@ namespace DeadCounty.AI
             AIEvents.RaiseStrike(ownId, Time.time, origin, commands.LungeDirection, hit);
         }
 
-        // Head aim from the eyes toward the commanded look point, in world degrees; positive pitch looks down.
+        // World degrees, positive pitch looks down.
         void UpdateAim()
         {
             var look = commands.HasLookPoint ? commands.LookPoint - (motor.Position + Vector3.up * tuning.EyeHeight) : motor.Heading;

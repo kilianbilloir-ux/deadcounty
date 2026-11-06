@@ -3,9 +3,8 @@ using static DeadCounty.EditorTools.VoiceSynth;
 
 namespace DeadCounty.EditorTools
 {
-    // Recipes of the zombie voices, one variant per call. They sit low (70 to 120 Hz, formants of a long tract),
-    // rough (period doubling, flapping false folds), wide-band and wet; each has its own pitch contour so the
-    // player tells an alert from a chase or an attack without seeing the zombie. System-only, like Synth.
+    // Low (70 to 120 Hz), rough and wet; each has its own pitch contour so the player tells an alert from a chase or
+    // an attack without seeing the zombie. One variant per call, System-only like Synth.
     public static class ZombieVoiceRecipes
     {
         const float AirHz = 2200f;

@@ -10,16 +10,8 @@ namespace DeadCounty.Player
 {
     public enum Gait { Idle, Walk, Run, Sprint }
 
-    // Third-person movement on a CharacterController with human-scale values: walk by default (1.5 m/s),
-    // Shift runs (3.5 m/s), Alt sprints (6 m/s), C crouch-walks (1 m/s). Planar physics (acceleration, speed
-    // dependent turn rate, pivot on sharp reversals, airborne momentum) come from PlanarLocomotion, shared with
-    // the zombies; climbing a slope and hard landings slow the player down on top of it.
-    // PlayerStamina gates the gaits (no run or sprint while exhausted) and pays for jumps.
-    // Look input rotates CameraTarget, which the Cinemachine ThirdPersonFollow camera tracks.
-    // Grounding uses its own probe plus snapping, so walking down steps and ramps never flickers into the air
-    // state; coyote time and a jump buffer make jumps forgiving; slopes steeper than the controller's slope
-    // limit slide the player off. NoiseRadius exposes the GDD noise values for the zombie AI.
-    // Hits go through Knockback (collides like any move) and Stagger; Teleport warps the player and camera.
+    // Human-scale gaits; planar physics come from PlanarLocomotion, shared with the zombies. Grounding uses its own
+    // probe plus snapping so walking down steps and ramps never flickers into the air state.
     [DefaultExecutionOrder(-100)]
     [RequireComponent(typeof(CharacterController), typeof(PlayerStamina))]
     public class ThirdPersonController : MonoBehaviour, IHumanoidMotion
@@ -114,7 +106,6 @@ namespace DeadCounty.Player
         public int MotionResetId { get; private set; }
         public float WalkSpeed => walkSpeed;
         public float RunSpeed => runSpeed;
-        public float SprintSpeed => sprintSpeed;
         public Gait Gait { get; private set; }
         // Actual horizontal speed after collisions, so walking into a wall reads as standing still.
         public float CurrentSpeed { get; private set; }
@@ -275,7 +266,7 @@ namespace DeadCounty.Player
             stamina.Model.Tick(activity, Time.deltaTime);
         }
 
-        // Moves the player along `displacement` over `duration` through the CharacterController, so walls stop it.
+        // Through the CharacterController, so walls stop it.
         public void Knockback(Vector3 displacement, float duration)
         {
             if (duration <= 0f) throw new ArgumentOutOfRangeException(nameof(duration), duration, "Knockback needs a positive duration");

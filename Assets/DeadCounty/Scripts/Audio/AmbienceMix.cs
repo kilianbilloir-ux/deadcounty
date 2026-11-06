@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // Soundscape math, no scene state: how much of each bed plays at a given darkness, how a room muffles the
-    // outside and how fast the levels follow. EditMode tested.
+    // Soundscape math without scene state, so it is EditMode tested.
     public static class AmbienceMix
     {
         // Birds hand over to the insects while NightFactor crosses this range (most of dusk and dawn).
@@ -26,7 +25,6 @@ namespace DeadCounty.Audio
 
         public static float NightWeight(float night) => Mathf.Clamp01(Mathf.Sin(Dusk(night) * Mathf.PI / 2f));
 
-        // The wind calms down after dark.
         public static float WindLevel(float night) => Mathf.Lerp(1f, NightWind, Mathf.Clamp01(night));
 
         // Songs per second relative to a plain day: none at night, more during the morning chorus.

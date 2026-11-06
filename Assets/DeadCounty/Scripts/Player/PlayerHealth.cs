@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // Player hit points. A hit knocks the player back away from its source and staggers them, then grants a
-    // short invulnerability so one swing cannot land several times. A hit may also open a bleeding wound that
-    // drains health until a bandage stops it (GDD 8.4).
+    // GDD 8.4. A hit grants a short invulnerability so one swing cannot land several times.
     [RequireComponent(typeof(ThirdPersonController))]
     public class PlayerHealth : MonoBehaviour
     {

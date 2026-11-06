@@ -4,21 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.Animation
 {
-    // Procedural locomotion for the segmented prototype characters (no rig, no clips), built on human gait data:
-    // - cadence rises with speed (about 1 stride per second walking, 1.6 sprinting);
-    // - each foot stays on the ground for a duty factor of the cycle (62 % walking, 30 % sprinting) and moves
-    //   back at exactly ground speed meanwhile, so it stays planted, then swings forward on an arc with heel
-    //   strike and toe-off;
-    // - the stance window sits behind the hip (heel strike just ahead, toe-off far behind with the heel up);
-    // - the hips can only be as high as the stretched stance leg allows, so they vault over it like an
-    //   inverted pendulum (highest mid-stance) and sway toward it; running hips also compress on contact and
-    //   rise during the flight phase;
-    // - legs use planar two-bone IK, a ray under each foot adapts them to steps and slopes, step-ups of the
-    //   CharacterController are smoothed and landings compress the legs;
-    // - the torso leans with speed, acceleration and into turns (centripetal), the head follows the aim.
-    // The tuning comes from a GaitProfile shared per kind of body, the motion from an IHumanoidMotion (player
-    // controller, zombie agent) whose PoseModifiers add zombie expression; a limp makes the legs asymmetric.
-    // Temporary until a rigged character with Mixamo / Synty animations replaces it.
+    // Segmented characters, no rig and no clips, built on human gait data: planted feet move back at exactly ground
+    // speed, and the hips vault over the stretched stance leg like an inverted pendulum.
     public partial class ProceduralHumanoidAnimator : MonoBehaviour
     {
         static readonly ProfilerMarker EvaluateMarker = new("DC.Anim.Humanoid");
@@ -82,7 +69,6 @@ namespace DeadCounty.Animation
             set => limp = value;
         }
 
-        // Whether each foot is in its stance phase, planted on the ground.
         public bool LeftFootPlanted { get; private set; }
         public bool RightFootPlanted { get; private set; }
         // Boot pitch (deg) of each foot, test observability for the flat-foot slip gate.

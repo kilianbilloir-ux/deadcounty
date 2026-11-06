@@ -2,9 +2,8 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Small nature and wear details: wildflowers in the meadows, stumps, branches and fallen trunks in the woods,
-    // birches among the broadleaf trees; cracks, potholes, patches and manholes on the roads. A separate seed from
-    // the vegetation pass, so the trees and bushes stay where they were. Only the fallen trunks are solid.
+    // A separate seed from the vegetation pass, so the trees and bushes stay where they were. Only the fallen trunks
+    // are solid.
     public static partial class TestSceneBuilder
     {
         static void BuildUndergrowth(Transform parent)

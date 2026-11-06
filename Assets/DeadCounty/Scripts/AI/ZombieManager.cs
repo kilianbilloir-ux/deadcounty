@@ -7,9 +7,8 @@ using UnityEngine.AI;
 
 namespace DeadCounty.AI
 {
-    // Scheduler of every zombie in the scene: every half second it sorts them into distance tiers around the
-    // target and keeps the nearest activeBudget awake; each frame it runs the due senses, staggered and capped,
-    // then Think and Move for the awake ones. Records stay apart from the views so any zombie can become data.
+    // Distance tiers re-sorted twice a second keep the nearest activeBudget zombies awake; senses are staggered and
+    // capped per frame. Records stay apart from the views so any zombie can become data.
     [DefaultExecutionOrder(-50)]
     public class ZombieManager : MonoBehaviour
     {
@@ -64,7 +63,7 @@ namespace DeadCounty.AI
         // Set by tests to perceive a stand-in instead of the player.
         public IPerceivable TargetOverride { get; set; }
 
-        // Debug freeze: every zombie goes dormant where it stands until unfrozen.
+        // Debug freeze: every zombie goes dormant where it stands.
         public bool Frozen
         {
             get => frozen;

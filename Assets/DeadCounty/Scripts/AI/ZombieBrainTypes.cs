@@ -28,10 +28,9 @@ namespace DeadCounty.AI
         bool TryTakeAttackTurn(float turnInterval);
     }
 
-    // What the agent sensed this frame. Positions are at ground level. Target fields always hold the true values;
-    // the brain only uses them while it perceives the target, or briefly after (chase tracking). Visibility
-    // values may be cached between time-sliced sensing ticks. Arrival and path failure refer to the destination
-    // of the previous commands.
+    // Positions at ground level. Target fields always hold the true values; the brain only reads them while it
+    // perceives the target or just after (chase tracking). Visibility may date from an earlier sensing tick.
+    // Arrival and path failure refer to the previous commands' destination.
     public struct PerceptionSnapshot
     {
         public float Time;

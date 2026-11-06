@@ -6,9 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace DeadCounty.Audio
 {
-    // Dark drone under the title (Music channel, heard while the clock is stopped), with a far bell tolling now and
-    // then; it rises when the title shows and dies away once Jouer is chosen. A Menu principal reloads the scene,
-    // which brings it back.
+    // Music channel, so it plays while the clock is stopped. Menu principal reloads the scene, which brings it back.
     public class TitleMusic : MonoBehaviour
     {
         // The bell is pitched to notes of the drone's A minor: A, G and E below.

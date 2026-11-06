@@ -5,10 +5,8 @@ using UnityEngine.Rendering;
 
 namespace DeadCounty.Player
 {
-    // Full-screen effects through global volumes: a dark red vignette that deepens as health drops under 40 % and
-    // beats slowly, steady when flashes are reduced, and a blur behind the pause menu and the options (GDD 8.11,
-    // after Risk of Rain 2), which stop the game. The world stays sharp behind the inventory, which does not, and
-    // behind the title page, which shows it off.
+    // The pause blur (GDD 8.11, after Risk of Rain 2) marks a stopped game: the world stays sharp behind the
+    // inventory, which leaves it running, and behind the title page, which shows it off.
     public class PlayerScreenEffects : MonoBehaviour
     {
         const float InjuredBelow = 0.4f;

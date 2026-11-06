@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Signs of the outbreak along the streets (GDD 8.12: deserted streets of a rural county): a car crashed into a
-    // lamp post, cars left at the curb, a police roadblock closing Main Street to the north, luggage dropped in
-    // flight, rubbish by the bins, shopping carts at the store, a bicycle in a yard, blood on the road. Solid
-    // pieces keep clear of the zombie spots, the spawn and the doors; the small clutter is not solid.
+    // Signs of the outbreak along the streets (GDD 8.12). Solid pieces keep clear of the zombie spots, the spawn and
+    // the doors; the small clutter is not solid.
     public static partial class TestSceneBuilder
     {
         const float RoadblockZ = 124f;
@@ -50,8 +48,7 @@ namespace DeadCounty.EditorTools
             BuildEvacuationTraces(root);
         }
 
-        // Main Street closed to the north: barriers across the road with gaps a person can squeeze through,
-        // sandbags on both sidewalks, a cruiser, cones and a spike strip.
+        // Main Street closed to the north, with gaps a person can squeeze through.
         static void BuildRoadblock(Transform root, System.Random rng)
         {
             foreach (var x in new[] { -2.4f, 2.4f })
