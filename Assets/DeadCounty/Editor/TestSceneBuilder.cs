@@ -10,8 +10,8 @@ using UnityEngine.AI;
 
 namespace DeadCounty.EditorTools
 {
-    // Generates Assets/Scenes/TestMap.unity from scratch on every run: edit the TestSceneBuilder.*.cs files rather
-    // than the scene.
+    // Generates Assets/Scenes/TestMap.unity, a 300 m rural county around the movement, AI and lighting test zones,
+    // from scratch on every run: edit the TestSceneBuilder.*.cs files rather than the scene.
     public static partial class TestSceneBuilder
     {
         const string ScenePath = "Assets/Scenes/TestMap.unity";

@@ -9,8 +9,9 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.AI
 {
-    // Direct device reads: debug keys do not belong in the gameplay action map. The F2 gizmos need Gizmos on in the
-    // Game view.
+    // F2 panel and gizmos, F3 noon/night, F5 ghost, F6 freeze, F7 spawn, F8 reset, F9 god mode, F10 slow motion,
+    // N + 1..4 test noise. Direct device reads: debug keys do not belong in the gameplay action map. The F2 gizmos
+    // need Gizmos on in the Game view.
     [RequireComponent(typeof(ZombieManager))]
     public class ZombieDebugTools : MonoBehaviour
     {
