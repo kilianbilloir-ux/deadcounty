@@ -26,8 +26,7 @@ namespace DeadCounty.EditorTools
         static readonly Vector3 TitleCameraPosition = new(64f, 3f, -17f);
         static readonly Vector3 TitleCameraTarget = new(70f, 2f, 25f);
 
-        // The prefab is only generated when missing, so Inspector tweaks survive scene rebuilds.
-        // Delete it to regenerate it from this code.
+        // Only generated when missing, so Inspector tweaks survive scene rebuilds; delete it to regenerate it.
         static void BuildPlayer()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
@@ -137,9 +136,8 @@ namespace DeadCounty.EditorTools
             return prefab;
         }
 
-        // The prefab is never regenerated, so components and references added to the player since it was created
-        // are added in place; existing components and their serialized values are left untouched to keep
-        // Inspector tweaks.
+        // The prefab is never regenerated: components added to the player since are added in place, and existing ones
+        // keep their serialized values (Inspector tweaks).
         static GameObject EnsurePlayerComponents(GameObject prefabAsset)
         {
             var path = AssetDatabase.GetAssetPath(prefabAsset);

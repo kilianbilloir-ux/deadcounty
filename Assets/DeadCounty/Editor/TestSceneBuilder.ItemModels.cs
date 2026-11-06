@@ -8,9 +8,8 @@ using Object = UnityEngine.Object;
 
 namespace DeadCounty.EditorTools
 {
-    // Ground models of the items, rebuilt in place on every build (pure code, nothing to tune in the Inspector),
-    // which keeps the GUIDs the item assets and the scene point to. Pivot on the ground, one box collider on the
-    // root for the interaction raycasts. Also places a few items in sight around the level.
+    // Rebuilt in place on every build, which keeps the GUIDs the item assets and the scene point to. Pivot on the
+    // ground, one box collider on the root for the interaction raycasts.
     public static partial class TestSceneBuilder
     {
         const string ItemModelDir = "Assets/DeadCounty/Prefabs/Items";

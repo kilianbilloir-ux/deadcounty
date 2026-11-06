@@ -2,10 +2,9 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Furniture assembled from a few boxes so each piece reads at a glance (legs, cushions, doors, handles).
-    // Each piece is a root with one box collider over its footprint, the only solid part: the NavMesh, the
-    // camera and the interaction raycasts see a simple block, LootContainer and Bed sit on the root.
-    // Local frame: origin on the floor at the centre of the footprint, the front facing -Z.
+    // Each piece is a root with one box collider over its footprint, the only solid part: the NavMesh, the camera
+    // and the interaction raycasts see a simple block. Local frame: origin on the floor at the centre of the
+    // footprint, the front facing -Z.
     public static partial class TestSceneBuilder
     {
         static Transform Piece(Transform parent, string name, Vector3 pos, float yaw, Vector3 footprint, bool solid = true)
@@ -79,7 +78,7 @@ namespace DeadCounty.EditorTools
             return p;
         }
 
-        // Chairs are not solid, like before: they stay out of the NavMesh and the player brushes past them.
+        // Chairs are not solid: they stay out of the NavMesh and the player brushes past them.
         static Transform Chair(Transform parent, Vector3 pos, float yaw, Quaternion? tipped = null)
         {
             var p = Piece(parent, "Chaise", pos, yaw, new Vector3(0.45f, 0.9f, 0.45f), solid: false);

@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Gable roofs with some depth: shingle courses and a ridge cap, white fascia, rake boards and soffits, the gable
-    // ends closed in the wall colour with a louvred vent, a flat ceiling inside; lap siding on the house and church
-    // walls. The former prism stays under each roof as its invisible collider, so physics, the NavMesh and the camera
-    // see the same roof as before. Nothing added here is solid.
+    // The former prism stays under each roof as its invisible collider, so physics, the NavMesh and the camera see
+    // the same roof as before. Nothing added here is solid.
     public static partial class TestSceneBuilder
     {
         const float ClapboardHeight = 0.23f;

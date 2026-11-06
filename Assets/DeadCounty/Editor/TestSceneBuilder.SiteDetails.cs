@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Detailed pieces for the gas station, the church and the warehouse, and the street furniture of Main Street.
     // Pieces that replace a former box keep its footprint as their only collider (see Piece), so the NavMesh, the
     // loot and the test zones stay as they were.
     public static partial class TestSceneBuilder

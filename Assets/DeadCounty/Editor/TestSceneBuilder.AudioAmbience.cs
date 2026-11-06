@@ -8,8 +8,6 @@ using Object = UnityEngine.Object;
 
 namespace DeadCounty.EditorTools
 {
-    // The soundscape, the title music and the interface sounds: their cues (AmbienceRecipes, DistantRecipes,
-    // InterfaceRecipes), the AmbienceDirector of the scene, the TitleMusic on the title and the rig's UiSounds.
     public static partial class TestSceneBuilder
     {
         // Calls are placed nearer than their cue's minDistance, so the rolloff never touches them: their distance is
