@@ -3,7 +3,6 @@ using static DeadCounty.EditorTools.AmbienceDsp;
 
 namespace DeadCounty.EditorTools
 {
-    // The county's soundscape: wind and night insect beds, a room tone, and the calls of the animals still around.
     // Beds are rendered one crossfade longer than their loop with every modulation periodic over the loop, then
     // wrapped (AmbienceDsp.Loop). Calls carry their own distance: no highs, a little open-air tail.
     static class AmbienceRecipes

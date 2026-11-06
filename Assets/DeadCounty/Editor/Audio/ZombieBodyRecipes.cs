@@ -3,8 +3,7 @@ using static DeadCounty.EditorTools.VoiceSynth;
 
 namespace DeadCounty.EditorTools
 {
-    // Recipes of what a zombie's body does: the lunge, the strike landing or snapping on air, fists on a door,
-    // shuffled and dragged feet. One variant per call; System-only, like Synth.
+    // One variant per call; System-only, like Synth.
     public static class ZombieBodyRecipes
     {
         // Arms swept forward on the lunge: an air band rising and falling, a flap of sleeve.

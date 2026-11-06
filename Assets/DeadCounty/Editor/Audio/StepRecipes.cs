@@ -3,10 +3,8 @@ using static DeadCounty.EditorTools.Synth;
 
 namespace DeadCounty.EditorTools
 {
-    // Boot footsteps per ground, after Farnell (Designing Sound, "Footsteps"): a walking step is a heel strike then
-    // the ball of the foot about 90 ms later; a running step lands both within 35 ms and harder, then scuffs. Each
-    // contact excites the ground (grit, pebbles, planks, plate modes) on top of the low thump of the body.
-    // Levels are set by loudness, not peak, so a grass swish and a concrete click sit where they should.
+    // After Farnell (Designing Sound, "Footsteps"): heel then ball of the foot about 90 ms later walking, both within
+    // 35 ms running. Levels are set by loudness, not peak, so a grass swish and a concrete click sit where they should.
     public static class StepRecipes
     {
         const float Length = 0.42f;
