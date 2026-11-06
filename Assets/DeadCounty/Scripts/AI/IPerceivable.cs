@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // Something zombies can see, hear the position of and strike: the player today, decoys or survivors later.
-    // Positions are in world space, Position at ground level.
+    // The player today, decoys or survivors later. World space, Position at ground level.
     public interface IPerceivable
     {
         Vector3 HeadPoint { get; }

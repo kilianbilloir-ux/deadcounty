@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // Everything that defines a zombie kind: behaviour, body physics, gait and the share of limpers.
     // Read-only at runtime: Play mode edits would persist into the asset.
     [CreateAssetMenu(menuName = "DeadCounty/Zombie Profile", fileName = "ZP_")]
     public class ZombieProfile : ScriptableObject
