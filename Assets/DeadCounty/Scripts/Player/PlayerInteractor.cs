@@ -5,9 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Picks the interactable the player looks at within reach, for the HUD prompt, and uses it on Interact. Holding
-    // Run or Sprint hurries the use. A timed use (searching) runs while the player keeps still and is cancelled by
-    // moving, pressing Interact again, getting hit or leaving its reach.
+    // Holding Run or Sprint hurries a use; moving, Interact again, a hit or leaving reach cancels a timed one.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerHealth))]
     public class PlayerInteractor : MonoBehaviour
     {

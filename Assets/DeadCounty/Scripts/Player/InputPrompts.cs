@@ -5,8 +5,7 @@ using UnityEngine.InputSystem.Utilities;
 
 namespace DeadCounty.Player
 {
-    // On-screen key prompts read from the project-wide action bindings, so they follow any rebinding. Prompts show
-    // the key of the device last pressed: the keyboard until a gamepad button is pressed, and back.
+    // Read from the project-wide action bindings so prompts follow any rebinding; they show the device last pressed.
     public static class InputPrompts
     {
         const string KeyboardGroup = "Keyboard&Mouse";
@@ -17,8 +16,7 @@ namespace DeadCounty.Player
 
         public static bool GamepadActive { get; private set; }
 
-        // Raised when the keys to show change, so prompts can be redrawn: the player switched between keyboard and
-        // gamepad, or rebound a key (KeyBindings).
+        // Device switch or rebinding (KeyBindings): prompts must be redrawn.
         public static event Action KeysChanged;
 
         // UI Submit and Cancel are generic bindings with no readable key name.

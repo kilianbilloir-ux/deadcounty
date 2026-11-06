@@ -5,14 +5,8 @@ using UnityEngine.Rendering;
 
 namespace DeadCounty.Player
 {
-    // Adapts the ThirdPersonFollow rig to the surroundings so the camera stays readable while searching
-    // buildings, without authored trigger volumes:
-    //  - scroll zoom, capped closer when the space is confined (ceiling overhead + walls on most sides);
-    //  - wall anticipation: sphere casts behind the camera (and 25 degrees to each side) ease it in before
-    //    Cinemachine's collision would snap it, then it eases back out slowly;
-    //  - shoulder lean-in when a wall is close on the shoulder side, auto swap to the free side, V to swap;
-    //  - camera arm kept under low ceilings, wider FOV when confined, player hidden when the camera is inside it.
-    // Cinemachine's own obstacle avoidance stays on as the last-resort safety.
+    // Keeps the camera readable while searching buildings, without authored trigger volumes: it eases in ahead of
+    // walls before Cinemachine's collision would snap it, which stays on as the last-resort safety.
     [DefaultExecutionOrder(100)]
     [RequireComponent(typeof(CinemachineCamera), typeof(CinemachineThirdPersonFollow))]
     public class PlayerCameraDirector : MonoBehaviour

@@ -6,9 +6,7 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // Sleeping in a bed (GDD 8.4), only once fatigue is under half: time runs 20 times faster until fatigue is full
-    // or morning comes, hunger and thirst drain at half rate and health comes back while nothing hurts. The zombies
-    // keep wandering meanwhile: one coming close, a noise nearby or a hit wakes the player.
+    // GDD 8.4. The zombies keep wandering meanwhile: one coming close, a noise nearby or a hit wakes the player.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerHealth), typeof(PlayerNeeds))]
     [RequireComponent(typeof(PlayerNoiseEmitter))]
     public class PlayerSleep : MonoBehaviour

@@ -5,8 +5,7 @@ using UnityEngine.Rendering;
 
 namespace DeadCounty.Player
 {
-    // Hunger, thirst and fatigue of the player. Empty needs drain health and cap stamina; empty fatigue also
-    // darkens the screen through a global volume. Asleep, fatigue fills back (see PlayerSleep).
+    // Empty needs drain health and cap stamina; empty fatigue also darkens the screen through a global volume.
     [RequireComponent(typeof(PlayerHealth), typeof(PlayerStamina))]
     public class PlayerNeeds : MonoBehaviour
     {

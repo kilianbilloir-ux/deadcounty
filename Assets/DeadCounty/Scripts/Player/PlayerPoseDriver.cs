@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // Body language of the player on top of the procedural gait: bent over and digging while searching, a hand
-    // reaching out when opening a door or picking something up, out of breath once stamina is spent, a recoil
-    // away from where a hit came from, and a limp below a quarter of health.
+    // Body language on top of the procedural gait.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerInteractor), typeof(PlayerHealth))]
     [RequireComponent(typeof(PlayerStamina), typeof(ProceduralHumanoidAnimator))]
     public class PlayerPoseDriver : MonoBehaviour

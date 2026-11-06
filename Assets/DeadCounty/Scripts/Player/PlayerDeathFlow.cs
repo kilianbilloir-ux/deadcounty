@@ -5,9 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Death and respawn loop: on death the body collapses and the screen fades to black (the HUD draws the fade,
-    // the survival time and the prompt from the state exposed here), then Jump respawns the player at the pose
-    // recorded in Start with full health, stamina and needs and the starting items. Lives on the rig root so it
+    // The HUD draws the fade, survival time and prompt from the state exposed here. Lives on the rig root so it
     // keeps running if the Player object gets disabled.
     public class PlayerDeathFlow : MonoBehaviour
     {
