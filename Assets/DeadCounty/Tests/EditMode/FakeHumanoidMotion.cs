@@ -2,7 +2,6 @@ using DeadCounty.Animation;
 
 namespace DeadCounty.Tests
 {
-    // Scripted motion source for animator tests.
     sealed class FakeHumanoidMotion : IHumanoidMotion
     {
         public float CurrentSpeed { get; set; }
