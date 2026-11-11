@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DeadCounty.EditorTools
@@ -81,27 +82,83 @@ namespace DeadCounty.EditorTools
                 var ankle = joints[left ? "leftAnkle" : "rightAnkle"] = Group(knee, left ? "Cheville_G" : "Cheville_D", new Vector3(0f, -0.43f, 0f));
                 Part(ankle, "Botte", Frustum("Boot", -0.08f, 0.05f, new(0.12f, 0.27f), new(0.11f, 0.15f), new(0f, 0.04f)), look.Boots);
             }
+            AddBodyDetails(model, look);
             return joints;
+        }
+
+        // Thumbs and ears on every body; a zipped jacket, thigh pockets and eyebrows on the survivor; blood
+        // around a zombie's mouth. Adds only what is missing, so bodies saved in older prefabs get them too.
+        // Returns whether anything was added.
+        static bool AddBodyDetails(Transform model, BodyLook look)
+        {
+            var added = false;
+            void Detail(string jointPath, string name, Mesh mesh, string mat, Vector3 offset = default)
+            {
+                var joint = model.Find(jointPath) ?? throw new System.InvalidOperationException($"{model.name} has no joint {jointPath}");
+                if (joint.Find(name) != null) return;
+                var part = MeshObject(name, joint, mesh, offset, Quaternion.identity, Vector3.one, new[] { mat }, false);
+                part.layer = joint.gameObject.layer;
+                added = true;
+            }
+
+            const string spine = "Hanches/Colonne";
+            const string head = spine + "/Cou/Tete";
+            foreach (var side in new[] { -1f, 1f })
+            {
+                var left = side < 0f;
+                var elbow = $"{spine}/{(left ? "Epaule_G/Coude_G" : "Epaule_D/Coude_D")}";
+                // On the inner front edge of the hand, toward the body.
+                Detail(elbow, "Pouce", Frustum(left ? "ThumbL" : "ThumbR", -0.31f, -0.25f, new(0.025f, 0.03f), new(0.03f, 0.035f), new(-side * 0.025f, 0.035f)), look.Skin);
+                Detail(head, left ? "Oreille_G" : "Oreille_D", Blob(left ? "EarL" : "EarR", new Vector3(side * 0.103f, 0.115f, 0f), new Vector3(0.02f, 0.038f, 0.03f)), look.Skin);
+                if (!look.Survivor) continue;
+                Detail(head, left ? "Sourcil_G" : "Sourcil_D", Frustum("Brow", 0.138f, 0.15f, new(0.045f, 0.012f), new(0.04f, 0.01f), new(0f, 0.122f)), look.Hair, new Vector3(side * 0.042f, 0f, 0f));
+                Detail($"Hanches/{(left ? "Hanche_G" : "Hanche_D")}", "Poche", Frustum(left ? "PocketL" : "PocketR", -0.22f, -0.08f, new(0.02f, 0.11f), new(0.02f, 0.1f), new(side * 0.074f, 0f)), "JeansDark");
+            }
+            if (look.Survivor)
+            {
+                Detail(spine, "Fermeture", Frustum("Zip", 0.02f, 0.4f, new(0.014f, 0.012f), new(0.014f, 0.012f), new(0f, 0.118f)), look.TopDark);
+                Detail(spine, "Ourlet", Frustum("JacketHem", -0.01f, 0.05f, new(0.37f, 0.225f), new(0.37f, 0.225f)), look.TopDark);
+            }
+            else
+            {
+                Detail(head, "Sang_Bouche", Frustum("MouthBlood", 0.025f, 0.065f, new(0.06f, 0.012f), new(0.05f, 0.012f), new(0f, 0.118f)), "Blood");
+            }
+            return added;
         }
 
         static void Part(Transform joint, string name, Mesh mesh, string mat, Vector3 offset = default)
             => MeshObject(name, joint, mesh, offset, Quaternion.identity, Vector3.one, new[] { mat }, false);
 
-        // Box tapering from `bottom` (X width, Z depth) at y0 to `top` at y1, centered on `offset` in XZ.
+        // Octagonal prism tapering from `bottom` (X width, Z depth) at y0 to `top` at y1, centred on `offset` in XZ:
+        // a box with its vertical edges cut, which reads as a rounded limb while staying flat-shaded low poly.
         static Mesh Frustum(string name, float y0, float y1, Vector2 bottom, Vector2 top, Vector2 offset = default) => Cached($"SM_Char_{name}", () =>
         {
+            const float chamfer = 0.3f;
             var m = new MeshBuilder().Sub();
-            Vector3 Corner(float y, Vector2 size, float sx, float sz) => new(offset.x + sx * size.x / 2f, y, offset.y + sz * size.y / 2f);
-            var b = new[] { Corner(y0, bottom, -1, -1), Corner(y0, bottom, 1, -1), Corner(y0, bottom, 1, 1), Corner(y0, bottom, -1, 1) };
-            var t = new[] { Corner(y1, top, -1, -1), Corner(y1, top, 1, -1), Corner(y1, top, 1, 1), Corner(y1, top, -1, 1) };
-            var center = new Vector3(offset.x, (y0 + y1) / 2f, offset.y);
-            for (var i = 0; i < 4; i++)
+            Vector3[] Ring(float y, Vector2 size)
             {
-                var j = (i + 1) % 4;
+                var hx = size.x / 2f;
+                var hz = size.y / 2f;
+                var c = chamfer * Mathf.Min(size.x, size.y);
+                return new[]
+                {
+                    new Vector3(-hx + c, y, -hz), new Vector3(hx - c, y, -hz), new Vector3(hx, y, -hz + c), new Vector3(hx, y, hz - c),
+                    new Vector3(hx - c, y, hz), new Vector3(-hx + c, y, hz), new Vector3(-hx, y, hz - c), new Vector3(-hx, y, -hz + c),
+                }.Select(v => v + new Vector3(offset.x, 0f, offset.y)).ToArray();
+            }
+            var b = Ring(y0, bottom);
+            var t = Ring(y1, top);
+            var center = new Vector3(offset.x, (y0 + y1) / 2f, offset.y);
+            for (var i = 0; i < 8; i++)
+            {
+                var j = (i + 1) % 8;
                 m.Quad(b[i], b[j], t[j], t[i], (b[i] + b[j] + t[i] + t[j]) / 4f - center);
             }
-            m.Quad(t[0], t[1], t[2], t[3], Vector3.up);
-            m.Quad(b[0], b[1], b[2], b[3], Vector3.down);
+            for (var i = 1; i < 7; i++)
+            {
+                m.Tri(t[0], t[i], t[i + 1], Vector3.up);
+                m.Tri(b[0], b[i], b[i + 1], Vector3.down);
+            }
             return m.Save($"SM_Char_{name}");
         });
 
