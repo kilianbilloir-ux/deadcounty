@@ -7,11 +7,13 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Every sound of the game is synthesised here (see Synth) into 16-bit mono WAVs next to their SoundCue assets.
-    // Seeds are stable and unchanged files are not rewritten, so a rebuild leaves git clean.
+    // Sounds are synthesised here (see Synth) into 16-bit mono WAVs next to their SoundCue assets; seeds are stable
+    // and unchanged files are not rewritten, so a rebuild leaves git clean. A cue with takes in Audio/Recorded plays
+    // those instead: voices, animals and music, which synthesis does poorly (scripts/audio/generate_sounds.py).
     public static partial class TestSceneBuilder
     {
         const string AudioDir = "Assets/DeadCounty/Audio";
+        const string RecordedDir = AudioDir + "/Recorded";
         const float StreamingThreshold = 3f;
         const float VorbisQuality = 0.7f;
 
@@ -36,7 +38,9 @@ namespace DeadCounty.EditorTools
             var file = name.Substring(slash + 1);
             EnsureFolder(dir);
 
-            var clips = new AudioClip[variants];
+            var clips = RecordedClips(name, channel);
+            if (clips.Length > 0) variants = 0;
+            else clips = new AudioClip[variants];
             for (var v = 0; v < variants; v++)
                 clips[v] = WriteClip($"{dir}/{file}_{v}.wav", render(new System.Random(StableSeed($"{name}#{v}"))));
             for (var v = variants; File.Exists($"{dir}/{file}_{v}.wav"); v++)
@@ -53,6 +57,20 @@ namespace DeadCounty.EditorTools
             return cue;
         }
 
+        // Takes Recorded/<name>_0.wav, _1... when there are any. Music keeps its stereo; the rest is placed in the
+        // world and plays in mono.
+        static AudioClip[] RecordedClips(string name, SoundChannel channel)
+        {
+            var clips = new System.Collections.Generic.List<AudioClip>();
+            for (var v = 0; File.Exists($"{RecordedDir}/{name}_{v}.wav"); v++)
+            {
+                var path = $"{RecordedDir}/{name}_{v}.wav";
+                if (AssetDatabase.LoadAssetAtPath<AudioClip>(path) == null) AssetDatabase.ImportAsset(path);
+                clips.Add(ImportClip(path, AssetDatabase.LoadAssetAtPath<AudioClip>(path).length, channel != SoundChannel.Music));
+            }
+            return clips.ToArray();
+        }
+
         static AudioClip WriteClip(string path, float[] samples)
         {
             var bytes = Wav(samples);
@@ -61,14 +79,18 @@ namespace DeadCounty.EditorTools
                 File.WriteAllBytes(path, bytes);
                 AssetDatabase.ImportAsset(path);
             }
+            return ImportClip(path, samples.Length / (float)Synth.Rate, true);
+        }
 
+        static AudioClip ImportClip(string path, float seconds, bool mono)
+        {
             var importer = (AudioImporter)AssetImporter.GetAtPath(path);
             var settings = importer.defaultSampleSettings;
-            var loadType = samples.Length < StreamingThreshold * Synth.Rate ? AudioClipLoadType.DecompressOnLoad : AudioClipLoadType.CompressedInMemory;
-            if (!importer.forceToMono || settings.loadType != loadType || settings.compressionFormat != AudioCompressionFormat.Vorbis
+            var loadType = seconds < StreamingThreshold ? AudioClipLoadType.DecompressOnLoad : AudioClipLoadType.CompressedInMemory;
+            if (importer.forceToMono != mono || settings.loadType != loadType || settings.compressionFormat != AudioCompressionFormat.Vorbis
                 || !Mathf.Approximately(settings.quality, VorbisQuality))
             {
-                importer.forceToMono = true;
+                importer.forceToMono = mono;
                 settings.loadType = loadType;
                 settings.compressionFormat = AudioCompressionFormat.Vorbis;
                 settings.quality = VorbisQuality;
