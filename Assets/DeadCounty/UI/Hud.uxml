@@ -1,6 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="root" picking-mode="Ignore" class="root">
         <ui:VisualElement name="hit-flash" picking-mode="Ignore" class="hit-flash" />
+        <ui:VisualElement name="hit-markers" picking-mode="Ignore" class="hit-markers" />
         <ui:VisualElement name="hud" picking-mode="Ignore" class="hud">
             <ui:VisualElement name="needs" picking-mode="Ignore" class="needs">
                 <ui:VisualElement name="hunger" picking-mode="Ignore" class="need">
@@ -47,6 +48,10 @@
         </ui:VisualElement>
         <ui:VisualElement picking-mode="Ignore" class="toast-row">
             <ui:Label name="loot-toast" picking-mode="Ignore" class="toast" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tip" picking-mode="Ignore" class="tip">
+            <ui:Label text="ASTUCE" picking-mode="Ignore" class="tip-title" />
+            <ui:Label name="tip-text" picking-mode="Ignore" class="tip-text" />
         </ui:VisualElement>
         <ui:VisualElement name="statuses" picking-mode="Ignore" class="statuses">
             <ui:Label name="status-bleeding" text="SAIGNEMENT" picking-mode="Ignore" class="status status--danger" />
@@ -152,6 +157,18 @@
                 <ui:VisualElement name="option-fullscreen" class="menu-item option-row">
                     <ui:Label text="Plein écran" picking-mode="Ignore" class="option-label" />
                     <ui:Label name="option-fullscreen-value" picking-mode="Ignore" class="option-value" />
+                </ui:VisualElement>
+                <ui:VisualElement name="option-ui-scale" class="menu-item option-row">
+                    <ui:Label text="Taille de l'interface" picking-mode="Ignore" class="option-label" />
+                    <ui:Label name="option-ui-scale-value" picking-mode="Ignore" class="option-value" />
+                </ui:VisualElement>
+                <ui:VisualElement name="option-tips" class="menu-item option-row">
+                    <ui:Label text="Astuces" picking-mode="Ignore" class="option-label" />
+                    <ui:Label name="option-tips-value" picking-mode="Ignore" class="option-value" />
+                </ui:VisualElement>
+                <ui:VisualElement name="option-flashes" class="menu-item option-row">
+                    <ui:Label text="Réduire les flashs" picking-mode="Ignore" class="option-label" />
+                    <ui:Label name="option-flashes-value" picking-mode="Ignore" class="option-value" />
                 </ui:VisualElement>
                 <ui:Label name="option-back" text="Retour" class="menu-item" />
             </ui:VisualElement>

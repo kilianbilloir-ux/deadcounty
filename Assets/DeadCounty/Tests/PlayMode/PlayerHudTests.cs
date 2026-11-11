@@ -4,6 +4,7 @@ using DeadCounty.Core;
 using DeadCounty.Player;
 using DeadCounty.UI;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
@@ -128,6 +129,79 @@ namespace DeadCounty.Tests
             yield return Tap(Keyboard, new KeyboardState(Key.Space), new KeyboardState());
             Assert.That(Health.IsAlive, Is.True);
             Assert.That(title.style.display.value, Is.EqualTo(DisplayStyle.None), "the title must go with the respawn");
+        }
+
+        [UnityTest]
+        public IEnumerator HitMarkerPointsWhereTheHitCameFromAndFollowsTheCamera()
+        {
+            var view = new GameObject("TestCamera", typeof(Camera)) { tag = "MainCamera" };
+            try
+            {
+                view.transform.SetPositionAndRotation(Health.transform.position + new Vector3(0f, 2f, -3f), Quaternion.identity);
+                var marker = Element<VisualElement>("hit-markers")[0];
+                yield return null;
+                Assert.That(Opacity(marker), Is.Zero);
+
+                // The knockback pushes the player straight away from the source: the bearing stays exact.
+                Health.ApplyHit(10f, Health.transform.position + Vector3.right * 2f);
+                yield return null;
+                Assert.That(Opacity(marker), Is.EqualTo(1f).Within(0.01f));
+                Assert.That(marker.style.rotate.value.angle.ToDegrees(), Is.EqualTo(90f).Within(1f), "a hit from the right must point right");
+
+                view.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+                yield return null;
+                Assert.That(marker.style.rotate.value.angle.ToDegrees(), Is.EqualTo(0f).Within(1f), "facing the attacker must bring the arc to the top");
+
+                yield return new WaitForSeconds(1.6f);
+                Assert.That(Opacity(marker), Is.Zero, "the arc must fade out");
+            }
+            finally
+            {
+                Object.Destroy(view);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator ReducedFlashesDropTheHitFlashButKeepTheMarker()
+        {
+            var view = new GameObject("TestCamera", typeof(Camera)) { tag = "MainCamera" };
+            var saved = GameSettings.ReduceFlashes;
+            try
+            {
+                GameSettings.ReduceFlashes = true;
+                Health.ApplyHit(10f, Health.transform.position + Vector3.forward);
+                yield return null;
+                Assert.That(Opacity(Element<VisualElement>("hit-flash")), Is.Zero);
+                Assert.That(Opacity(Element<VisualElement>("hit-markers")[0]), Is.EqualTo(1f).Within(0.01f));
+            }
+            finally
+            {
+                GameSettings.ReduceFlashes = saved;
+                Object.Destroy(view);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator InterfaceSizeScalesTheLayoutWithoutTouchingTheAsset()
+        {
+            var saved = GameSettings.UiScale;
+            try
+            {
+                GameSettings.UiScale = 1f;
+                yield return null;
+                var width = Root.layout.width;
+                GameSettings.UiScale = 1.25f;
+                yield return null;
+                yield return null;
+                Assert.That(Rig.GetComponent<UIDocument>().panelSettings.scale, Is.EqualTo(1.25f));
+                Assert.That(AssetDatabase.LoadAssetAtPath<PanelSettings>("Assets/DeadCounty/UI/HudPanelSettings.asset").scale, Is.EqualTo(1f),
+                    "the option wrote into the shared asset");
+                Assert.That(Root.layout.width, Is.EqualTo(width / 1.25f).Within(1f), "the layout did not scale");
+            }
+            finally
+            {
+                GameSettings.UiScale = saved;
+            }
         }
 
         static void SetPrivate(object target, string field, float value) =>

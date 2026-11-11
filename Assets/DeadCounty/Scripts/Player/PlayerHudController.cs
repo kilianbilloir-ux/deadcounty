@@ -16,9 +16,10 @@ namespace DeadCounty.Player
     // flashlight and clock readouts show for a few seconds when they change, with the need gauges. The
     // interaction prompt sits next to what the player can use, its name above the key and the action (GDD 8.11,
     // after Valheim), with a ring filling through a search; what was found, or why the player woke up, shows for a
-    // moment below the middle of the screen. Also draws the hit flash and the game over screen from
-    // PlayerDeathFlow. The only allocations are texts rebuilt when they change. Afflictions and the sleep screen
-    // are PlayerConditionHud's.
+    // moment below the middle of the screen. A hit flashes the screen and leaves an arc around the centre that
+    // points at where it came from and follows the camera. Also draws the game over screen from PlayerDeathFlow.
+    // The only allocations are texts rebuilt when they change. Afflictions and the sleep screen are
+    // PlayerConditionHud's.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -32,6 +33,9 @@ namespace DeadCounty.Player
         const float PromptOffsetX = 16f;
         const float PromptOffsetY = -22f;
         const float ToastShowTime = 3f;
+        const int HitMarkerCount = 3;
+        const float HitMarkerHold = 0.6f;
+        const float HitMarkerFade = 0.9f;
 
         [SerializeField] PanelSettings panelSettings;
         [SerializeField] VisualTreeAsset hudLayout;
@@ -40,6 +44,10 @@ namespace DeadCounty.Player
         [SerializeField] float hitFlashTime = 0.3f;
         [SerializeField] float hitFlashAlpha = 0.35f;
 
+        readonly HitMarker[] hitMarkers = new HitMarker[HitMarkerCount];
+        readonly Vector3[] hitSources = new Vector3[HitMarkerCount];
+        readonly float[] hitTimes = new float[HitMarkerCount];
+        PanelSettings panel;
         PlayerHealth health;
         PlayerStamina stamina;
         PlayerNeeds needs;
@@ -65,6 +73,7 @@ namespace DeadCounty.Player
         float healthOpacity, staminaOpacity, readoutOpacity, readoutsUntil;
         float hungerOpacity, thirstOpacity, fatigueOpacity, toastOpacity, toastUntil;
         int day = -1, hour = -1, minute = -1, phase = -1;
+        int nextHitMarker;
         bool flashlightWasOn, deathShown;
 
         // Assigned by the builder; a rig built in code passes them through Configure.
@@ -92,7 +101,9 @@ namespace DeadCounty.Player
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
-            if (panelSettings != null) document.panelSettings = panelSettings;
+            // A copy, so the interface size option never writes into the asset.
+            var settings = panelSettings != null ? panelSettings : document.panelSettings;
+            if (settings != null) document.panelSettings = panel = Instantiate(settings);
             if (hudLayout != null) document.visualTreeAsset = hudLayout;
             var root = document.rootVisualElement;
             if (root == null) throw new InvalidOperationException($"PlayerHudController on '{name}': no UI root");
@@ -124,8 +135,16 @@ namespace DeadCounty.Player
             gameOverTime = Find<Label>(root, "game-over-time");
             gameOverPrompt = Find<Label>(root, "game-over-prompt");
             gameOverKey = Find<Label>(root, "game-over-key");
+            var markers = Find<VisualElement>(root, "hit-markers");
+            for (var i = 0; i < HitMarkerCount; i++)
+            {
+                markers.Add(hitMarkers[i] = new HitMarker());
+                hitMarkers[i].style.opacity = 0f;
+                hitTimes[i] = float.NegativeInfinity;
+            }
             text = new StringBuilder(32);
             ShowKeys();
+            ApplyUiScale();
             time.style.display = director != null ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
@@ -153,6 +172,7 @@ namespace DeadCounty.Player
             inventory.Received += OnReceived;
             sleep.WokeUp += ShowToast;
             InputPrompts.DeviceChanged += ShowKeys;
+            GameSettings.Changed += ApplyUiScale;
         }
 
         void OnDisable()
@@ -161,7 +181,12 @@ namespace DeadCounty.Player
             inventory.Received -= OnReceived;
             sleep.WokeUp -= ShowToast;
             InputPrompts.DeviceChanged -= ShowKeys;
+            GameSettings.Changed -= ApplyUiScale;
         }
+
+        void OnDestroy() => Destroy(panel);
+
+        void ApplyUiScale() => panel.scale = GameSettings.UiScale;
 
         void OnReceived(IReadOnlyList<ItemStack> items)
         {
@@ -181,7 +206,13 @@ namespace DeadCounty.Player
             toastUntil = Time.time + ToastShowTime;
         }
 
-        void OnDamaged(PlayerHealth _) => flashValue = 1f;
+        void OnDamaged(PlayerHealth _)
+        {
+            if (!GameSettings.ReduceFlashes) flashValue = 1f;
+            hitSources[nextHitMarker] = health.LastHitSource;
+            hitTimes[nextHitMarker] = Time.time;
+            nextHitMarker = (nextHitMarker + 1) % HitMarkerCount;
+        }
 
         void ShowReadouts() => readoutsUntil = Time.time + ReadoutShowTime;
 
@@ -205,7 +236,7 @@ namespace DeadCounty.Player
             var healthRatio = health.Pool.Normalized;
             healthFill.EnableInClassList("health-fill--low", healthRatio <= LowHealth);
             var model = stamina.Model;
-            staminaFill.EnableInClassList("stamina-fill--spent", model.Exhausted && Mathf.Repeat(now * ExhaustedBlinkRate, 1f) < 0.5f);
+            staminaFill.EnableInClassList("stamina-fill--spent", model.Exhausted && (GameSettings.ReduceFlashes || Mathf.Repeat(now * ExhaustedBlinkRate, 1f) < 0.5f));
 
             var lit = flashlight != null && flashlight.IsOn;
             if (lit != flashlightWasOn)
@@ -233,6 +264,7 @@ namespace DeadCounty.Player
             flash.style.opacity = flashValue * hitFlashAlpha;
             // Menus cover it: the inventory shows the same stats, the pause hides the game.
             hud.style.display = alive && !controller.MenuOpen ? DisplayStyle.Flex : DisplayStyle.None;
+            UpdateHitMarkers(now, alive && !controller.MenuOpen);
             UpdateInteraction(alive);
             UpdateGameOver();
         }
@@ -248,6 +280,24 @@ namespace DeadCounty.Player
             gauge.Value = value;
             need.EnableInClassList("need--low", value <= LowNeed);
             Fade(need, ref opacity, alive && (value < NeedShowBelow || readoutsShown), dt);
+        }
+
+        // Measured from the camera heading on every frame: turning toward the attacker brings its arc to the top.
+        void UpdateHitMarkers(float now, bool shown)
+        {
+            var view = Camera.main;
+            var player = health.transform.position;
+            for (var i = 0; i < HitMarkerCount; i++)
+            {
+                var opacity = shown && view != null ? 1f - Mathf.Clamp01((now - hitTimes[i] - HitMarkerHold) / HitMarkerFade) : 0f;
+                hitMarkers[i].style.opacity = opacity;
+                if (opacity <= 0f) continue;
+                var heading = view.transform.forward;
+                heading.y = 0f;
+                var toSource = hitSources[i] - player;
+                toSource.y = 0f;
+                hitMarkers[i].style.rotate = new Rotate(Angle.Degrees(Vector3.SignedAngle(heading, toSource, Vector3.up)));
+            }
         }
 
         // Text changes only when the target or its action does; the position follows the camera every frame.

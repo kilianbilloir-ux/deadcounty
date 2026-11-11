@@ -18,6 +18,8 @@ namespace DeadCounty.EditorTools
         const string HudUxmlPath = "Assets/DeadCounty/UI/Hud.uxml";
         const string HudUssPath = "Assets/DeadCounty/UI/Hud.uss";
         const string ExhaustionProfilePath = ArtDir + "/VP_Exhausted.asset";
+        const string InjuryProfilePath = ArtDir + "/VP_Injured.asset";
+        const string MenuBlurProfilePath = ArtDir + "/VP_MenuBlur.asset";
         static readonly Vector3 SpawnPosition = new(65.2f, 0.15f, -10f);
 
         // The prefab is only generated when missing, so Inspector tweaks survive scene rebuilds.
@@ -156,8 +158,11 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerInventoryScreen>(rig);
             added |= AddMissing<PlayerConditionHud>(rig);
             added |= AddMissing<PauseMenu>(rig);
+            added |= AddMissing<PlayerTips>(rig);
+            added |= AddMissing<PlayerScreenEffects>(rig);
             added |= EnsureFlashlight(player);
             added |= EnsureExhaustionVolume(rig, player);
+            added |= EnsureScreenEffectVolumes(rig);
             added |= AssignStartingItems(player);
             return added;
         }
@@ -166,17 +171,32 @@ namespace DeadCounty.EditorTools
         static bool EnsureExhaustionVolume(GameObject rig, GameObject player)
         {
             var so = new SerializedObject(player.GetComponent<PlayerNeeds>());
-            var property = so.FindProperty("exhaustionVolume");
+            var added = AssignVolume(rig, so.FindProperty("exhaustionVolume"), "ExhaustionVolume", 10f, ExhaustionProfile);
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return added;
+        }
+
+        // Global volumes that PlayerScreenEffects blends in: the injury vignette, then the blur behind the menus.
+        static bool EnsureScreenEffectVolumes(GameObject rig)
+        {
+            var so = new SerializedObject(rig.GetComponent<PlayerScreenEffects>());
+            var added = AssignVolume(rig, so.FindProperty("injuryVolume"), "InjuryVolume", 11f, InjuryProfile);
+            added |= AssignVolume(rig, so.FindProperty("menuBlurVolume"), "MenuBlurVolume", 20f, MenuBlurProfile);
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return added;
+        }
+
+        static bool AssignVolume(GameObject rig, SerializedProperty property, string volumeName, float priority, System.Func<VolumeProfile> profile)
+        {
             if (property.objectReferenceValue != null) return false;
-            var holder = new GameObject("ExhaustionVolume");
+            var holder = new GameObject(volumeName);
             holder.transform.SetParent(rig.transform, false);
             var volume = holder.AddComponent<Volume>();
             volume.isGlobal = true;
-            volume.priority = 10f;
+            volume.priority = priority;
             volume.weight = 0f;
-            volume.sharedProfile = ExhaustionProfile();
+            volume.sharedProfile = profile();
             property.objectReferenceValue = volume;
-            so.ApplyModifiedPropertiesWithoutUndo();
             return true;
         }
 
@@ -188,6 +208,36 @@ namespace DeadCounty.EditorTools
             vignette.smoothness.Override(0.5f);
             vignette.color.Override(Color.black);
             AddOverride<ColorAdjustments>(profile).saturation.Override(-45f);
+            EditorUtility.SetDirty(profile);
+            return profile;
+        }
+
+        static VolumeProfile InjuryProfile()
+        {
+            var profile = EmptiedProfile(InjuryProfilePath);
+            var vignette = AddOverride<Vignette>(profile);
+            vignette.intensity.Override(0.5f);
+            vignette.smoothness.Override(0.6f);
+            // The danger accent, darkened: dried blood at the edges of the screen.
+            vignette.color.Override(new Color(0.33f, 0.1f, 0.05f));
+            AddOverride<ColorAdjustments>(profile).saturation.Override(-30f);
+            EditorUtility.SetDirty(profile);
+            return profile;
+        }
+
+        static VolumeProfile MenuBlurProfile()
+        {
+            var profile = EmptiedProfile(MenuBlurProfilePath);
+            var blur = AddOverride<DepthOfField>(profile);
+            blur.mode.Override(DepthOfFieldMode.Gaussian);
+            // Blurred from half a metre: the whole scene behind the menu.
+            blur.gaussianStart.Override(0f);
+            blur.gaussianEnd.Override(0.5f);
+            blur.gaussianMaxRadius.Override(1.5f);
+            blur.highQualitySampling.Override(true);
+            var grade = AddOverride<ColorAdjustments>(profile);
+            grade.postExposure.Override(-0.7f);
+            grade.saturation.Override(-40f);
             EditorUtility.SetDirty(profile);
             return profile;
         }

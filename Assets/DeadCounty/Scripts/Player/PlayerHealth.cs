@@ -35,6 +35,8 @@ namespace DeadCounty.Player
         public HealthPool Pool { get; private set; }
         public bool IsAlive => !Pool.IsDead;
         public float LastHitTime { get; private set; } = float.NegativeInfinity;
+        // Where the last hit came from, for the HUD to point at.
+        public Vector3 LastHitSource { get; private set; }
         // Debug god mode: every hit is ignored.
         public bool Invulnerable { get; set; }
         public bool Bleeding { get; private set; }
@@ -55,6 +57,7 @@ namespace DeadCounty.Player
             if (!(damage > 0f) || !IsAlive || Invulnerable || Time.time < invulnerableUntil) return false;
             var killed = Pool.Apply(damage);
             LastHitTime = Time.time;
+            LastHitSource = sourcePosition;
             invulnerableUntil = Time.time + invulnerabilityTime;
 
             var away = transform.position - sourcePosition;
