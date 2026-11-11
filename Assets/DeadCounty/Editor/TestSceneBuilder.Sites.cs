@@ -116,7 +116,7 @@ namespace DeadCounty.EditorTools
         {
             var rng = new System.Random(23);
             Box("Cour", parent, new Vector3(-88f, 0.015f, 87.5f), new Vector3(36f, 0.03f, 21f), "Gravel");
-            House(parent, "Ferme_Maison", new Vector3(-62f, 0f, 84f), 0f, 3, false);
+            House(parent, "Ferme_Maison", new Vector3(-62f, 0f, 84f), 0f, 3, HouseKind.TwoStorey, false);
             Pickup(parent, "Pickup_Ferme", new Vector3(-72f, 0f, 82f), 100f, "CarBeige");
             Box("Tas_Bois", parent, new Vector3(-55f, 0.6f, 92f), new Vector3(0.8f, 1.2f, 3f), "WoodDark");
             Mailbox(parent, new Vector3(-82f, 0f, 6.5f));

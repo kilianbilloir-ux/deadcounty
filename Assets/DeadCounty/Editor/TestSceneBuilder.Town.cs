@@ -16,6 +16,23 @@ namespace DeadCounty.EditorTools
         };
 
         static readonly float[] VillageLots = { 24f, 46f, 68f, 90f, 112f };
+
+        // Same ground floor for all, so the rooms, the NavMesh and the zombie spots hold: only the outside differs.
+        enum HouseKind { Ranch, TwoStorey, Veranda }
+
+        // Per lot going north, picked so that no two neighbours or facing houses share a shape.
+        static readonly HouseKind[] WestKinds = { HouseKind.TwoStorey, HouseKind.Ranch, HouseKind.Veranda, HouseKind.TwoStorey, HouseKind.Ranch };
+        static readonly HouseKind[] EastKinds = { HouseKind.Veranda, HouseKind.TwoStorey, HouseKind.Ranch, HouseKind.Veranda, HouseKind.TwoStorey };
+        const float UpperHeight = 2.6f;
+
+        // The upper storey is a shell: windows all round, no stairs up to it.
+        static readonly (string Name, Vector2 From, Vector2 To, Opening[] Openings)[] UpperShell =
+        {
+            ("Etage_Facade", new Vector2(0f, 0f), new Vector2(12f, 0f), new[] { Window(2f), Window(6f), Window(9.5f) }),
+            ("Etage_Droit", new Vector2(12f, 0f), new Vector2(12f, 10f), new[] { Window(2.5f), Window(7.5f) }),
+            ("Etage_Arriere", new Vector2(12f, 10f), new Vector2(0f, 10f), new[] { Window(3f), Window(8f) }),
+            ("Etage_Gauche", new Vector2(0f, 10f), new Vector2(0f, 0f), new[] { Window(5f) }),
+        };
         const float HouseRoofSpan = 10.8f;
         const float HouseRoofHeight = 2.2f;
 
@@ -52,8 +69,8 @@ namespace DeadCounty.EditorTools
             var rng = new System.Random(11);
             for (var i = 0; i < VillageLots.Length; i++)
             {
-                Lot(parent, $"Maison_O{i + 1}", LotFront(i, false), LotYaw(false), i, rng, boarded: i == 2);
-                Lot(parent, $"Maison_E{i + 1}", LotFront(i, true), LotYaw(true), i + 3, rng, boarded: i == 4);
+                Lot(parent, $"Maison_O{i + 1}", LotFront(i, false), LotYaw(false), i, WestKinds[i], rng, boarded: i == 2);
+                Lot(parent, $"Maison_E{i + 1}", LotFront(i, true), LotYaw(true), i + 3, EastKinds[i], rng, boarded: i == 4);
             }
             var lamps = Group(parent, "Lampadaires");
             for (var z = 14f; z <= 114f; z += 25f)
@@ -67,9 +84,9 @@ namespace DeadCounty.EditorTools
 
         // Residential lot around a house: driveway, garage, mailbox, fenced backyard with random yard props.
         // Root-local frame: street on -Z, lot spans x -8..14 and z -6..19.5.
-        static void Lot(Transform parent, string name, Vector3 frontCenter, float yaw, int style, System.Random rng, bool boarded)
+        static void Lot(Transform parent, string name, Vector3 frontCenter, float yaw, int style, HouseKind kind, System.Random rng, bool boarded)
         {
-            var root = House(parent, name, frontCenter, yaw, style, boarded);
+            var root = House(parent, name, frontCenter, yaw, style, kind, boarded);
             var roof = HouseStyles[style % HouseStyles.Length].roof;
 
             Box("Allee", root, new Vector3(9.5f, 0.02f, -1.5f), new Vector3(3f, 0.04f, 9f), "Concrete");
@@ -92,9 +109,9 @@ namespace DeadCounty.EditorTools
             ReserveLocal(root, -8f, -6f, 14f, 19.5f);
         }
 
-        // 12 x 10 m single-storey house: living room, kitchen, bedroom, bathroom, porch and gable roof.
+        // 12 x 10 m house: living room, kitchen, bedroom, bathroom, porch and gable roof, under one of three shapes.
         // Root-local frame: front wall on z = 0 facing -Z, house spans x -6..6 and z 0..10.
-        static Transform House(Transform parent, string name, Vector3 frontCenter, float yaw, int style, bool boarded)
+        static Transform House(Transform parent, string name, Vector3 frontCenter, float yaw, int style, HouseKind kind, bool boarded)
         {
             var (siding, shutter, roof) = HouseStyles[style % HouseStyles.Length];
             var root = Group(parent, name, frontCenter, yaw);
@@ -110,20 +127,38 @@ namespace DeadCounty.EditorTools
             Wall(body, "Cloison_Cuisine", new Vector2(0f, 6f), new Vector2(7f, 6f), inner, Door(5.5f));
 
             const float face = WallThickness / 2f;
-            GableRoof(body, new Vector3(6f, WallHeight, 5f), 12.8f, HouseRoofSpan, HouseRoofHeight, 0f, new Vector2(6f + face, 5f + face), roof, siding, "Interior", clapboard: true);
+            var top = kind == HouseKind.TwoStorey ? WallHeight + UpperHeight : WallHeight;
+            if (kind == HouseKind.TwoStorey) UpperStorey(body, siding, shutter);
+            GableRoof(body, new Vector3(6f, top, 5f), 12.8f, HouseRoofSpan, HouseRoofHeight, 0f, new Vector2(6f + face, 5f + face), roof, siding, "Interior", clapboard: true);
             MeshObject("Bardage", body, ClapboardMesh("SM_Bardage_Maison", HouseShell, 0.24f, WallHeight), Vector3.zero, Quaternion.identity, Vector3.one, new[] { siding }, false);
-            Box("Cheminee", body, new Vector3(2f, 4.4f, 7.5f), new Vector3(0.9f, 2.8f, 0.9f), "Brick");
-            ChimneyCap(body, new Vector3(2f, 5.8f, 7.5f), 0.9f);
+            // From the ground floor ceiling to 2.8 m above the wall tops, whatever the number of storeys.
+            var chimneyTop = top + 2.8f;
+            Box("Cheminee", body, new Vector3(2f, (WallHeight + chimneyTop) / 2f, 7.5f), new Vector3(0.9f, chimneyTop - WallHeight, 0.9f), "Brick");
+            ChimneyCap(body, new Vector3(2f, chimneyTop, 7.5f), 0.9f);
 
-            Box("Porche", body, new Vector3(5f, 0.1f, -1.3f), new Vector3(3.6f, 0.2f, 2.6f), "Wood");
+            var veranda = kind == HouseKind.Veranda;
+            if (veranda)
+            {
+                Box("Veranda", body, new Vector3(6f, 0.1f, -1.3f), new Vector3(12.4f, 0.2f, 2.6f), "Wood");
+                foreach (var x in new[] { 0.2f, 3.1f, 6.9f, 9.4f, 11.8f })
+                    Post("Poteau_Porche", body, new Vector3(x, 0.2f, -2.4f), 2.6f, 0.07f, "Trim");
+                Box("Auvent", body, new Vector3(6f, 2.9f, -1.3f), new Vector3(12.8f, 0.12f, 2.9f), roof, Quaternion.Euler(-8f, 0f, 0f), solid: false);
+                foreach (var x in new[] { 3f, 9f })
+                    Dormer(body, x, siding, roof);
+            }
+            else
+            {
+                Box("Porche", body, new Vector3(5f, 0.1f, -1.3f), new Vector3(3.6f, 0.2f, 2.6f), "Wood");
+                Post("Poteau_Porche", body, new Vector3(3.4f, 0.2f, -2.4f), 2.6f, 0.07f, "Trim");
+                Post("Poteau_Porche", body, new Vector3(6.6f, 0.2f, -2.4f), 2.6f, 0.07f, "Trim");
+                Box("Auvent", body, new Vector3(5f, 2.9f, -1.3f), new Vector3(4f, 0.12f, 2.9f), roof, Quaternion.Euler(-8f, 0f, 0f), solid: false);
+            }
             Box("Marche", body, new Vector3(5f, 0.05f, -2.85f), new Vector3(1.6f, 0.1f, 0.5f), "Wood");
-            Post("Poteau_Porche", body, new Vector3(3.4f, 0.2f, -2.4f), 2.6f, 0.07f, "Trim");
-            Post("Poteau_Porche", body, new Vector3(6.6f, 0.2f, -2.4f), 2.6f, 0.07f, "Trim");
-            Box("Auvent", body, new Vector3(5f, 2.9f, -1.3f), new Vector3(4f, 0.12f, 2.9f), roof, Quaternion.Euler(-8f, 0f, 0f), solid: false);
             Box("Marche_Arriere", body, new Vector3(9f, 0.05f, 10.4f), new Vector3(1.4f, 0.1f, 0.6f), "Concrete");
 
+            // Against the wall, or in front of the deck when it runs the whole width.
             foreach (var x in new[] { 1f, 2.8f, 7.5f, 9.6f })
-                MeshObject("Haie", body, BushMesh(1), new Vector3(x, 0f, -0.75f), Quaternion.Euler(0f, x * 40f, 0f), new Vector3(0.8f, 0.85f, 0.6f), new[] { "Bush" }, false);
+                MeshObject("Haie", body, BushMesh(1), new Vector3(x, 0f, veranda ? -3.2f : -0.75f), Quaternion.Euler(0f, x * 40f, 0f), new Vector3(0.8f, 0.85f, 0.6f), new[] { "Bush" }, false);
 
             if (boarded)
                 foreach (var offset in new[] { 2f, 9.5f })
@@ -131,9 +166,36 @@ namespace DeadCounty.EditorTools
                         Box("Planche", body, new Vector3(offset, 1.15f + k * 0.35f, -0.17f), new Vector3(1.5f, 0.16f, 0.04f), "WoodDark", Quaternion.Euler(0f, 0f, k == 1 ? -12f : 9f), solid: false);
 
             var rng = new System.Random(Mathf.RoundToInt(frontCenter.x * 73f + frontCenter.z * 31f));
-            HouseExterior(body, rng);
+            HouseExterior(body, rng, top, veranda);
             Furnish(body, rng);
             return root;
+        }
+
+        // A ceiling over the ground floor, then walls and lap siding up to the roof, with a belt board between.
+        static void UpperStorey(Transform body, string siding, string shutter)
+        {
+            var upper = Group(body, "Etage", new Vector3(0f, WallHeight, 0f));
+            Box("Plancher", upper, new Vector3(6f, 0.05f, 5f), new Vector3(12f, 0.1f, 10f), "Interior");
+            var style = new WallStyle(siding, UpperHeight, shutter);
+            foreach (var (wallName, start, end, openings) in UpperShell)
+                Wall(upper, wallName, start, end, style, openings);
+            MeshObject("Bardage", upper, ClapboardMesh("SM_Bardage_Etage", UpperShell, 0.1f, UpperHeight), Vector3.zero, Quaternion.identity, Vector3.one, new[] { siding }, false);
+            const float face = WallThickness / 2f + 0.035f;
+            foreach (var z in new[] { -face, 10f + face })
+                Box("Bandeau_Etage", upper, new Vector3(6f, 0.02f, z), new Vector3(12.3f, 0.18f, 0.05f), "Trim", solid: false);
+            foreach (var x in new[] { -face, 12f + face })
+                Box("Bandeau_Etage", upper, new Vector3(x, 0.02f, 5f), new Vector3(0.05f, 0.18f, 10.3f), "Trim", solid: false);
+        }
+
+        // Gabled window standing on the front slope of the roof, centred on `x` in the body frame.
+        static void Dormer(Transform body, float x, string siding, string roof)
+        {
+            var d = Group(body, "Lucarne", new Vector3(x, WallHeight, 2.1f));
+            Box("Corps", d, new Vector3(0f, 1.12f, 0f), new Vector3(1.4f, 1.25f, 2f), siding);
+            Box("Cadre", d, new Vector3(0f, 1.25f, -1.01f), new Vector3(1f, 0.9f, 0.04f), "Trim", solid: false);
+            Box("Vitre", d, new Vector3(0f, 1.25f, -1.03f), new Vector3(0.8f, 0.7f, 0.03f), "Glass", solid: false);
+            Box("Croisillon", d, new Vector3(0f, 1.25f, -1.05f), new Vector3(0.04f, 0.7f, 0.02f), "Trim", solid: false);
+            Roof(d, "Toit_Lucarne", new Vector3(0f, 1.74f, -0.05f), 2.3f, 1.7f, 0.55f, roof, 90f);
         }
 
         // Rooms in the body frame: floor top at 0.1, living room x 0..7 z 0..6, kitchen x 0..7 z 6..10, bedroom
