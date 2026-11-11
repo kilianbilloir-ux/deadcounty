@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: SC_Hurt
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 605f4f3bef1ab4908ae289ce7b92c99c, type: 3}
-  - {fileID: 8300000, guid: 7988d67dfd1234761872914a6cae1dc3, type: 3}
-  - {fileID: 8300000, guid: fbb3cf85af7e6421e8f1c0661c201da4, type: 3}
-  - {fileID: 8300000, guid: 08b8fdc64f6004b1abf4c1c556d9ae24, type: 3}
-  - {fileID: 8300000, guid: 72075160988494f0a89485fe5049777d, type: 3}
+  - {fileID: 8300000, guid: 7043c4ab52933483f864cbc300af32a5, type: 3}
+  - {fileID: 8300000, guid: 6d847b8658c7c472e97e6ef5be2ffc60, type: 3}
+  - {fileID: 8300000, guid: 931370024690e4a2c919f6c8451ee135, type: 3}
+  - {fileID: 8300000, guid: a93f22af5a00d4f58832468ca88c9dbc, type: 3}
+  - {fileID: 8300000, guid: 11b0c8dad9b354d79a2872521bafbd08, type: 3}
   volume: 0.7
   pitch: {x: 0.96, y: 1.04}
   channel: 0

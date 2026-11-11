@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: SC_Growl
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: df6d850ed85e74708b08a3c89d6dbe05, type: 3}
-  - {fileID: 8300000, guid: 2e22f28c61f0a41979ef54150b09f178, type: 3}
-  - {fileID: 8300000, guid: 452cc53eedee34bf2b782403b5f0f0dc, type: 3}
-  - {fileID: 8300000, guid: 08c9c7e6c626346f7853cac0c37ad6db, type: 3}
+  - {fileID: 8300000, guid: 41011f4d6b7cb4504a92c8a6b6f2b595, type: 3}
+  - {fileID: 8300000, guid: 8f8c7abb7757344ac9950a6810a6bafb, type: 3}
+  - {fileID: 8300000, guid: d4bb3d1e6ea8042a88fce83978f02441, type: 3}
+  - {fileID: 8300000, guid: 86833d0733f6c4370b1ae4c819d702df, type: 3}
   volume: 0.8
   pitch: {x: 0.95, y: 1.05}
   channel: 0

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: SC_Moan
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: db02661a91b4344f486575bf192ba1e0, type: 3}
-  - {fileID: 8300000, guid: b133ebd41d7a148a8b25842e6a08a060, type: 3}
-  - {fileID: 8300000, guid: 29b3ff980afa043d78c94bbe4c4f6683, type: 3}
-  - {fileID: 8300000, guid: 006a327d250f9492d9c6ac147ecf91ef, type: 3}
-  - {fileID: 8300000, guid: efef8c49abed5439eb1ecdda6eca4520, type: 3}
+  - {fileID: 8300000, guid: bdd0d94b20bcf4cfdb31d6db7d0e116a, type: 3}
+  - {fileID: 8300000, guid: c9876bf3c9571484c86b7dee38b63ab6, type: 3}
+  - {fileID: 8300000, guid: d0c451149462042ee8bc9e9a7aa86e6e, type: 3}
+  - {fileID: 8300000, guid: d32bce12fdb524a289029e2dc259a285, type: 3}
+  - {fileID: 8300000, guid: 90dde1c8e8dd84db694e9a789d8030c8, type: 3}
   volume: 0.7
   pitch: {x: 0.96, y: 1.04}
   channel: 0

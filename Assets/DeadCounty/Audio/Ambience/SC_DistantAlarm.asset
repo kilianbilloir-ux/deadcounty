@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_DistantAlarm
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 6feb355b9fd80496e828f080945c4d33, type: 3}
-  - {fileID: 8300000, guid: eb263832ef8114cb782ff34144b3e6de, type: 3}
+  - {fileID: 8300000, guid: 70d2fb3e222114a658043216f93341b5, type: 3}
+  - {fileID: 8300000, guid: d73dcd54045b64bdab4945a626043638, type: 3}
   volume: 0.22
   pitch: {x: 0.98, y: 1.02}
   channel: 1

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_Dog
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 20cc0ed2bdbb24803a67dfeac6981361, type: 3}
-  - {fileID: 8300000, guid: a8f5c6b5c89eb4a668e3be4426f75d5f, type: 3}
+  - {fileID: 8300000, guid: 1aacf649887e2466595e9064dce4b7c2, type: 3}
+  - {fileID: 8300000, guid: b8c54320ce6fd4c9fac7ab7fe3a665c3, type: 3}
   volume: 0.3
   pitch: {x: 0.95, y: 1.05}
   channel: 1

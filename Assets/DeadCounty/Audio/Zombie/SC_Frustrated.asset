@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: SC_Frustrated
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 125e14ca076ab470d8927b43992306ac, type: 3}
-  - {fileID: 8300000, guid: 4831db9721e044d459a36facc5d5da54, type: 3}
-  - {fileID: 8300000, guid: a593492ba42d64d8fa7dad6878ccf824, type: 3}
+  - {fileID: 8300000, guid: 8d7190ed0334e47c6a7742a508881dd7, type: 3}
+  - {fileID: 8300000, guid: 63c3c338e3a204f5aa761c6e1a9d07e5, type: 3}
+  - {fileID: 8300000, guid: 4ca51c41e3e6e4537b196f68273fc2a2, type: 3}
   volume: 0.8
   pitch: {x: 0.96, y: 1.04}
   channel: 0

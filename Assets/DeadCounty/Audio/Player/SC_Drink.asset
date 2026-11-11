@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_Drink
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: baa3d8a2aee0d475db9e2c9ee84f0e8f, type: 3}
-  - {fileID: 8300000, guid: 6468823c0c39744bbb9d93fc9cf4d7a7, type: 3}
+  - {fileID: 8300000, guid: dbac1cb9b8695429d94046de6c8e90da, type: 3}
+  - {fileID: 8300000, guid: e2bb9738b90e046dea3528e08636c122, type: 3}
   volume: 0.6
   pitch: {x: 0.96, y: 1.04}
   channel: 0

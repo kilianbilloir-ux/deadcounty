@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: SC_Bird
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 66701b888f0cb4d639f0e4a0cb3a1b70, type: 3}
-  - {fileID: 8300000, guid: 6bc6cd493e55d449490ef68d11a0653f, type: 3}
-  - {fileID: 8300000, guid: 638eaa82787d248d4be92c655226c517, type: 3}
-  - {fileID: 8300000, guid: 0195b21cfa4e14f4cb5bda6ea8a092e9, type: 3}
-  - {fileID: 8300000, guid: 5865be6d5acb1432484f0525a6b83bd0, type: 3}
-  - {fileID: 8300000, guid: 3961ae6f27a6b41d4bf66f70da68f0f2, type: 3}
+  - {fileID: 8300000, guid: e7a942e64806b4563b05c6ecae9abb8d, type: 3}
+  - {fileID: 8300000, guid: 59eecb5b515e6488d999d7fb57aa0b9e, type: 3}
+  - {fileID: 8300000, guid: 5056a9537e4d144a4b81d065914d6903, type: 3}
+  - {fileID: 8300000, guid: 8a422cc52356d4d4ca77b2d84e317436, type: 3}
+  - {fileID: 8300000, guid: 8dc4fab8257bc4f1e8d3158370194cf3, type: 3}
+  - {fileID: 8300000, guid: 83f44c1469ac44dd3b1f153ccfdc09d0, type: 3}
   volume: 0.35
   pitch: {x: 0.94, y: 1.06}
   channel: 1

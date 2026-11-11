@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_Bandage
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: ed80c63bd20eb4a798a0e8e44fa57efa, type: 3}
-  - {fileID: 8300000, guid: 9036c4ff9cb204094ae1ffdb7d471ecc, type: 3}
+  - {fileID: 8300000, guid: 28b460b7bc5a04ca583e5035b2bf1ca7, type: 3}
+  - {fileID: 8300000, guid: 19de93876bfaf4b77b11b79ba762e726, type: 3}
   volume: 0.6
   pitch: {x: 0.96, y: 1.04}
   channel: 0

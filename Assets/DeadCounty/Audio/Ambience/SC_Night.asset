@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SC_Night
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 9e1de392aef0b438992c1781fbec65f4, type: 3}
+  - {fileID: 8300000, guid: 5090c4c9d56a44a8398d486de571bb1c, type: 3}
   volume: 0.3
   pitch: {x: 1, y: 1}
   channel: 1

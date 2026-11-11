@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SC_Wind
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 602c366ce386a43c7b6906c155f7a95c, type: 3}
+  - {fileID: 8300000, guid: aff604c86cb2445a8a8fd1398cf1ef75, type: 3}
   volume: 0.4
   pitch: {x: 1, y: 1}
   channel: 1
