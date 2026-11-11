@@ -31,7 +31,7 @@ namespace DeadCounty.EditorTools
             ["LampGlow"] = Rgb(0xD4B976), ["PanelGlow"] = Rgb(0xE8EEF2), ["PoliceRed"] = Rgb(0xC8261E), ["PoliceBlue"] = Rgb(0x1E4FC8),
             ["Trunk"] = Rgb(0x4E3B2C), ["Pine"] = Rgb(0x2E4433), ["Foliage"] = Rgb(0x4E6234), ["FoliageOlive"] = Rgb(0x6D6A3A),
             ["FoliageAutumn"] = Rgb(0xA0602A), ["FoliageRust"] = Rgb(0x8A3F24), ["Bush"] = Rgb(0x445A30), ["Rock"] = Rgb(0x77777A),
-            ["Wheat"] = Rgb(0xBFA25A), ["Corn"] = Rgb(0x7E8A3E), ["Hay"] = Rgb(0xC7A860),
+            ["Wheat"] = Rgb(0xBFA25A), ["WheatDark"] = Rgb(0x9A7E45), ["Corn"] = Rgb(0x7E8A3E), ["Hay"] = Rgb(0xC7A860), ["GrassTall"] = Rgb(0x5E6A3A),
             ["CarRed"] = Rgb(0x7A2420), ["CarBlue"] = Rgb(0x2E4766), ["CarGreen"] = Rgb(0x3E5444), ["CarBeige"] = Rgb(0xB8A88A),
             ["CarWhite"] = Rgb(0xD6D6D2), ["CarBlack"] = Rgb(0x1C1D20), ["CarBurnt"] = Rgb(0x252220), ["Tire"] = Rgb(0x151515),
             ["BusYellow"] = Rgb(0xD6A21E), ["TractorGreen"] = Rgb(0x3F6B3A),

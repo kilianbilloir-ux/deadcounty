@@ -65,6 +65,7 @@ namespace DeadCounty.EditorTools
             if (rng.NextDouble() < 0.5) Clothesline(root, new Vector3(0.5f, 0f, 12.5f), new Vector3(5.5f, 0f, 13f));
             if (rng.NextDouble() < 0.5) Box("Tas_Bois", root, new Vector3(-6.9f, 0.5f, 12f), new Vector3(0.7f, 1f, 2.4f), "WoodDark");
             if (rng.NextDouble() < 0.6) PlaceTree(root, new Vector3(-5.6f, 0f, -3.6f), rng, false);
+            TallGrass(root, rng);
             if (rng.NextDouble() < 0.35) Car(root, "Voiture_Allee", new Vector3(9.5f, 0f, -1.5f), 90f + Range(rng, -4f, 4f), rng.NextDouble() < 0.5 ? "CarRed" : "CarBlue");
 
             ReserveLocal(root, -8f, -6f, 14f, 19.5f);
@@ -107,7 +108,9 @@ namespace DeadCounty.EditorTools
                     for (var k = 0; k < 3; k++)
                         Box("Planche", body, new Vector3(offset, 1.15f + k * 0.35f, -0.17f), new Vector3(1.5f, 0.16f, 0.04f), "WoodDark", Quaternion.Euler(0f, 0f, k == 1 ? -12f : 9f), solid: false);
 
-            Furnish(body, new System.Random(Mathf.RoundToInt(frontCenter.x * 73f + frontCenter.z * 31f)));
+            var rng = new System.Random(Mathf.RoundToInt(frontCenter.x * 73f + frontCenter.z * 31f));
+            HouseExterior(body, rng);
+            Furnish(body, rng);
             return root;
         }
 
