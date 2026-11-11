@@ -26,6 +26,13 @@ namespace DeadCounty.Core
             return IsDead;
         }
 
+        // No effect once dead. !(amount > 0) rejects NaN, where <= would let it through.
+        public void Heal(float amount)
+        {
+            if (!(amount > 0f) || IsDead) return;
+            Current = Mathf.Min(Current + amount, Max);
+        }
+
         public void Reset() => Current = Max;
     }
 }

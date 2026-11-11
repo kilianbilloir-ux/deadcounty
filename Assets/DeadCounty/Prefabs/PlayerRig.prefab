@@ -1867,6 +1867,7 @@ GameObject:
   - component: {fileID: 5457722342757846616}
   - component: {fileID: 9131007080392847135}
   - component: {fileID: 6630331365674300}
+  - component: {fileID: 5654377057039098411}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1933,6 +1934,7 @@ MonoBehaviour:
   runSpeed: 3.5
   sprintSpeed: 6
   stickRunThreshold: 0.7
+  encumberedSpeedFactor: 0.75
   locomotion:
     Acceleration: 6
     Deceleration: 9
@@ -2129,6 +2131,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerInteractor
   reach: 1.8
   maxAngle: 60
+--- !u!114 &5654377057039098411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0656edeeaeb94e67a6c0c3e781d844d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerInventory
+  baseCapacity: 6
+  startingItems:
+  - Item: {fileID: 11400000, guid: 2a48bfc8e80dd4e4fa7d4c4195ad243f, type: 2}
+    Count: 1
+  - Item: {fileID: 11400000, guid: 514697f0faa71479d9788702c7cc97a9, type: 2}
+    Count: 1
+  - Item: {fileID: 11400000, guid: a43dd927d28f04d8dab835ffe024928e, type: 2}
+    Count: 1
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0
@@ -2575,6 +2597,7 @@ GameObject:
   - component: {fileID: 5939641845900695887}
   - component: {fileID: 5721207825746083105}
   - component: {fileID: 5512533205525538230}
+  - component: {fileID: 4494367367221273902}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -2673,6 +2696,18 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &4494367367221273902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e238b165a2f4542e2b9e0e79f974171b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerInventoryScreen
 --- !u!1 &6092803171642249547
 GameObject:
   m_ObjectHideFlags: 0

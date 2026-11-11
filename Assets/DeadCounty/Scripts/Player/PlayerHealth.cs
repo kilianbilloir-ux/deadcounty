@@ -69,6 +69,8 @@ namespace DeadCounty.Player
             if (Pool.Apply(damage)) Died?.Invoke(this);
         }
 
+        public void Heal(float amount) => Pool.Heal(amount);
+
         public void Restore()
         {
             Pool.Reset();

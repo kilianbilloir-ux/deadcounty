@@ -18,7 +18,7 @@ namespace DeadCounty.World
         public abstract Vector3 PromptPoint { get; }
 
         // hurried: the player was sprinting.
-        public abstract void Interact(Vector3 userPosition, bool hurried);
+        public abstract void Interact(Transform user, bool hurried);
 
         protected virtual void OnEnable() => all.Add(this);
 

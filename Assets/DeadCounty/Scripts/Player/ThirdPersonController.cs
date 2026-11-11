@@ -31,6 +31,8 @@ namespace DeadCounty.Player
         [SerializeField] float sprintSpeed = 6f;
         [Tooltip("Gamepad stick deflection above which the player runs instead of walking.")]
         [SerializeField, Range(0f, 1f)] float stickRunThreshold = 0.7f;
+        [Tooltip("Speed factor while carrying more than the inventory capacity; running and sprinting are locked.")]
+        [SerializeField, Range(0f, 1f)] float encumberedSpeedFactor = 0.75f;
 
         [Header("Acceleration and turning")]
         [SerializeField] LocomotionSettings locomotion = LocomotionSettings.Player;
@@ -79,9 +81,24 @@ namespace DeadCounty.Player
         float yaw, pitch, verticalVelocity, cameraTargetStandingY, landingNoiseTimer, recoveryTimer;
         float knockbackTimer, staggerTimer, staggerSpeedFactor = 1f;
         float lastGroundedTime = float.NegativeInfinity, lastJumpPressTime = float.NegativeInfinity;
+        bool menuOpen;
 
         // When false (death screen) movement, jump and crouch input are ignored and the player brakes; look still works.
         public bool InputEnabled { get; set; } = true;
+        // While a menu is open (inventory) the cursor is free, the camera holds and the player brakes.
+        public bool MenuOpen
+        {
+            get => menuOpen;
+            set
+            {
+                menuOpen = value;
+                SetCursorLocked(!value);
+            }
+        }
+        // Movement, jump, crouch and interaction input are read.
+        public bool Controllable => InputEnabled && !menuOpen;
+        // Carrying more than the inventory capacity (GDD 8.5).
+        public bool Encumbered { get; set; }
         // Actual horizontal velocity of the last move, after collisions.
         public Vector3 Velocity { get; private set; }
         // Increases on every Teleport so animators can snap instead of blending across the warp.
@@ -132,8 +149,8 @@ namespace DeadCounty.Player
 
         void Update()
         {
-            UpdateCursor();
-            if (Cursor.lockState == CursorLockMode.Locked) ReadLook();
+            if (!menuOpen) UpdateCursor();
+            if (!menuOpen && Cursor.lockState == CursorLockMode.Locked) ReadLook();
             UpdateCrouch();
             Move();
             UpdateStamina();
@@ -167,12 +184,12 @@ namespace DeadCounty.Player
         void Move()
         {
             var dt = Time.deltaTime;
-            var input = InputEnabled ? Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f) : Vector2.zero;
+            var input = Controllable ? Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f) : Vector2.zero;
             var hasInput = input.sqrMagnitude > 0.01f;
             var onStick = move.activeControl?.device is Gamepad;
             var staggered = staggerTimer > 0f;
             Gait = !hasInput ? Gait.Idle
-                : IsCrouching || staggered ? Gait.Walk
+                : IsCrouching || staggered || Encumbered ? Gait.Walk
                 : sprint.IsPressed() && stamina.Model.CanSprint ? Gait.Sprint
                 : (run.IsPressed() || (onStick && input.magnitude > stickRunThreshold)) && stamina.Model.CanRun ? Gait.Run
                 : Gait.Walk;
@@ -185,15 +202,16 @@ namespace DeadCounty.Player
                 if (recoveryTimer > 0f) targetSpeed *= 0.4f;
             }
             if (staggered) targetSpeed *= staggerSpeedFactor;
+            if (Encumbered) targetSpeed *= encumberedSpeedFactor;
             PlanarLocomotion.Step(ref motion, locomotion, wish, targetSpeed, hasInput, IsGrounded, dt);
             transform.rotation = Quaternion.LookRotation(motion.Heading);
             recoveryTimer -= dt;
             staggerTimer -= dt;
 
-            if (InputEnabled && jump.WasPressedThisFrame()) lastJumpPressTime = Time.time;
+            if (Controllable && jump.WasPressedThisFrame()) lastJumpPressTime = Time.time;
             var jumped = false;
             // Stamina is checked last so it is only spent on a jump that actually fires.
-            if (InputEnabled && !IsCrouching && !IsSliding && recoveryTimer <= 0f && Time.time - lastGroundedTime <= coyoteTime
+            if (Controllable && !IsCrouching && !IsSliding && recoveryTimer <= 0f && Time.time - lastGroundedTime <= coyoteTime
                 && Time.time - lastJumpPressTime <= jumpBufferTime && stamina.Model.TryJump())
             {
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -336,7 +354,7 @@ namespace DeadCounty.Player
 
         void UpdateCrouch()
         {
-            if (InputEnabled && crouch.WasPressedThisFrame() && (!IsCrouching || CanStand())) IsCrouching = !IsCrouching;
+            if (Controllable && crouch.WasPressedThisFrame() && (!IsCrouching || CanStand())) IsCrouching = !IsCrouching;
 
             var height = Mathf.MoveTowards(controller.height, IsCrouching ? crouchHeight : standingHeight, heightChangeSpeed * Time.deltaTime);
             controller.height = height;

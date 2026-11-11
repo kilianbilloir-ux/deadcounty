@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f8c6ba0daaf477e846d465f637ccf7, type: 3}
+  m_Name: IT_Mais
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Items.ItemDefinition
+  DisplayName: "Conserve de ma\xEFs"
+  Category: 0
+  Weight: 0.35
+  UseVerb: Manger
+  Hunger: 0.35
+  Thirst: 0
+  Health: 0
+  CapacityBonus: 0

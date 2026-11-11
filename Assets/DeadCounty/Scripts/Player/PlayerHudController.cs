@@ -4,7 +4,6 @@ using DeadCounty.Core;
 using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
@@ -15,7 +14,7 @@ namespace DeadCounty.Player
     // flashlight and clock readouts show for a few seconds when they change, with the need gauges. Also draws the
     // hit flash and the game over screen from PlayerDeathFlow. The only allocations are the clock and survival
     // time strings when they change. The interaction prompt sits next to what the player can use, its name
-    // above the key and the action (GDD 8.11, after Valheim).
+    // above the key and the action (GDD 8.11, after Valheim); "Surchargé" shows while the inventory is too heavy.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -42,12 +41,13 @@ namespace DeadCounty.Player
         PlayerFlashlight flashlight;
         PlayerDeathFlow deathFlow;
         PlayerInteractor interactor;
+        PlayerInventory inventory;
         DayNightDirector director;
         VisualElement hud, healthRow, staminaRow, readouts, healthFill, staminaFill, flash, gameOver;
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
         RadialGauge hungerGauge, thirstGauge, fatigueGauge;
         VisualElement interaction;
-        Label interactionName, interactionAction;
+        Label interactionName, interactionAction, encumbered;
         Interactable shownInteractable;
         string shownAction, interactKeys;
         Label flashlightLabel, time, gameOverTitle, gameOverTime, gameOverPrompt;
@@ -74,9 +74,10 @@ namespace DeadCounty.Player
             flashlight = GetComponentInChildren<PlayerFlashlight>(true);
             deathFlow = GetComponent<PlayerDeathFlow>();
             interactor = GetComponentInChildren<PlayerInteractor>(true);
+            inventory = GetComponentInChildren<PlayerInventory>(true);
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null || needs == null || interactor == null)
-                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds and a PlayerInteractor in its children");
+            if (health == null || stamina == null || needs == null || interactor == null || inventory == null)
+                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor and a PlayerInventory in its children");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -102,7 +103,8 @@ namespace DeadCounty.Player
             interaction = Find<VisualElement>(root, "interaction");
             interactionName = Find<Label>(root, "interaction-name");
             interactionAction = Find<Label>(root, "interaction-action");
-            interactKeys = BindingKeys("Player/Interact");
+            encumbered = Find<Label>(root, "encumbered");
+            interactKeys = InputPrompts.Keys("Player/Interact");
             flashlightLabel = Find<Label>(root, "flashlight");
             time = Find<Label>(root, "time");
             gameOverTitle = Find<Label>(root, "game-over-title");
@@ -117,18 +119,7 @@ namespace DeadCounty.Player
             root.Q<T>(elementName) ?? throw new InvalidOperationException($"PlayerHudController on '{name}': the HUD has no '{elementName}' {typeof(T).Name}");
 
         // Respawn is bound to Jump.
-        static string RestartPrompt() => Prompt(BindingKeys("Player/Jump"), "Recommencer");
-
-        static string Prompt(string keys, string action) => keys == null ? action : $"[{keys}] {action}";
-
-        // The keyboard and gamepad buttons of an action, read from its bindings: "E / Y".
-        static string BindingKeys(string actionPath)
-        {
-            var action = InputSystem.actions?.FindAction(actionPath);
-            if (action == null) return null;
-            const InputBinding.DisplayStringOptions options = InputBinding.DisplayStringOptions.DontIncludeInteractions;
-            return $"{action.GetBindingDisplayString(options, "Keyboard&Mouse")} / {action.GetBindingDisplayString(options, "Gamepad")}";
-        }
+        static string RestartPrompt() => InputPrompts.Prompt(InputPrompts.Keys("Player/Jump"), "Recommencer");
 
         // Not in Awake: the pools are created in the health and stamina Awakes, which may run after this one.
         void Start()
@@ -187,6 +178,7 @@ namespace DeadCounty.Player
             UpdateNeed(hungerNeed, hungerGauge, ref hungerOpacity, needsModel.Hunger, alive, readoutsShown, dt);
             UpdateNeed(thirstNeed, thirstGauge, ref thirstOpacity, needsModel.Thirst, alive, readoutsShown, dt);
             UpdateNeed(fatigueNeed, fatigueGauge, ref fatigueOpacity, needsModel.Fatigue, alive, readoutsShown, dt);
+            encumbered.style.display = alive && inventory.Items.Overloaded ? DisplayStyle.Flex : DisplayStyle.None;
 
             flashValue = Mathf.Max(flashValue - dt / hitFlashTime, 0f);
             flash.style.opacity = flashValue * hitFlashAlpha;
@@ -225,7 +217,7 @@ namespace DeadCounty.Player
                 shownInteractable = current;
                 shownAction = action;
                 interactionName.text = current.DisplayName;
-                interactionAction.text = Prompt(interactKeys, action);
+                interactionAction.text = InputPrompts.Prompt(interactKeys, action);
             }
             var point = RuntimePanelUtils.CameraTransformWorldToPanel(interaction.panel, current.PromptPoint, view);
             interaction.style.left = point.x + PromptOffsetX;

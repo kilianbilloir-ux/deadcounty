@@ -83,11 +83,11 @@ namespace DeadCounty.World
             all.Remove(this);
         }
 
-        public override void Interact(Vector3 userPosition, bool hurried)
+        public override void Interact(Transform user, bool hurried)
         {
             var time = hurried ? slamTime : swingTime;
             var noise = hurried ? slamNoise : useNoise;
-            if (targetAngle == 0f) Swing(-Doorway.Side(userPosition) * openAngle, time, noise);
+            if (targetAngle == 0f) Swing(-Doorway.Side(user.position) * openAngle, time, noise);
             else if (DoorwayClear()) Swing(0f, time, noise);
         }
 

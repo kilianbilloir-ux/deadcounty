@@ -30,8 +30,8 @@ namespace DeadCounty.Player
 
         void Update()
         {
-            Current = health.IsAlive && controller.InputEnabled ? Pick() : null;
-            if (Current != null && interact.WasPressedThisFrame()) Current.Interact(transform.position, controller.IsSprinting);
+            Current = health.IsAlive && controller.Controllable ? Pick() : null;
+            if (Current != null && interact.WasPressedThisFrame()) Current.Interact(transform, controller.IsSprinting);
         }
 
         // The candidate closest to the camera heading, weighted by distance, with nothing in between.

@@ -97,5 +97,19 @@ namespace DeadCounty.Tests
             settings.HungerMinutes = float.NaN;
             Assert.Throws<ArgumentOutOfRangeException>(() => new NeedsModel(settings));
         }
+
+        [Test]
+        public void EatingAndDrinkingRefillUpToFull()
+        {
+            var model = Create();
+            model.Tick(6f * Minute, false);
+            model.Restore(0.35f, 0.5f);
+            Assert.That(model.Hunger, Is.EqualTo(1f));
+            Assert.That(model.Thirst, Is.EqualTo(1f));
+            model.Tick(12f * Minute, false);
+            model.Restore(0.25f, 0f);
+            Assert.That(model.Hunger, Is.EqualTo(0.4f + 0.25f).Within(1e-3f));
+            Assert.That(model.Thirst, Is.Zero.Within(1e-4f));
+        }
     }
 }

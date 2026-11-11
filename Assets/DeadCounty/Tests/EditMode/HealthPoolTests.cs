@@ -64,5 +64,21 @@ namespace DeadCounty.Tests
             Assert.That(health.IsDead, Is.False);
             Assert.That(health.Current, Is.EqualTo(health.Max));
         }
+
+        [Test]
+        public void HealingIsCappedAndNeverRevives()
+        {
+            var health = new HealthPool(100f);
+            health.Apply(30f);
+            health.Heal(20f);
+            Assert.That(health.Current, Is.EqualTo(90f));
+            health.Heal(50f);
+            Assert.That(health.Current, Is.EqualTo(100f));
+            health.Heal(float.NaN);
+            Assert.That(health.Current, Is.EqualTo(100f));
+            health.Apply(200f);
+            health.Heal(20f);
+            Assert.That(health.IsDead, "a dead pool must stay dead");
+        }
     }
 }
