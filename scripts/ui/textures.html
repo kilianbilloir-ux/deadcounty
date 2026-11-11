@@ -1,0 +1,177 @@
+<!doctype html>
+<meta charset="utf-8">
+<!-- Worn interface textures, one per ?t= name, rendered to PNG by render_textures.sh. Everything is SVG with
+     turbulence filters, so the grime is procedural and the same on every run. -->
+<style>
+  @font-face { font-family: Sign; src: url(fonts/Overpass-ExtraBold.ttf); }
+  @font-face { font-family: SignText; src: url(fonts/Overpass-Regular.ttf); }
+  @font-face { font-family: Marker; src: url(fonts/PermanentMarker-Regular.ttf); }
+  html, body { margin: 0; background: transparent; }
+  svg { display: block; }
+</style>
+<body>
+<script>
+const defs = `
+<defs>
+  <filter id="torn" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="4" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="ragged" x="-5%" y="-20%" width="110%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="spray" x="-20%" y="-60%" width="140%" height="220%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="11" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="7" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.8"/>
+  </filter>
+  <!-- Keeps the source only where coarse noise is high: blotches of rust, dirt or wear. -->
+  <filter id="blotch" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="5" seed="21" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3.4 0 0 0 -1.75" result="m"/>
+    <feComposite in="SourceGraphic" in2="m" operator="in"/>
+  </filter>
+  <filter id="speck" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="5" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 5 0 0 -2.9" result="m"/>
+    <feComposite in="SourceGraphic" in2="m" operator="in"/>
+  </filter>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="2" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 1.1 0 -0.42" result="m"/>
+    <feComposite in="SourceGraphic" in2="m" operator="in"/>
+  </filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+  <filter id="softer"><feGaussianBlur stdDeviation="40"/></filter>
+</defs>`;
+
+// Small deterministic generator so scratches and spatters do not move between runs.
+let state = 1234567;
+const rnd = () => (state = (state * 1103515245 + 12345) % 2147483648) / 2147483648;
+const span = (a, b) => a + rnd() * (b - a);
+
+function scratches(count, w, h, colour, opacity) {
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const x = span(0, w), y = span(0, h), length = span(30, 220), angle = span(-0.5, 0.5) + (rnd() < 0.3 ? 1.3 : 0);
+    out += `<line x1="${x}" y1="${y}" x2="${x + Math.cos(angle) * length}" y2="${y + Math.sin(angle) * length}" stroke="${colour}" stroke-width="${span(0.6, 1.8)}" opacity="${span(0.3, 1) * opacity}"/>`;
+  }
+  return out;
+}
+
+function spatter(cx, cy, reach, count, colour) {
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const a = span(0, Math.PI * 2), d = reach * Math.pow(rnd(), 1.8), r = span(1, 16) * Math.pow(1 - d / reach, 1.4) + 1;
+    out += `<ellipse cx="${cx + Math.cos(a) * d}" cy="${cy + Math.sin(a) * d}" rx="${r}" ry="${r * span(0.7, 1.6)}" transform="rotate(${a * 57.3} ${cx + Math.cos(a) * d} ${cy + Math.sin(a) * d})" fill="${colour}" opacity="${span(0.55, 0.95)}"/>`;
+  }
+  return out;
+}
+
+function bulletHole(x, y, r) {
+  let cracks = '';
+  for (let i = 0; i < 7; i++) {
+    const a = span(0, Math.PI * 2), l = r * span(1.6, 3.2);
+    cracks += `<line x1="${x + Math.cos(a) * r}" y1="${y + Math.sin(a) * r}" x2="${x + Math.cos(a) * l}" y2="${y + Math.sin(a) * l}" stroke="#15130f" stroke-width="1.6" opacity="0.7"/>`;
+  }
+  return `<circle cx="${x}" cy="${y}" r="${r * 1.7}" fill="#8f8a7c" opacity="0.55"/><circle cx="${x}" cy="${y}" r="${r * 1.25}" fill="#5b4a3a"/>${cracks}<circle cx="${x}" cy="${y}" r="${r}" fill="#0b0a09"/>`;
+}
+
+const textures = {
+  // The county line sign after the evacuation: rust, dirt, bullet holes, the population sprayed out.
+  sign: [1024, 512, () => `
+    <clipPath id="plate"><rect x="32" y="40" width="960" height="432" rx="40"/></clipPath>
+    <rect x="32" y="40" width="960" height="432" rx="40" fill="#2a4d34"/>
+    <g clip-path="url(#plate)">
+      <rect x="52" y="60" width="920" height="392" rx="26" fill="none" stroke="#d6d2c2" stroke-width="8"/>
+      <text x="512" y="204" font-family="Sign" font-size="104" letter-spacing="3" text-anchor="middle" fill="#d9d5c6">DEAD COUNTY</text>
+      <rect x="104" y="262" width="816" height="6" fill="#d6d2c2"/>
+      <text x="108" y="358" font-family="SignText" font-size="56" fill="#d9d5c6">Population</text>
+      <text x="826" y="358" font-family="SignText" font-size="56" text-anchor="end" fill="#d9d5c6">3 812</text>
+      <rect x="32" y="40" width="960" height="432" fill="#6f3a1c" filter="url(#blotch)" opacity="0.9"/>
+      <rect x="32" y="40" width="960" height="432" fill="#3b2414" filter="url(#speck)" opacity="0.8"/>
+      <rect x="32" y="300" width="960" height="172" fill="url(#dirt)"/>
+      ${scratches(22, 1024, 512, '#e9e6da', 0.3)}
+      ${scratches(26, 1024, 512, '#14110d', 0.5)}
+      <rect x="32" y="40" width="960" height="432" fill="#000" filter="url(#grain)" opacity="0.5"/>
+      ${bulletHole(214, 124, 11)}${bulletHole(748, 96, 9)}${bulletHole(905, 392, 12)}
+      <g filter="url(#spray)">
+        <path d="M 612 366 C 680 316, 760 372, 868 312" stroke="#8c1b15" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <path d="M 628 318 C 700 356, 790 300, 858 364" stroke="#8c1b15" stroke-width="8" stroke-linecap="round" fill="none"/>
+      </g>
+      <text x="930" y="372" font-family="Marker" font-size="118" fill="#9c1f18" text-anchor="middle" transform="rotate(-9 930 372)" filter="url(#spray)">0</text>
+      <g filter="url(#spray)" opacity="0.75">
+        <path d="M 74 470 C 92 430, 100 396, 98 356 M 108 470 C 126 436, 136 408, 136 376 M 142 470 C 158 442, 170 420, 174 396" stroke="#551009" stroke-width="13" stroke-linecap="round" fill="none"/>
+        <ellipse cx="120" cy="462" rx="74" ry="20" fill="#551009"/>
+      </g>
+    </g>
+    <linearGradient id="dirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1309" stop-opacity="0"/><stop offset="1" stop-color="#1b1309" stop-opacity="0.75"/></linearGradient>`],
+
+  // A torn, stained scrap of paper: tips, messages, the pieces of the pause menu.
+  paper: [512, 512, () => `
+    <clipPath id="sheet"><rect x="26" y="26" width="460" height="460"/></clipPath>
+    <g filter="url(#torn)">
+      <g clip-path="url(#sheet)">
+        <rect x="26" y="26" width="460" height="460" fill="#c9bb98"/>
+        <rect x="26" y="26" width="460" height="460" fill="#7d6235" filter="url(#blotch)" opacity="0.55"/>
+        <rect x="26" y="26" width="460" height="460" fill="#4a3920" filter="url(#speck)" opacity="0.5"/>
+        <circle cx="390" cy="120" r="54" fill="none" stroke="#6e4f25" stroke-width="7" opacity="0.35" filter="url(#ragged)"/>
+        <rect x="26" y="26" width="460" height="460" fill="none" stroke="#3a2a15" stroke-width="70" opacity="0.28" filter="url(#soft)"/>
+        <rect x="26" y="26" width="460" height="460" fill="#000" filter="url(#grain)" opacity="0.28"/>
+      </g>
+    </g>`],
+
+  // A strip of duct tape with ragged ends: the selected entry, key prompts, labels.
+  tape: [512, 128, () => `
+    <clipPath id="strip"><rect x="18" y="20" width="476" height="88"/></clipPath>
+    <g filter="url(#ragged)">
+      <g clip-path="url(#strip)">
+        <rect x="18" y="20" width="476" height="88" fill="#a9a79c"/>
+        <rect x="18" y="20" width="476" height="30" fill="#c2c0b5" opacity="0.5"/>
+        <rect x="18" y="84" width="476" height="24" fill="#5f5d55" opacity="0.4"/>
+        ${Array.from({ length: 30 }, (_, i) => `<rect x="18" y="${22 + i * 2.9}" width="476" height="0.8" fill="#55534c" opacity="${span(0.12, 0.3)}"/>`).join('')}
+        <rect x="18" y="20" width="476" height="88" fill="#3d3a30" filter="url(#speck)" opacity="0.45"/>
+        <rect x="18" y="20" width="476" height="88" fill="#000" filter="url(#grain)" opacity="0.3"/>
+      </g>
+    </g>`],
+
+  // Dark scuffed board with rust creeping in from its edges: the inventory and other large panels.
+  panel: [512, 512, () => `
+    <clipPath id="board"><rect x="14" y="14" width="484" height="484" rx="6"/></clipPath>
+    <g filter="url(#ragged)">
+      <g clip-path="url(#board)">
+        <rect x="14" y="14" width="484" height="484" fill="#201e1b"/>
+        <rect x="14" y="14" width="484" height="484" fill="#3a2a1c" filter="url(#blotch)" opacity="0.6"/>
+        <rect x="14" y="14" width="484" height="484" fill="none" stroke="#7a3d1a" stroke-width="34" opacity="0.55" filter="url(#speck)"/>
+        <rect x="14" y="14" width="484" height="484" fill="none" stroke="#000" stroke-width="60" opacity="0.5" filter="url(#soft)"/>
+        ${scratches(40, 512, 512, '#8c877b', 0.22)}
+        <rect x="14" y="14" width="484" height="484" fill="#000" filter="url(#grain)" opacity="0.45"/>
+      </g>
+    </g>`],
+
+  // Grime closing in from the edges of the screen, blood in two corners; clear in the middle.
+  grime: [2048, 1024, () => `
+    <radialGradient id="edges" cx="50%" cy="48%" r="74%"><stop offset="0.5" stop-color="#0c0906" stop-opacity="0"/><stop offset="1" stop-color="#0c0906" stop-opacity="0.94"/></radialGradient>
+    <radialGradient id="rimLight" cx="50%" cy="48%" r="72%"><stop offset="0.45" stop-color="#000"/><stop offset="0.95" stop-color="#fff"/></radialGradient>
+    <mask id="rim"><rect width="2048" height="1024" fill="url(#rimLight)"/></mask>
+    <rect width="2048" height="1024" fill="url(#edges)"/>
+    <g mask="url(#rim)">
+      <rect width="2048" height="1024" fill="#1a120a" opacity="0.75" filter="url(#blotch)"/>
+      <rect width="2048" height="1024" fill="#090705" opacity="0.8" filter="url(#speck)"/>
+    </g>
+    <g filter="url(#ragged)">${spatter(1930, 930, 340, 240, '#2e0806')}${spatter(90, 80, 220, 120, '#2a0705')}${spatter(1990, 990, 120, 60, '#240605')}${spatter(40, 30, 90, 40, '#240605')}</g>`],
+
+  // One dry brush stroke of red paint: under the titles of the menus.
+  stroke: [512, 64, () => `
+    <g filter="url(#spray)">
+      <path d="M 16 34 C 110 22, 210 44, 320 28 S 470 38, 498 30" stroke="#8c1b15" stroke-width="15" stroke-linecap="round" fill="none"/>
+      <path d="M 40 44 C 150 36, 260 50, 440 40" stroke="#8c1b15" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+    </g>`],
+};
+
+const name = new URLSearchParams(location.search).get('t');
+const [width, height, draw] = textures[name];
+document.body.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${defs}${draw()}</svg>`;
+document.title = `${width}x${height}`;
+</script>

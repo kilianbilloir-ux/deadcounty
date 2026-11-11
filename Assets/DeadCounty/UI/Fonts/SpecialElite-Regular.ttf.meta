@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9500f817a8f8343808a4eb6283030942
+guid: fba0bf1d2663b4c788e4064326f5ac2a
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Overpass
+  - Special Elite
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

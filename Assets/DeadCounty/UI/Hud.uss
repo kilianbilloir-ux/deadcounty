@@ -1,8 +1,10 @@
-/* HUD and screens (GDD 8.11), drawn like the county's road signs: Overpass, the open descendant of the US highway
-   alphabet, in two weights; flat plates with thick borders; the colours of the world's own signs and roads.
-   Sign white rgb(230, 230, 224), steel rgb(180, 188, 201), fog rgb(138, 143, 150), line yellow rgb(218, 178, 70) for
-   what is selected, sign green rgb(47, 90, 58), danger rgb(167, 95, 59), asphalt rgb(38, 39, 42) for panels. Sizes
-   are for 1080p; the panel scales with the screen. */
+/* HUD and screens (GDD 8.11), made of what a survivor finds lying around: the county line sign shot up and
+   rusted, entries scrawled in marker, the one selected on a strip of duct tape, notes on torn stained paper, panels
+   of scuffed board, grime and blood closing in from the edges of the screen. The textures are drawn in
+   scripts/ui/textures.html. Type: Permanent Marker for what is written by hand, Special Elite, a worn typewriter,
+   for the rest. Bone rgb(222, 216, 200), steel rgb(180, 188, 201), fog rgb(138, 143, 150), spray orange
+   rgb(208, 97, 42) for what is selected, blood rgb(170, 36, 30) for danger, ink rgb(29, 27, 24) on paper and tape.
+   Sizes are for 1080p; the panel scales with the screen. */
 .root {
     position: absolute;
     left: 0;
@@ -10,8 +12,8 @@
     right: 0;
     bottom: 0;
     flex-grow: 1;
-    -unity-font: url("Fonts/Overpass-Regular.ttf");
-    color: rgb(230, 230, 224);
+    -unity-font: url("Fonts/SpecialElite-Regular.ttf");
+    color: rgb(222, 216, 200);
 }
 
 .hit-flash {
@@ -20,7 +22,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    background-color: rgb(167, 95, 59);
+    background-color: rgb(170, 36, 30);
     opacity: 0;
 }
 
@@ -41,7 +43,7 @@
     height: 500px;
     margin-left: -250px;
     margin-top: -250px;
-    color: rgb(204, 110, 72);
+    color: rgb(200, 48, 40);
 }
 
 /* Bottom left: needs, then health and stamina, then the clock and the flashlight. */
@@ -73,7 +75,7 @@
 }
 
 .need--low .need-gauge {
-    --gauge-fill: rgb(167, 95, 59);
+    --gauge-fill: rgb(170, 36, 30);
 }
 
 .need-label {
@@ -124,11 +126,11 @@
 }
 
 .health-fill--low {
-    background-color: rgb(167, 95, 59);
+    background-color: rgb(170, 36, 30);
 }
 
 .stamina-fill {
-    background-color: rgb(218, 178, 70);
+    background-color: rgb(208, 97, 42);
 }
 
 .stamina-fill--spent {
@@ -167,11 +169,11 @@
 }
 
 .noise-meter--loud .noise-segment--lit {
-    background-color: rgb(218, 178, 70);
+    background-color: rgb(208, 97, 42);
 }
 
 .noise-meter--very-loud .noise-segment--lit {
-    background-color: rgb(167, 95, 59);
+    background-color: rgb(170, 36, 30);
 }
 
 .readouts {
@@ -192,7 +194,7 @@
 }
 
 .flashlight-readout--on {
-    color: rgb(218, 178, 70);
+    color: rgb(208, 97, 42);
 }
 
 /* Key prompts: the key in a frame, then the action. */
@@ -206,16 +208,16 @@
     padding: 3px 8px 1px 8px;
     margin-right: 8px;
     font-size: 15px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
     -unity-text-align: middle-center;
     color: rgb(38, 39, 42);
-    background-color: rgb(230, 230, 224);
+    background-color: rgb(222, 216, 200);
     border-radius: 5px;
 }
 
 .prompt-action {
     font-size: 17px;
-    color: rgb(218, 178, 70);
+    color: rgb(208, 97, 42);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -234,16 +236,16 @@
     height: 34px;
     margin-right: 10px;
     --gauge-track: rgba(10, 11, 13, 0.6);
-    --gauge-fill: rgb(218, 178, 70);
+    --gauge-fill: rgb(208, 97, 42);
     --gauge-thickness: 4;
     display: none;
 }
 
 .interaction-name {
     font-size: 20px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
     margin-bottom: 4px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
 }
 
@@ -259,10 +261,10 @@
 .toast {
     font-size: 18px;
     padding: 8px 18px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     background-color: rgba(38, 39, 42, 0.85);
     border-left-width: 5px;
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
     opacity: 0;
 }
 
@@ -281,7 +283,7 @@
     padding: 3px 16px 3px 8px;
     background-color: rgba(38, 39, 42, 0.85);
     border-left-width: 5px;
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
 }
 
 .pickup-icon {
@@ -293,14 +295,14 @@
 
 .pickup-name {
     font-size: 17px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
 }
 
 .pickup-count {
     margin-left: 8px;
     font-size: 17px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
-    color: rgb(218, 178, 70);
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
+    color: rgb(208, 97, 42);
 }
 
 .pickup--empty {
@@ -325,21 +327,21 @@
     padding: 12px 16px;
     background-color: rgba(38, 39, 42, 0.88);
     border-left-width: 5px;
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
     display: none;
 }
 
 .tip-title {
     font-size: 13px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
     letter-spacing: 3px;
-    color: rgb(218, 178, 70);
+    color: rgb(208, 97, 42);
     margin-bottom: 6px;
 }
 
 .tip-text {
     font-size: 17px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     white-space: normal;
 }
 
@@ -353,26 +355,26 @@
 
 .status {
     font-size: 15px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
     letter-spacing: 1px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     padding: 6px 12px;
     margin-bottom: 8px;
     background-color: rgba(38, 39, 42, 0.8);
     border-left-width: 5px;
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
     display: none;
 }
 
 .status--danger {
-    border-color: rgb(167, 95, 59);
+    border-color: rgb(170, 36, 30);
     color: rgb(230, 170, 140);
 }
 
 /* Full-screen screens: sleep and game over, over a darkened scene (Crow Country). */
 .screen-title {
     font-size: 54px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
     letter-spacing: 2px;
     margin-bottom: 16px;
 }
@@ -414,12 +416,12 @@
 }
 
 .game-over-title {
-    color: rgb(167, 95, 59);
+    color: rgb(170, 36, 30);
 }
 
 .game-over-cause {
     font-size: 24px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     margin-bottom: 10px;
 }
 
@@ -458,13 +460,13 @@
     padding: 32px;
     background-color: rgb(38, 39, 42);
     border-top-width: 5px;
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
     border-radius: 6px;
 }
 
 .panel-title {
     font-size: 15px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
     letter-spacing: 3px;
     color: rgb(138, 143, 150);
     margin-bottom: 18px;
@@ -494,7 +496,7 @@
 
 .stat-label {
     font-size: 16px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
 }
 
 .stat-word {
@@ -518,11 +520,11 @@
 }
 
 .stat-fill--stamina {
-    background-color: rgb(218, 178, 70);
+    background-color: rgb(208, 97, 42);
 }
 
 .stat-fill--low {
-    background-color: rgb(167, 95, 59);
+    background-color: rgb(170, 36, 30);
 }
 
 .inventory-warning {
@@ -530,9 +532,9 @@
     padding: 8px 10px;
     font-size: 15px;
     color: rgb(230, 170, 140);
-    background-color: rgba(167, 95, 59, 0.15);
+    background-color: rgba(170, 36, 30, 0.15);
     border-left-width: 3px;
-    border-color: rgb(167, 95, 59);
+    border-color: rgb(170, 36, 30);
     white-space: normal;
 }
 
@@ -544,12 +546,12 @@
 
 .inventory-weight {
     font-size: 20px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
-    color: rgb(230, 230, 224);
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
+    color: rgb(222, 216, 200);
 }
 
 .inventory-weight--over {
-    color: rgb(167, 95, 59);
+    color: rgb(170, 36, 30);
 }
 
 .capacity-bar {
@@ -565,7 +567,7 @@
 }
 
 .capacity-fill--over {
-    background-color: rgb(167, 95, 59);
+    background-color: rgb(170, 36, 30);
 }
 
 .item-columns {
@@ -586,8 +588,8 @@
 }
 
 .item-column--active {
-    color: rgb(218, 178, 70);
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    color: rgb(208, 97, 42);
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
 }
 
 .item-name {
@@ -631,13 +633,13 @@
 }
 
 .item-row--selected {
-    background-color: rgba(230, 230, 224, 0.08);
-    border-color: rgb(218, 178, 70);
+    background-color: rgba(222, 216, 200, 0.08);
+    border-color: rgb(208, 97, 42);
 }
 
 .item-row > Label {
     font-size: 17px;
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
 }
 
 .item-row .item-category,
@@ -678,8 +680,8 @@
 
 .item-detail-name {
     font-size: 19px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
-    color: rgb(230, 230, 224);
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
+    color: rgb(222, 216, 200);
 }
 
 .item-detail-meta {
@@ -701,7 +703,7 @@
 
 .item-effect-value {
     font-size: 16px;
-    color: rgb(218, 178, 70);
+    color: rgb(208, 97, 42);
 }
 
 .item-effect--wasted .item-effect-value {
@@ -744,66 +746,32 @@
     -unity-background-scale-mode: stretch-to-fill;
 }
 
-/* The county line sign: a green plate, its white border set in from the edge, the population painted out. */
+/* The county line sign, text and all, as one worn image. */
 .county-sign {
-    align-self: flex-start;
-    padding: 7px;
-    margin-bottom: 16px;
-    background-color: rgb(47, 90, 58);
-    border-radius: 22px;
-}
-
-.county-sign-face {
-    padding: 20px 36px 14px 36px;
-    border-width: 4px;
-    border-color: rgb(230, 230, 224);
-    border-radius: 15px;
-}
-
-.title-name {
-    font-size: 68px;
-    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
-    letter-spacing: 3px;
-    color: rgb(230, 230, 224);
-}
-
-.county-sign-rule {
-    height: 3px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    background-color: rgb(230, 230, 224);
-}
-
-.county-sign-line {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.county-sign-small {
-    font-size: 26px;
-    color: rgb(230, 230, 224);
-}
-
-.county-sign-struck {
-    justify-content: center;
-}
-
-.county-sign-strike {
-    position: absolute;
-    left: -8px;
-    right: -8px;
-    top: 42%;
-    height: 5px;
-    background-color: rgb(168, 50, 42);
-    rotate: -7deg;
+    width: 620px;
+    height: 310px;
+    margin-left: -22px;
+    margin-bottom: 2px;
+    background-image: url("Textures/Worn_Sign.png");
+    rotate: -1.5deg;
 }
 
 .title-tagline {
-    font-size: 18px;
-    color: rgb(218, 178, 70);
-    margin-left: 12px;
-    margin-bottom: 44px;
+    align-self: flex-start;
+    font-size: 20px;
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
+    color: rgb(29, 27, 24);
+    padding: 8px 22px 6px 22px;
+    margin-left: 380px;
+    margin-top: -34px;
+    margin-bottom: 40px;
+    background-image: url("Textures/Worn_Tape.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+    -unity-slice-scale: 0.5px;
+    rotate: 4deg;
 }
 
 .title-list {
@@ -813,14 +781,8 @@
 /* Two classes, to win over the centred .menu-item declared further down. */
 .title-list .title-item {
     -unity-text-align: middle-left;
-    padding-left: 18px;
-    min-width: 280px;
-    color: rgb(230, 230, 224);
-    background-color: rgba(38, 39, 42, 0.55);
-}
-
-.title-list .menu-item--selected {
-    background-color: rgba(38, 39, 42, 0.95);
+    padding-left: 26px;
+    min-width: 300px;
 }
 
 .title-hints {
@@ -847,11 +809,11 @@
 
 /* Underlined in line yellow, like the centre of the road. */
 .menu-title {
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     padding-bottom: 4px;
     margin-bottom: 30px;
     border-bottom-width: 4px;
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
 }
 
 .menu-item {
@@ -867,9 +829,9 @@
 }
 
 .menu-item--selected {
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
     background-color: rgba(38, 39, 42, 0.85);
-    border-color: rgb(218, 178, 70);
+    border-color: rgb(208, 97, 42);
 }
 
 .option-row {
@@ -885,14 +847,14 @@
 }
 
 .menu-item--selected .option-label {
-    color: rgb(230, 230, 224);
+    color: rgb(222, 216, 200);
 }
 
 /* Same width as the bar, so values and bars start on one line. */
 .option-value {
     width: 160px;
     font-size: 20px;
-    color: rgb(218, 178, 70);
+    color: rgb(208, 97, 42);
 }
 
 .option-bar {
@@ -904,7 +866,7 @@
 .option-fill {
     height: 100%;
     width: 50%;
-    background-color: rgb(218, 178, 70);
+    background-color: rgb(208, 97, 42);
 }
 
 /* Keyboard keys: compact rows so the thirteen keys fit with the page title. */
@@ -928,7 +890,7 @@
 }
 
 .controls-key--waiting {
-    background-color: rgb(218, 178, 70);
+    background-color: rgb(208, 97, 42);
 }
 
 .menu-hints {
@@ -937,3 +899,122 @@
     justify-content: center;
 }
 
+
+/* Worn layer: declared last so it wins over the flat rules above with the same weight. */
+.title-screen {
+    background-image: url("Textures/Worn_Grime.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.pause {
+    background-color: rgba(8, 6, 4, 0.55);
+    background-image: url("Textures/Worn_Grime.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+/* Written straight on the screen in marker; the selected entry sits on a strip of tape. */
+.menu-item {
+    font-size: 30px;
+    -unity-font: url("Fonts/PermanentMarker-Regular.ttf");
+    color: rgb(222, 216, 200);
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.9);
+    padding: 10px 34px 6px 34px;
+    border-left-width: 0;
+    transition-property: color;
+}
+
+.menu-item--selected {
+    color: rgb(29, 27, 24);
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("Textures/Worn_Tape.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+    -unity-slice-scale: 0.6px;
+}
+
+.option-label,
+.option-value {
+    font-size: 22px;
+}
+
+.menu-item--selected .option-label {
+    color: rgb(29, 27, 24);
+}
+
+.menu-item--selected .option-value {
+    color: rgb(120, 24, 18);
+}
+
+.menu-title {
+    font-size: 64px;
+    padding-bottom: 22px;
+    border-bottom-width: 0;
+    background-image: url("Textures/Worn_Stroke.png");
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 100% 26px;
+}
+
+/* A scrap of the same paper as the notes, typed. */
+.keycap {
+    color: rgb(29, 27, 24);
+    background-color: rgb(201, 187, 152);
+    border-radius: 2px;
+    padding: 5px 9px 1px 9px;
+    font-size: 15px;
+    -unity-font: url("Fonts/SpecialElite-Regular.ttf");
+}
+
+.controls-key--waiting {
+    color: rgb(170, 36, 30);
+}
+
+.inventory-panel {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("Textures/Worn_Panel.png");
+    -unity-slice-left: 48;
+    -unity-slice-right: 48;
+    -unity-slice-top: 48;
+    -unity-slice-bottom: 48;
+    border-top-width: 0;
+    border-radius: 0;
+}
+
+/* Notes on torn paper, in ink. */
+.tip,
+.toast,
+.status {
+    color: rgb(29, 27, 24);
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("Textures/Worn_Paper.png");
+    -unity-slice-left: 60;
+    -unity-slice-right: 60;
+    -unity-slice-top: 60;
+    -unity-slice-bottom: 60;
+    -unity-slice-scale: 0.4px;
+    border-left-width: 0;
+}
+
+.tip {
+    padding: 20px 26px 18px 26px;
+}
+
+.toast,
+.status {
+    padding: 12px 22px 9px 22px;
+}
+
+.tip-title {
+    color: rgb(120, 24, 18);
+}
+
+.tip-text {
+    color: rgb(29, 27, 24);
+}
+
+.status--danger {
+    color: rgb(150, 28, 22);
+}
