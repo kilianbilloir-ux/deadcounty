@@ -14,7 +14,8 @@ namespace DeadCounty.Player
     //   TitleScreen in the scene asks for it; without one the game starts at once.
     // - Pause, on Cancel: Reprendre, Options, Menu principal, Quitter, with the clock stopped.
     // - Options: mouse sensitivity, vertical look inversion, full screen, interface size, one-time tips and reduced
-    //   flashes, kept in PlayerPrefs (the last three through GameSettings).
+    //   flashes, kept in PlayerPrefs (the last three through GameSettings), and the keyboard keys (KeyBindings):
+    //   Submit on a key waits for the new one, Escape cancels.
     // Menu principal, from the pause or with Cancel on the death screen, reloads the scene, which brings the title
     // back. Runs before the inventory screen, which closes itself on Cancel: an open inventory is closed, not paused.
     [DefaultExecutionOrder(-10)]
@@ -43,11 +44,12 @@ namespace DeadCounty.Player
         PlayerDeathFlow deathFlow;
         PlayerInventoryScreen inventoryScreen;
         InputAction cancel, submit, navigate;
-        VisualElement titleScreen, pauseScreen, mainPage, settingsPage, sensitivityBar, sensitivityFill;
+        readonly List<Label> keyLabels = new();
+        VisualElement titleScreen, pauseScreen, mainPage, settingsPage, controlsPage, sensitivityBar, sensitivityFill;
         Label invertValue, fullscreenValue, uiScaleValue, tipsValue, flashesValue;
         KeyHint titleConfirmHint, confirmHint, backHint;
         // The page on screen, null while every menu is closed; settingsReturn is the page Options was opened from.
-        List<Item> titleItems, mainItems, settingsItems, items, settingsReturn;
+        List<Item> titleItems, mainItems, settingsItems, controlsItems, items, settingsReturn;
         int selected;
         Vector2Int held;
         float repeatAt, timeScaleBefore = 1f;
@@ -55,8 +57,11 @@ namespace DeadCounty.Player
 
         // From ShowTitle until Jouer, Options included.
         public bool OnTitle { get; private set; }
+        // The title page itself, over the world it shows off.
+        public bool TitleShown => items != null && items == titleItems;
         public bool Paused => items != null && !OnTitle;
         public bool InSettings => items == settingsItems;
+        public bool InControls => items == controlsItems;
 
         // Jouer was chosen on the title.
         public event Action Started;
@@ -92,6 +97,7 @@ namespace DeadCounty.Player
             pauseScreen = Find<VisualElement>(root, "pause");
             mainPage = Find<VisualElement>(root, "pause-main");
             settingsPage = Find<VisualElement>(root, "pause-settings");
+            controlsPage = Find<VisualElement>(root, "pause-controls");
             sensitivityFill = Find<VisualElement>(root, "option-sensitivity-fill");
             sensitivityBar = sensitivityFill.parent;
             invertValue = Find<Label>(root, "option-invert-value");
@@ -121,8 +127,12 @@ namespace DeadCounty.Player
                 Entry(root, "option-ui-scale", CycleUiScale, StepUiScale),
                 Entry(root, "option-tips", ToggleTips, _ => ToggleTips()),
                 Entry(root, "option-flashes", ToggleFlashes, _ => ToggleFlashes()),
+                Entry(root, "option-controls", () => ShowPage(controlsItems)),
                 Entry(root, "option-back", () => ShowPage(settingsReturn)),
             };
+            controlsItems = BuildControls(Find<VisualElement>(root, "controls-list"));
+            controlsItems.Add(Entry(root, "controls-reset", KeyBindings.ResetAll));
+            controlsItems.Add(Entry(root, "controls-back", () => ShowPage(settingsItems)));
             // Clicking along the bar sets the sensitivity there.
             sensitivityBar.pickingMode = PickingMode.Position;
             sensitivityBar.RegisterCallback<ClickEvent>(e =>
@@ -133,42 +143,88 @@ namespace DeadCounty.Player
             confirmHint = new KeyHint(hints, "Valider");
             backHint = new KeyHint(hints, "Retour");
             ShowKeys();
-            InputPrompts.DeviceChanged += ShowKeys;
+            InputPrompts.KeysChanged += ShowKeys;
             ShowPage(null);
             if (titleRequested) ShowTitle();
         }
 
-        void OnDestroy() => InputPrompts.DeviceChanged -= ShowKeys;
+        void OnDestroy() => InputPrompts.KeysChanged -= ShowKeys;
 
         void OnDisable()
         {
+            KeyBindings.Cancel();
             if (items != null) Time.timeScale = timeScaleBefore;
         }
 
         T Find<T>(VisualElement root, string elementName) where T : VisualElement =>
             root.Q<T>(elementName) ?? throw new InvalidOperationException($"GameMenu on '{name}': the HUD has no '{elementName}' {typeof(T).Name}");
 
-        Item Entry(VisualElement root, string elementName, Action activate, Action<int> adjust = null)
+        Item Entry(VisualElement root, string elementName, Action activate, Action<int> adjust = null) =>
+            Entry(Find<VisualElement>(root, elementName), activate, adjust);
+
+        Item Entry(VisualElement element, Action activate, Action<int> adjust = null)
         {
-            var item = new Item { Element = Find<VisualElement>(root, elementName), Activate = activate, Adjust = adjust };
-            item.Element.RegisterCallback<PointerEnterEvent>(_ =>
+            var item = new Item { Element = element, Activate = activate, Adjust = adjust };
+            element.RegisterCallback<PointerEnterEvent>(_ =>
             {
                 var index = items?.IndexOf(item) ?? -1;
                 if (index >= 0) Select(index);
             });
-            item.Element.RegisterCallback<ClickEvent>(_ => item.Activate?.Invoke());
+            element.RegisterCallback<ClickEvent>(_ =>
+            {
+                if (!KeyBindings.Rebinding) item.Activate?.Invoke();
+            });
             return item;
         }
 
+        // One row per rebindable key: what it does, then the key in its frame.
+        List<Item> BuildControls(VisualElement list)
+        {
+            var rows = new List<Item>();
+            foreach (var binding in KeyBindings.Rows)
+            {
+                var row = new VisualElement();
+                row.AddToClassList("menu-item");
+                row.AddToClassList("option-row");
+                row.AddToClassList("controls-row");
+                var label = new Label(binding.Label) { pickingMode = PickingMode.Ignore };
+                label.AddToClassList("option-label");
+                var key = new Label { pickingMode = PickingMode.Ignore };
+                key.AddToClassList("keycap");
+                key.AddToClassList("controls-key");
+                row.Add(label);
+                row.Add(key);
+                list.Add(row);
+                keyLabels.Add(key);
+                rows.Add(Entry(row, () => Rebind(binding, key)));
+            }
+            return rows;
+        }
+
+        void Rebind(KeyBindings.Row binding, Label key)
+        {
+            key.text = "Appuyez sur une touche";
+            key.AddToClassList("controls-key--waiting");
+            KeyBindings.Rebind(binding, () =>
+            {
+                key.RemoveFromClassList("controls-key--waiting");
+                key.text = KeyBindings.Key(binding);
+            });
+        }
+
+        // Also runs once a key has been rebound or the keys reset.
         void ShowKeys()
         {
             titleConfirmHint.SetKey(InputPrompts.SubmitKey);
             confirmHint.SetKey(InputPrompts.SubmitKey);
             backHint.SetKey(InputPrompts.CancelKey);
+            for (var i = 0; i < keyLabels.Count; i++) keyLabels[i].text = KeyBindings.Key(KeyBindings.Rows[i]);
         }
 
         void Update()
         {
+            // The key that ends a rebinding wait, Escape included, belongs to the wait.
+            if (KeyBindings.Rebinding || KeyBindings.EndedThisFrame) return;
             if (items == null)
             {
                 if (!cancel.WasPressedThisFrame()) return;
@@ -179,7 +235,8 @@ namespace DeadCounty.Player
             // The title has nothing to go back to.
             if (cancel.WasPressedThisFrame())
             {
-                if (InSettings) ShowPage(settingsReturn);
+                if (InControls) ShowPage(settingsItems);
+                else if (InSettings) ShowPage(settingsReturn);
                 else if (Paused) Resume();
                 return;
             }
@@ -255,9 +312,10 @@ namespace DeadCounty.Player
         {
             items = page;
             titleScreen.style.display = page == titleItems ? DisplayStyle.Flex : DisplayStyle.None;
-            pauseScreen.style.display = page == mainItems || page == settingsItems ? DisplayStyle.Flex : DisplayStyle.None;
+            pauseScreen.style.display = page == mainItems || page == settingsItems || page == controlsItems ? DisplayStyle.Flex : DisplayStyle.None;
             mainPage.style.display = page == mainItems ? DisplayStyle.Flex : DisplayStyle.None;
             settingsPage.style.display = page == settingsItems ? DisplayStyle.Flex : DisplayStyle.None;
+            controlsPage.style.display = page == controlsItems ? DisplayStyle.Flex : DisplayStyle.None;
             held = Vector2Int.zero;
             if (page == null) return;
             Select(0);

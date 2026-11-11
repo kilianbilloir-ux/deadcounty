@@ -174,7 +174,7 @@ namespace DeadCounty.Player
             health.Damaged += OnDamaged;
             inventory.Received += OnReceived;
             sleep.WokeUp += ShowToast;
-            InputPrompts.DeviceChanged += ShowKeys;
+            InputPrompts.KeysChanged += ShowKeys;
             GameSettings.Changed += ApplyUiScale;
         }
 
@@ -183,7 +183,7 @@ namespace DeadCounty.Player
             health.Damaged -= OnDamaged;
             inventory.Received -= OnReceived;
             sleep.WokeUp -= ShowToast;
-            InputPrompts.DeviceChanged -= ShowKeys;
+            InputPrompts.KeysChanged -= ShowKeys;
             GameSettings.Changed -= ApplyUiScale;
         }
 

@@ -95,11 +95,17 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
-        public IEnumerator TheTitleKeepsTheWorldSharp()
+        public IEnumerator TheTitleKeepsTheWorldSharpButNotItsOptions()
         {
+            var blur = Rig.transform.Find("MenuBlurVolume").GetComponent<Volume>();
             yield return ShowTitle();
             yield return new WaitForSecondsRealtime(0.4f);
-            Assert.That(Rig.transform.Find("MenuBlurVolume").GetComponent<Volume>().weight, Is.Zero, "the world behind the title must not be blurred");
+            Assert.That(blur.weight, Is.Zero, "the world behind the title must not be blurred");
+
+            yield return Press(Key.DownArrow);
+            yield return Press(Key.Enter);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Assert.That(blur.weight, Is.EqualTo(1f), "the options list needs the blurred, darkened backdrop to read");
         }
 
         [UnityTest]
@@ -168,6 +174,49 @@ namespace DeadCounty.Tests
             {
                 GameSettings.UiScale = savedScale;
                 GameSettings.Tips = savedTips;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator ControlsRebindAKeySwapTheOneItTookAndEscapeCancels()
+        {
+            var savedOverrides = InputSystem.actions.SaveBindingOverridesAsJson();
+            var savedPrefs = PlayerPrefs.GetString("dc.bindings", null);
+            var jump = KeyBindings.Rows[7];
+            var interact = KeyBindings.Rows[8];
+            try
+            {
+                InputSystem.actions.RemoveAllBindingOverrides();
+                yield return Press(Key.Escape);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                for (var i = 0; i < 6; i++) yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                Assert.That(pause.InControls, "Enter on Contrôles did not open the keys");
+                for (var i = 0; i < 7; i++) yield return Press(Key.DownArrow);
+                Assert.That(jump.Label, Is.EqualTo("Sauter"));
+                yield return Press(Key.Enter);
+                Assert.That(KeyBindings.Rebinding, "Enter on a key must wait for the new one");
+
+                yield return Press(Key.E);
+                Assert.That(KeyBindings.Rebinding, Is.False);
+                Assert.That(KeyBindings.Key(jump), Is.EqualTo("E"));
+                Assert.That(KeyBindings.Key(interact), Is.EqualTo("Espace"), "the action that had the key must take the old one");
+                Assert.That(PlayerPrefs.GetString("dc.bindings", ""), Does.Contain("<Keyboard>/e"));
+
+                yield return Press(Key.Enter);
+                yield return Press(Key.Escape);
+                Assert.That(KeyBindings.Rebinding, Is.False);
+                Assert.That(pause.InControls, "Escape must cancel the wait, not leave the page");
+                Assert.That(KeyBindings.Key(jump), Is.EqualTo("E"));
+            }
+            finally
+            {
+                KeyBindings.Cancel();
+                InputSystem.actions.RemoveAllBindingOverrides();
+                InputSystem.actions.LoadBindingOverridesFromJson(savedOverrides);
+                if (savedPrefs == null) PlayerPrefs.DeleteKey("dc.bindings");
+                else PlayerPrefs.SetString("dc.bindings", savedPrefs);
             }
         }
 
