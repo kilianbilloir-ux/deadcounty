@@ -84,8 +84,8 @@ namespace DeadCounty.Tests
             Assert.That(Opacity(hunger), Is.EqualTo(1f).Within(0.01f));
             Assert.That(Opacity(fatigue), Is.EqualTo(0f).Within(0.01f), "a need above half must stay hidden");
             Assert.That(thirstGauge.Value, Is.EqualTo(needs.Model.Thirst).Within(0.01f));
-            Assert.That(thirstGauge.ClassListContains("need-gauge--low"), Is.True, "a low need must take the danger colour");
-            Assert.That(Element<RadialGauge>("hunger-gauge").ClassListContains("need-gauge--low"), Is.False);
+            Assert.That(thirst.ClassListContains("need--low"), Is.True, "a low need must take the danger colour");
+            Assert.That(hunger.ClassListContains("need--low"), Is.False);
         }
 
         [UnityTest]

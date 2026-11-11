@@ -1,31 +1,64 @@
+using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 
 namespace DeadCounty.Player
 {
-    // On-screen key prompts read from the project-wide action bindings, so they follow any rebinding.
+    // On-screen key prompts read from the project-wide action bindings, so they follow any rebinding. Prompts show
+    // the key of the device last pressed: the keyboard until a gamepad button is pressed, and back.
     public static class InputPrompts
     {
-        // "E / Y": the keyboard and gamepad buttons of an action, or null without project-wide actions.
-        public static string Keys(string actionPath)
+        const string KeyboardGroup = "Keyboard&Mouse";
+        const string GamepadGroup = "Gamepad";
+        const InputBinding.DisplayStringOptions Options = InputBinding.DisplayStringOptions.DontIncludeInteractions;
+
+        static IDisposable listener;
+
+        public static bool GamepadActive { get; private set; }
+
+        // Raised when the player switches between keyboard and gamepad, so prompts can be redrawn.
+        public static event Action DeviceChanged;
+
+        // "E" on keyboard, "Y" on gamepad; null without project-wide actions.
+        public static string Key(string actionPath)
         {
             var action = InputSystem.actions?.FindAction(actionPath);
-            if (action == null) return null;
-            const InputBinding.DisplayStringOptions options = InputBinding.DisplayStringOptions.DontIncludeInteractions;
-            return $"{action.GetBindingDisplayString(options, "Keyboard&Mouse")} / {action.GetBindingDisplayString(options, "Gamepad")}";
+            return action == null ? null : French(action.GetBindingDisplayString(Options, GamepadActive ? GamepadGroup : KeyboardGroup));
         }
 
-        // "1 2": the keyboard keys of two actions, for compact hints.
-        public static string KeyboardKeys(string firstAction, string secondAction)
+        // The Input System names keys in English.
+        static string French(string key) => key switch
         {
-            var actions = InputSystem.actions;
-            if (actions == null) return null;
-            const InputBinding.DisplayStringOptions options = InputBinding.DisplayStringOptions.DontIncludeInteractions;
-            var first = actions.FindAction(firstAction, true).GetBindingDisplayString(options, "Keyboard&Mouse");
-            var second = actions.FindAction(secondAction, true).GetBindingDisplayString(options, "Keyboard&Mouse");
-            return $"{first} {second}";
-        }
+            "Space" => "Espace",
+            "Esc" or "Escape" => "Échap",
+            "Enter" => "Entrée",
+            "Shift" or "Left Shift" => "Maj",
+            "Right Shift" => "Maj droite",
+            "Backspace" => "Retour",
+            "Delete" => "Suppr",
+            "Left Alt" or "Alt" => "Alt",
+            "Left Ctrl" or "Ctrl" => "Ctrl",
+            _ => key,
+        };
 
-        // "[E / Y] Ouvrir", or the bare action without keys.
-        public static string Prompt(string keys, string action) => keys == null ? action : $"[{keys}] {action}";
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Listen() => listener = InputSystem.onAnyButtonPress.Call(control =>
+        {
+            var gamepad = control.device is Gamepad;
+            if (gamepad == GamepadActive) return;
+            GamepadActive = gamepad;
+            DeviceChanged?.Invoke();
+        });
+
+        // Domain reload is disabled on entering Play mode: the previous session's listener must be dropped by hand.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            listener?.Dispose();
+            listener = null;
+            GamepadActive = false;
+            DeviceChanged = null;
+        }
     }
 }

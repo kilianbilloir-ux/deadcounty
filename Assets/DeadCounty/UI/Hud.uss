@@ -1,4 +1,6 @@
-/* Prototype HUD (GDD 8.11): desaturated palette, dried blood as the single danger accent. */
+/* HUD and screens (GDD 8.11): one font, a desaturated palette, dried blood as the single danger accent.
+   Bone rgb(217, 217, 217) · steel rgb(180, 188, 201) · ash rgb(138, 143, 150) · amber rgb(212, 185, 118)
+   · danger rgb(167, 95, 59) · panel rgb(26, 29, 34). Sizes are for 1080p; the panel scales with the screen. */
 .root {
     position: absolute;
     left: 0;
@@ -6,6 +8,8 @@
     right: 0;
     bottom: 0;
     flex-grow: 1;
+    -unity-font: url("Fonts/Inter-Regular.otf");
+    color: rgb(217, 217, 217);
 }
 
 .hit-flash {
@@ -18,74 +22,72 @@
     opacity: 0;
 }
 
+/* Bottom left: needs, then health and stamina, then the clock and the flashlight. */
 .hud {
     position: absolute;
     left: 0;
     bottom: 0;
-    padding-left: 28px;
-    padding-bottom: 28px;
-    padding-top: 28px;
-    padding-right: 28px;
+    padding: 32px;
     align-items: flex-start;
 }
 
 .needs {
     flex-direction: row;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .need {
     align-items: center;
-    width: 64px;
-    margin-right: 6px;
+    margin-right: 14px;
     opacity: 0;
 }
 
 .need-gauge {
-    width: 40px;
-    height: 40px;
-    --gauge-track: rgba(180, 188, 201, 0.3);
+    width: 46px;
+    height: 46px;
+    --gauge-track: rgba(180, 188, 201, 0.25);
     --gauge-fill: rgb(180, 188, 201);
     --gauge-thickness: 5;
 }
 
-.need-gauge--low {
-    --gauge-track: rgba(167, 95, 59, 0.55);
+.need--low .need-gauge {
     --gauge-fill: rgb(167, 95, 59);
 }
 
 .need-label {
-    margin-top: 3px;
-    font-size: 13px;
-    -unity-text-align: middle-center;
+    margin-top: 4px;
+    font-size: 15px;
     color: rgb(138, 143, 150);
+    -unity-text-align: middle-center;
+}
+
+.need--low .need-label {
+    color: rgb(200, 130, 100);
 }
 
 .bars {
     align-items: flex-start;
-    flex-direction: column;
 }
 
 .bar-row {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .bar-label {
-    width: 92px;
-    margin-right: 10px;
-    -unity-text-align: middle-right;
-    font-size: 15px;
+    width: 104px;
+    font-size: 16px;
     color: rgb(180, 188, 201);
+    -unity-text-align: middle-left;
 }
 
 .bar-frame {
-    width: 260px;
-    height: 14px;
-    background-color: rgba(26, 29, 34, 0.55);
+    width: 280px;
+    height: 12px;
+    background-color: rgba(10, 11, 13, 0.6);
     border-width: 1px;
-    border-color: rgba(212, 185, 118, 0.35);
+    border-color: rgba(180, 188, 201, 0.25);
 }
 
 .bar-fill {
@@ -110,34 +112,56 @@
 }
 
 .stamina-row .bar-frame {
-    height: 7px;
+    height: 6px;
 }
 
 .readouts {
     flex-direction: row;
     align-items: center;
-    margin-top: 6px;
+    margin-top: 10px;
 }
 
 .readout {
     font-size: 16px;
-    margin-right: 14px;
+    margin-right: 18px;
     color: rgb(138, 143, 150);
-}
-
-.flashlight-readout {
-    color: rgb(212, 185, 118);
-    opacity: 0.45;
-}
-
-.flashlight-readout--on {
-    opacity: 1;
 }
 
 .time-readout {
     color: rgb(180, 188, 201);
 }
 
+.flashlight-readout--on {
+    color: rgb(212, 185, 118);
+}
+
+/* Key prompts: the key in a frame, then the action. */
+.prompt-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.keycap {
+    min-width: 26px;
+    padding: 2px 7px;
+    margin-right: 8px;
+    font-size: 15px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(217, 217, 217);
+    background-color: rgba(10, 11, 13, 0.7);
+    border-width: 1px;
+    border-radius: 4px;
+    border-color: rgba(212, 185, 118, 0.7);
+}
+
+.prompt-action {
+    font-size: 17px;
+    color: rgb(212, 185, 118);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Interaction prompt beside the object (Valheim): its name, then the key and the action. */
 .interaction {
     position: absolute;
     left: 0;
@@ -148,56 +172,59 @@
 }
 
 .interaction-progress {
-    width: 30px;
-    height: 30px;
-    margin-right: 8px;
-    --gauge-track: rgba(10, 11, 13, 0.55);
+    width: 34px;
+    height: 34px;
+    margin-right: 10px;
+    --gauge-track: rgba(10, 11, 13, 0.6);
     --gauge-fill: rgb(212, 185, 118);
     --gauge-thickness: 4;
     display: none;
 }
 
-.loot-toast {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 150px;
-    -unity-text-align: middle-center;
-    font-size: 18px;
-    color: rgb(217, 217, 217);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    opacity: 0;
-}
-
 .interaction-name {
     font-size: 20px;
     -unity-font-style: bold;
+    margin-bottom: 4px;
     color: rgb(217, 217, 217);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
 }
 
-.interaction-action {
-    font-size: 18px;
-    color: rgb(212, 185, 118);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.statuses {
+/* Short messages: found items, why the player woke up. */
+.toast-row {
     position: absolute;
-    top: 28px;
-    right: 28px;
-    align-items: flex-end;
+    left: 0;
+    right: 0;
+    bottom: 170px;
+    align-items: center;
+}
+
+.toast {
+    font-size: 18px;
+    padding: 8px 18px;
+    color: rgb(217, 217, 217);
+    background-color: rgba(26, 29, 34, 0.85);
+    border-left-width: 3px;
+    border-color: rgb(212, 185, 118);
+    opacity: 0;
 }
 
 /* Afflictions on the right, after The Long Dark; only the active ones show (GDD 8.4, moodles). */
+.statuses {
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    align-items: flex-end;
+}
+
 .status {
-    font-size: 14px;
+    font-size: 15px;
     -unity-font-style: bold;
+    letter-spacing: 1px;
     color: rgb(217, 217, 217);
-    padding: 4px 10px;
-    margin-bottom: 6px;
-    background-color: rgba(26, 29, 34, 0.75);
-    border-right-width: 3px;
+    padding: 6px 12px;
+    margin-bottom: 8px;
+    background-color: rgba(26, 29, 34, 0.8);
+    border-left-width: 3px;
     border-color: rgb(212, 185, 118);
     display: none;
 }
@@ -205,6 +232,14 @@
 .status--danger {
     border-color: rgb(167, 95, 59);
     color: rgb(230, 170, 140);
+}
+
+/* Full-screen screens: sleep and game over, over a darkened scene (Crow Country). */
+.screen-title {
+    font-size: 54px;
+    -unity-font-style: bold;
+    letter-spacing: 6px;
+    margin-bottom: 16px;
 }
 
 .sleep {
@@ -221,16 +256,42 @@
 }
 
 .sleep-title {
-    font-size: 28px;
+    font-size: 36px;
     color: rgb(180, 188, 201);
-    margin-bottom: 10px;
 }
 
 .sleep-time {
-    font-size: 20px;
+    font-size: 22px;
     color: rgb(138, 143, 150);
 }
 
+.game-over {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(5, 6, 8, 0.82);
+    opacity: 0;
+    display: none;
+}
+
+.game-over-title {
+    color: rgb(167, 95, 59);
+}
+
+.game-over-line {
+    font-size: 22px;
+    color: rgb(180, 188, 201);
+}
+
+.game-over-prompt-row {
+    margin-top: 36px;
+}
+
+/* Inventory (GDD 8.5): the character's state on the left, the list on the right. */
 .inventory {
     position: absolute;
     left: 0;
@@ -239,66 +300,67 @@
     bottom: 0;
     justify-content: center;
     align-items: center;
-    background-color: rgba(10, 11, 13, 0.6);
+    background-color: rgba(5, 6, 8, 0.7);
     display: none;
 }
 
 .inventory-panel {
     flex-direction: row;
-    width: 1040px;
-    height: 600px;
-    padding: 28px;
+    width: 1100px;
+    height: 640px;
+    padding: 32px;
     background-color: rgb(26, 29, 34);
     border-width: 1px;
-    border-color: rgba(212, 185, 118, 0.35);
+    border-color: rgba(212, 185, 118, 0.3);
+}
+
+.panel-title {
+    font-size: 15px;
+    -unity-font-style: bold;
+    letter-spacing: 3px;
+    color: rgb(138, 143, 150);
+    margin-bottom: 18px;
 }
 
 .inventory-status {
     width: 300px;
-    margin-right: 36px;
+    margin-right: 40px;
+    padding-right: 32px;
+    border-right-width: 1px;
+    border-color: rgba(180, 188, 201, 0.12);
 }
 
 .inventory-items {
     flex-grow: 1;
 }
 
-.inventory-title {
-    font-size: 22px;
-    -unity-font-style: bold;
-    color: rgb(217, 217, 217);
+.stat-row {
     margin-bottom: 16px;
 }
 
-.inventory-header {
+.stat-head {
     flex-direction: row;
     justify-content: space-between;
-}
-
-.inventory-weight {
-    font-size: 20px;
-    color: rgb(180, 188, 201);
-}
-
-.inventory-weight--over {
-    color: rgb(167, 95, 59);
-    -unity-font-style: bold;
-}
-
-.stat-row {
-    margin-bottom: 14px;
+    margin-bottom: 5px;
 }
 
 .stat-label {
+    font-size: 16px;
+    color: rgb(217, 217, 217);
+}
+
+.stat-word {
     font-size: 15px;
-    color: rgb(180, 188, 201);
-    margin-bottom: 4px;
+    color: rgb(138, 143, 150);
+}
+
+.stat-word--low {
+    color: rgb(200, 130, 100);
 }
 
 .stat-bar {
-    height: 12px;
+    height: 8px;
     background-color: rgba(10, 11, 13, 0.8);
-    border-width: 1px;
-    border-color: rgba(212, 185, 118, 0.25);
 }
 
 .stat-fill {
@@ -307,22 +369,62 @@
     background-color: rgb(180, 188, 201);
 }
 
+.stat-fill--stamina {
+    background-color: rgb(212, 185, 118);
+}
+
 .stat-fill--low {
     background-color: rgb(167, 95, 59);
 }
 
 .inventory-warning {
-    margin-top: 10px;
+    margin-top: 8px;
+    padding: 8px 10px;
     font-size: 15px;
-    color: rgb(167, 95, 59);
+    color: rgb(230, 170, 140);
+    background-color: rgba(167, 95, 59, 0.15);
+    border-left-width: 3px;
+    border-color: rgb(167, 95, 59);
     white-space: normal;
+}
+
+.inventory-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.inventory-weight {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(217, 217, 217);
+}
+
+.inventory-weight--over {
+    color: rgb(167, 95, 59);
+}
+
+.capacity-bar {
+    height: 4px;
+    margin-bottom: 16px;
+    background-color: rgba(10, 11, 13, 0.8);
+}
+
+.capacity-fill {
+    height: 100%;
+    width: 0;
+    background-color: rgb(180, 188, 201);
+}
+
+.capacity-fill--over {
+    background-color: rgb(167, 95, 59);
 }
 
 .item-columns {
     flex-direction: row;
-    padding: 0 10px 6px 10px;
+    padding: 0 12px 8px 15px;
     border-bottom-width: 1px;
-    border-color: rgba(212, 185, 118, 0.25);
+    border-color: rgba(180, 188, 201, 0.15);
 }
 
 .item-column {
@@ -340,7 +442,7 @@
 }
 
 .item-category {
-    width: 160px;
+    width: 170px;
 }
 
 .item-weight {
@@ -355,45 +457,67 @@
 
 .item-row {
     flex-direction: row;
-    padding: 7px 10px;
+    padding: 9px 12px;
+    border-left-width: 3px;
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.item-row:hover {
+    background-color: rgba(180, 188, 201, 0.06);
 }
 
 .item-row--selected {
-    background-color: rgba(212, 185, 118, 0.18);
+    background-color: rgba(212, 185, 118, 0.1);
+    border-color: rgb(212, 185, 118);
 }
 
 .item-row > Label {
-    font-size: 16px;
+    font-size: 17px;
     color: rgb(217, 217, 217);
 }
 
 .item-row .item-category,
 .item-row .item-weight {
+    font-size: 16px;
     color: rgb(138, 143, 150);
 }
 
 .inventory-empty {
     font-size: 16px;
     color: rgb(138, 143, 150);
-    margin: 12px 10px;
+    margin: 14px 15px;
 }
 
 .item-detail {
-    min-height: 44px;
-    margin-top: 10px;
+    min-height: 46px;
+    margin-top: 12px;
+    padding-top: 12px;
+    font-size: 16px;
+    color: rgb(180, 188, 201);
+    border-top-width: 1px;
+    border-color: rgba(180, 188, 201, 0.15);
+    white-space: normal;
+}
+
+.hints {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.hints .prompt-row {
+    margin-right: 22px;
+    margin-top: 6px;
+}
+
+.hints .prompt-action {
     font-size: 15px;
     color: rgb(180, 188, 201);
-    white-space: normal;
+    text-shadow: none;
 }
 
-.inventory-hints {
-    margin-top: 8px;
-    white-space: normal;
-    font-size: 14px;
-    color: rgb(212, 185, 118);
-}
-
-.game-over {
+/* Pause (GDD 8.11, after Risk of Rain 2): a few centred text entries over the darkened game. */
+.pause {
     position: absolute;
     left: 0;
     top: 0;
@@ -401,25 +525,74 @@
     bottom: 0;
     justify-content: center;
     align-items: center;
-    background-color: rgb(0, 0, 0);
-    opacity: 0;
+    background-color: rgba(5, 6, 8, 0.9);
     display: none;
 }
 
-.game-over-title {
-    font-size: 42px;
-    -unity-font-style: bold;
-    color: rgb(167, 95, 59);
-    margin-bottom: 14px;
+.menu {
+    align-items: center;
+    min-width: 520px;
 }
 
-.game-over-line {
-    font-size: 20px;
+.menu-title {
+    color: rgb(180, 188, 201);
+    margin-bottom: 30px;
+}
+
+.menu-item {
+    font-size: 24px;
+    padding: 9px 24px;
+    margin-bottom: 4px;
+    color: rgb(180, 188, 201);
+    -unity-text-align: middle-center;
+    border-left-width: 3px;
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.menu-item--selected {
     color: rgb(217, 217, 217);
-    margin-top: 6px;
+    background-color: rgba(212, 185, 118, 0.1);
+    border-color: rgb(212, 185, 118);
 }
 
-.game-over-prompt {
-    margin-top: 24px;
+.option-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 520px;
+}
+
+.option-label {
+    font-size: 20px;
     color: rgb(180, 188, 201);
 }
+
+.menu-item--selected .option-label {
+    color: rgb(217, 217, 217);
+}
+
+/* Same width as the bar, so values and bars start on one line. */
+.option-value {
+    width: 160px;
+    font-size: 20px;
+    color: rgb(212, 185, 118);
+}
+
+.option-bar {
+    width: 160px;
+    height: 8px;
+    background-color: rgba(10, 11, 13, 0.8);
+}
+
+.option-fill {
+    height: 100%;
+    width: 50%;
+    background-color: rgb(212, 185, 118);
+}
+
+.menu-hints {
+    position: absolute;
+    bottom: 48px;
+    justify-content: center;
+}
+

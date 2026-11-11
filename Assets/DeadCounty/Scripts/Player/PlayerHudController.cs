@@ -48,15 +48,17 @@ namespace DeadCounty.Player
         PlayerInteractor interactor;
         PlayerInventory inventory;
         PlayerSleep sleep;
+        ThirdPersonController controller;
         DayNightDirector director;
         VisualElement hud, healthRow, staminaRow, readouts, healthFill, staminaFill, flash, gameOver;
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
         RadialGauge hungerGauge, thirstGauge, fatigueGauge;
         VisualElement interaction;
-        Label interactionName, interactionAction, toast;
+        Label interactionName, interactionAction, interactionKey, gameOverKey, toast;
+        VisualElement interactionRow;
         RadialGauge interactionProgress;
         Interactable shownInteractable;
-        string shownAction, interactKeys;
+        string shownAction;
         Label flashlightLabel, time, gameOverTitle, gameOverTime, gameOverPrompt;
         StringBuilder text;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
@@ -83,9 +85,10 @@ namespace DeadCounty.Player
             interactor = GetComponentInChildren<PlayerInteractor>(true);
             inventory = GetComponentInChildren<PlayerInventory>(true);
             sleep = GetComponentInChildren<PlayerSleep>(true);
+            controller = GetComponentInChildren<ThirdPersonController>(true);
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null || needs == null || interactor == null || inventory == null || sleep == null)
-                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerInventory and a PlayerSleep in its children");
+            if (health == null || stamina == null || needs == null || interactor == null || inventory == null || sleep == null || controller == null)
+                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerInventory, a PlayerSleep and a ThirdPersonController in its children");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -111,24 +114,30 @@ namespace DeadCounty.Player
             interaction = Find<VisualElement>(root, "interaction");
             interactionName = Find<Label>(root, "interaction-name");
             interactionAction = Find<Label>(root, "interaction-action");
+            interactionKey = Find<Label>(root, "interaction-key");
+            interactionRow = Find<VisualElement>(root, "interaction-row");
             toast = Find<Label>(root, "loot-toast");
             interactionProgress = Find<RadialGauge>(root, "interaction-progress");
-            interactKeys = InputPrompts.Keys("Player/Interact");
             flashlightLabel = Find<Label>(root, "flashlight");
             time = Find<Label>(root, "time");
             gameOverTitle = Find<Label>(root, "game-over-title");
             gameOverTime = Find<Label>(root, "game-over-time");
             gameOverPrompt = Find<Label>(root, "game-over-prompt");
+            gameOverKey = Find<Label>(root, "game-over-key");
             text = new StringBuilder(32);
-            gameOverPrompt.text = RestartPrompt();
+            ShowKeys();
             time.style.display = director != null ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         T Find<T>(VisualElement root, string elementName) where T : VisualElement =>
             root.Q<T>(elementName) ?? throw new InvalidOperationException($"PlayerHudController on '{name}': the HUD has no '{elementName}' {typeof(T).Name}");
 
-        // Respawn is bound to Jump.
-        static string RestartPrompt() => InputPrompts.Prompt(InputPrompts.Keys("Player/Jump"), "Recommencer");
+        // Keys of the device in use; respawn is bound to Jump.
+        void ShowKeys()
+        {
+            interactionKey.text = InputPrompts.Key("Player/Interact");
+            gameOverKey.text = InputPrompts.Key("Player/Jump");
+        }
 
         // Not in Awake: the pools are created in the health and stamina Awakes, which may run after this one.
         void Start()
@@ -143,6 +152,7 @@ namespace DeadCounty.Player
             health.Damaged += OnDamaged;
             inventory.Received += OnReceived;
             sleep.WokeUp += ShowToast;
+            InputPrompts.DeviceChanged += ShowKeys;
         }
 
         void OnDisable()
@@ -150,6 +160,7 @@ namespace DeadCounty.Player
             health.Damaged -= OnDamaged;
             inventory.Received -= OnReceived;
             sleep.WokeUp -= ShowToast;
+            InputPrompts.DeviceChanged -= ShowKeys;
         }
 
         void OnReceived(IReadOnlyList<ItemStack> items)
@@ -200,9 +211,10 @@ namespace DeadCounty.Player
             if (lit != flashlightWasOn)
             {
                 flashlightWasOn = lit;
+                flashlightLabel.text = lit ? "Lampe allumée" : "Lampe éteinte";
+                flashlightLabel.EnableInClassList("flashlight-readout--on", lit);
                 ShowReadouts();
             }
-            flashlightLabel.EnableInClassList("flashlight-readout--on", lit);
             UpdateClock();
 
             var showHealth = healthRatio < 1f || now - health.LastHitTime < HealthShowTime;
@@ -219,7 +231,8 @@ namespace DeadCounty.Player
 
             flashValue = Mathf.Max(flashValue - dt / hitFlashTime, 0f);
             flash.style.opacity = flashValue * hitFlashAlpha;
-            hud.style.display = alive ? DisplayStyle.Flex : DisplayStyle.None;
+            // Menus cover it: the inventory shows the same stats, the pause hides the game.
+            hud.style.display = alive && !controller.MenuOpen ? DisplayStyle.Flex : DisplayStyle.None;
             UpdateInteraction(alive);
             UpdateGameOver();
         }
@@ -233,7 +246,7 @@ namespace DeadCounty.Player
         static void UpdateNeed(VisualElement need, RadialGauge gauge, ref float opacity, float value, bool alive, bool readoutsShown, float dt)
         {
             gauge.Value = value;
-            gauge.EnableInClassList("need-gauge--low", value <= LowNeed);
+            need.EnableInClassList("need--low", value <= LowNeed);
             Fade(need, ref opacity, alive && (value < NeedShowBelow || readoutsShown), dt);
         }
 
@@ -254,8 +267,8 @@ namespace DeadCounty.Player
                 shownInteractable = current;
                 shownAction = action;
                 interactionName.text = current.DisplayName;
-                interactionAction.text = action == null ? "" : InputPrompts.Prompt(interactKeys, action);
-                interactionAction.style.display = action == null ? DisplayStyle.None : DisplayStyle.Flex;
+                interactionAction.text = action ?? "";
+                interactionRow.style.display = action == null ? DisplayStyle.None : DisplayStyle.Flex;
             }
             interactionProgress.style.display = interactor.Busy ? DisplayStyle.Flex : DisplayStyle.None;
             if (interactor.Busy) interactionProgress.Value = interactor.UseProgress;
@@ -315,7 +328,9 @@ namespace DeadCounty.Player
             // Only the black screen fades back out after the respawn.
             gameOverTitle.style.display = dead ? DisplayStyle.Flex : DisplayStyle.None;
             gameOverTime.style.display = dead ? DisplayStyle.Flex : DisplayStyle.None;
-            gameOverPrompt.style.display = dead && deathFlow.CanRespawn ? DisplayStyle.Flex : DisplayStyle.None;
+            var prompt = dead && deathFlow.CanRespawn ? DisplayStyle.Flex : DisplayStyle.None;
+            gameOverPrompt.style.display = prompt;
+            gameOverKey.style.display = prompt;
         }
     }
 }

@@ -155,6 +155,7 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerHudController>(rig);
             added |= AddMissing<PlayerInventoryScreen>(rig);
             added |= AddMissing<PlayerConditionHud>(rig);
+            added |= AddMissing<PauseMenu>(rig);
             added |= EnsureFlashlight(player);
             added |= EnsureExhaustionVolume(rig, player);
             added |= AssignStartingItems(player);

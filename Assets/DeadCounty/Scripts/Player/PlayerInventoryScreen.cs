@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using DeadCounty.Items;
+using DeadCounty.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -24,7 +25,6 @@ namespace DeadCounty.Player
         const float RepeatInterval = 0.12f;
         const float LowHealth = 0.4f;
         const float LowNeed = 0.2f;
-        const string Separator = "   ·   ";
         static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
 
         ThirdPersonController controller;
@@ -33,13 +33,14 @@ namespace DeadCounty.Player
         PlayerNeeds needs;
         PlayerInventory inventory;
         InputAction toggle, cancel, move, use, drop, previous, next;
-        VisualElement screen, healthFill, staminaFill, hungerFill, thirstFill, fatigueFill;
-        Label weight, encumbered, empty, detail, hints, sortName, sortCategory, sortWeight;
+        VisualElement screen, healthFill, staminaFill, hungerFill, thirstFill, fatigueFill, capacityFill;
+        Label weight, encumbered, empty, detail, sortName, sortCategory, sortWeight;
+        Label healthWord, staminaWord, hungerWord, thirstWord, fatigueWord;
+        KeyHint useHint, dropHint, sortHint, closeHint;
         ScrollView list;
         readonly List<ItemStack> sorted = new();
         readonly List<VisualElement> rows = new();
         readonly StringBuilder text = new();
-        string useKeys, dropKeys, sortKeys, closeKeys;
         int selected, heldDirection;
         float repeatAt;
         bool dirty;
@@ -63,10 +64,6 @@ namespace DeadCounty.Player
             drop = actions.FindAction("Player/Drop", true);
             previous = actions.FindAction("Player/Previous", true);
             next = actions.FindAction("Player/Next", true);
-            useKeys = InputPrompts.Keys("Player/Interact");
-            dropKeys = InputPrompts.Keys("Player/Drop");
-            sortKeys = InputPrompts.KeyboardKeys("Player/Previous", "Player/Next");
-            closeKeys = InputPrompts.Keys("Player/Inventory");
         }
 
         T Require<T>() where T : Component
@@ -90,7 +87,19 @@ namespace DeadCounty.Player
             encumbered = Find<Label>(root, "inventory-encumbered");
             empty = Find<Label>(root, "inventory-empty");
             detail = Find<Label>(root, "item-detail");
-            hints = Find<Label>(root, "inventory-hints");
+            capacityFill = Find<VisualElement>(root, "inventory-capacity");
+            healthWord = Find<Label>(root, "stat-health-word");
+            staminaWord = Find<Label>(root, "stat-stamina-word");
+            hungerWord = Find<Label>(root, "stat-hunger-word");
+            thirstWord = Find<Label>(root, "stat-thirst-word");
+            fatigueWord = Find<Label>(root, "stat-fatigue-word");
+            var hints = Find<VisualElement>(root, "inventory-hints");
+            useHint = new KeyHint(hints);
+            dropHint = new KeyHint(hints, "Jeter");
+            sortHint = new KeyHint(hints, "Trier");
+            closeHint = new KeyHint(hints, "Fermer");
+            ShowKeys();
+            InputPrompts.DeviceChanged += ShowKeys;
             sortName = Find<Label>(root, "sort-name");
             sortCategory = Find<Label>(root, "sort-category");
             sortWeight = Find<Label>(root, "sort-weight");
@@ -105,6 +114,15 @@ namespace DeadCounty.Player
         void OnDestroy()
         {
             if (inventory != null && inventory.Items != null) inventory.Items.Changed -= MarkDirty;
+            InputPrompts.DeviceChanged -= ShowKeys;
+        }
+
+        void ShowKeys()
+        {
+            useHint.SetKey(InputPrompts.Key("Player/Interact"));
+            dropHint.SetKey(InputPrompts.Key("Player/Drop"));
+            sortHint.SetKey($"{InputPrompts.Key("Player/Previous")} {InputPrompts.Key("Player/Next")}");
+            closeHint.SetKey(InputPrompts.Key("Player/Inventory"));
         }
 
         T Find<T>(VisualElement root, string elementName) where T : VisualElement =>
@@ -120,7 +138,8 @@ namespace DeadCounty.Player
                 if (IsOpen) SetOpen(false);
                 return;
             }
-            if (toggle.WasPressedThisFrame()) SetOpen(!IsOpen);
+            // Another menu (pause) already holds the screen.
+            if (toggle.WasPressedThisFrame() && (IsOpen || !controller.MenuOpen)) SetOpen(!IsOpen);
             else if (IsOpen && cancel.WasPressedThisFrame()) SetOpen(false);
             if (!IsOpen) return;
 
@@ -204,12 +223,16 @@ namespace DeadCounty.Player
             var items = inventory.Items;
             weight.text = $"{items.Weight.ToString("0.0", French)} / {items.Capacity.ToString("0.#", French)} kg";
             weight.EnableInClassList("inventory-weight--over", items.Overloaded);
+            capacityFill.style.width = Length.Percent(Mathf.Clamp01(items.Weight / items.Capacity) * 100f);
+            capacityFill.EnableInClassList("capacity-fill--over", items.Overloaded);
             encumbered.style.display = items.Overloaded ? DisplayStyle.Flex : DisplayStyle.None;
             sortName.EnableInClassList("item-column--active", Sort == SortMode.Name);
             sortCategory.EnableInClassList("item-column--active", Sort == SortMode.Category);
             sortWeight.EnableInClassList("item-column--active", Sort == SortMode.Weight);
-            detail.text = Describe(Selected);
-            hints.text = Hints(Selected);
+            var item = Selected;
+            detail.text = Describe(item);
+            useHint.Show(item != null && item.Usable, item != null ? item.UseVerb : null);
+            dropHint.Show(item != null);
             dirty = false;
         }
 
@@ -257,30 +280,27 @@ namespace DeadCounty.Player
             return text.ToString();
         }
 
-        string Hints(ItemDefinition item)
-        {
-            text.Clear();
-            if (item != null && item.Usable) text.Append(InputPrompts.Prompt(useKeys, item.UseVerb)).Append(Separator);
-            if (item != null) text.Append(InputPrompts.Prompt(dropKeys, "Jeter")).Append(Separator);
-            text.Append(InputPrompts.Prompt(sortKeys, "Trier")).Append(Separator);
-            text.Append(InputPrompts.Prompt(closeKeys, "Fermer"));
-            return text.ToString();
-        }
-
+        // Words rather than numbers (GDD 8.4): the bar says how much, the word says what it means.
         void UpdateStats()
         {
             var model = needs.Model;
-            Bar(healthFill, health.Pool.Normalized, LowHealth);
-            Bar(staminaFill, stamina.Model.Normalized, 0f);
-            Bar(hungerFill, model.Hunger, LowNeed);
-            Bar(thirstFill, model.Thirst, LowNeed);
-            Bar(fatigueFill, model.Fatigue, LowNeed);
+            var healthValue = health.Pool.Normalized;
+            Stat(healthFill, healthWord, healthValue, healthValue <= LowHealth, healthValue >= 0.7f ? "Bonne" : healthValue > LowHealth ? "Blessé" : "Grave");
+            var staminaModel = stamina.Model;
+            Stat(staminaFill, staminaWord, staminaModel.Normalized, staminaModel.Exhausted, staminaModel.Exhausted ? "À bout de souffle" : "");
+            Stat(hungerFill, hungerWord, model.Hunger, model.Hunger <= LowNeed, Word(model.Hunger, "Rassasié", "Petit creux", "Affamé"));
+            Stat(thirstFill, thirstWord, model.Thirst, model.Thirst <= LowNeed, Word(model.Thirst, "Désaltéré", "Gorge sèche", "Assoiffé"));
+            Stat(fatigueFill, fatigueWord, model.Fatigue, model.Fatigue <= LowNeed, Word(model.Fatigue, "Reposé", "Fatigué", "Épuisé"));
         }
 
-        static void Bar(VisualElement fill, float value, float low)
+        static string Word(float value, string fine, string middle, string low) => value >= 0.5f ? fine : value > LowNeed ? middle : low;
+
+        static void Stat(VisualElement fill, Label word, float value, bool low, string text)
         {
             fill.style.width = Length.Percent(Mathf.Clamp01(value) * 100f);
-            fill.EnableInClassList("stat-fill--low", value <= low);
+            fill.EnableInClassList("stat-fill--low", low);
+            word.text = text;
+            word.EnableInClassList("stat-word--low", low);
         }
     }
 }

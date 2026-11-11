@@ -18,7 +18,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="bars" picking-mode="Ignore" class="bars">
                 <ui:VisualElement name="health-row" picking-mode="Ignore" class="bar-row">
-                    <ui:Label name="health-label" text="Vie" picking-mode="Ignore" class="bar-label" />
+                    <ui:Label name="health-label" text="Santé" picking-mode="Ignore" class="bar-label" />
                     <ui:VisualElement name="health-bar" picking-mode="Ignore" class="bar-frame">
                         <ui:VisualElement name="health-fill" picking-mode="Ignore" class="bar-fill health-fill" />
                     </ui:VisualElement>
@@ -31,18 +31,23 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="readouts" picking-mode="Ignore" class="readouts">
-                <ui:Label name="flashlight" text="Lampe" picking-mode="Ignore" class="readout flashlight-readout" />
                 <ui:Label name="time" text="Jour 1 — 11:00" picking-mode="Ignore" class="readout time-readout" />
+                <ui:Label name="flashlight" text="Lampe éteinte" picking-mode="Ignore" class="readout flashlight-readout" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="interaction" picking-mode="Ignore" class="interaction">
             <DeadCounty.UI.RadialGauge name="interaction-progress" picking-mode="Ignore" class="interaction-progress" />
             <ui:VisualElement picking-mode="Ignore">
                 <ui:Label name="interaction-name" picking-mode="Ignore" class="interaction-name" />
-                <ui:Label name="interaction-action" picking-mode="Ignore" class="interaction-action" />
+                <ui:VisualElement name="interaction-row" picking-mode="Ignore" class="prompt-row">
+                    <ui:Label name="interaction-key" picking-mode="Ignore" class="keycap" />
+                    <ui:Label name="interaction-action" picking-mode="Ignore" class="prompt-action" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label name="loot-toast" picking-mode="Ignore" class="loot-toast" />
+        <ui:VisualElement picking-mode="Ignore" class="toast-row">
+            <ui:Label name="loot-toast" picking-mode="Ignore" class="toast" />
+        </ui:VisualElement>
         <ui:VisualElement name="statuses" picking-mode="Ignore" class="statuses">
             <ui:Label name="status-bleeding" text="SAIGNEMENT" picking-mode="Ignore" class="status status--danger" />
             <ui:Label name="status-hungry" text="AFFAMÉ" picking-mode="Ignore" class="status" />
@@ -51,49 +56,67 @@
             <ui:Label name="status-encumbered" text="SURCHARGÉ" picking-mode="Ignore" class="status" />
         </ui:VisualElement>
         <ui:VisualElement name="sleep" picking-mode="Ignore" class="sleep">
-            <ui:Label text="Vous dormez…" picking-mode="Ignore" class="sleep-title" />
+            <ui:Label text="VOUS DORMEZ" picking-mode="Ignore" class="screen-title sleep-title" />
             <ui:Label name="sleep-time" picking-mode="Ignore" class="sleep-time" />
         </ui:VisualElement>
         <ui:VisualElement name="inventory" class="inventory">
             <ui:VisualElement class="inventory-panel">
                 <ui:VisualElement class="inventory-status">
-                    <ui:Label text="État" picking-mode="Ignore" class="inventory-title" />
+                    <ui:Label text="ÉTAT" picking-mode="Ignore" class="panel-title" />
                     <ui:VisualElement picking-mode="Ignore" class="stat-row">
-                        <ui:Label text="Santé" picking-mode="Ignore" class="stat-label" />
+                        <ui:VisualElement picking-mode="Ignore" class="stat-head">
+                            <ui:Label text="Santé" picking-mode="Ignore" class="stat-label" />
+                            <ui:Label name="stat-health-word" picking-mode="Ignore" class="stat-word" />
+                        </ui:VisualElement>
                         <ui:VisualElement picking-mode="Ignore" class="stat-bar">
                             <ui:VisualElement name="stat-health" picking-mode="Ignore" class="stat-fill" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement picking-mode="Ignore" class="stat-row">
-                        <ui:Label text="Endurance" picking-mode="Ignore" class="stat-label" />
+                        <ui:VisualElement picking-mode="Ignore" class="stat-head">
+                            <ui:Label text="Endurance" picking-mode="Ignore" class="stat-label" />
+                            <ui:Label name="stat-stamina-word" picking-mode="Ignore" class="stat-word" />
+                        </ui:VisualElement>
                         <ui:VisualElement picking-mode="Ignore" class="stat-bar">
-                            <ui:VisualElement name="stat-stamina" picking-mode="Ignore" class="stat-fill" />
+                            <ui:VisualElement name="stat-stamina" picking-mode="Ignore" class="stat-fill stat-fill--stamina" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement picking-mode="Ignore" class="stat-row">
-                        <ui:Label text="Faim" picking-mode="Ignore" class="stat-label" />
+                        <ui:VisualElement picking-mode="Ignore" class="stat-head">
+                            <ui:Label text="Faim" picking-mode="Ignore" class="stat-label" />
+                            <ui:Label name="stat-hunger-word" picking-mode="Ignore" class="stat-word" />
+                        </ui:VisualElement>
                         <ui:VisualElement picking-mode="Ignore" class="stat-bar">
                             <ui:VisualElement name="stat-hunger" picking-mode="Ignore" class="stat-fill" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement picking-mode="Ignore" class="stat-row">
-                        <ui:Label text="Soif" picking-mode="Ignore" class="stat-label" />
+                        <ui:VisualElement picking-mode="Ignore" class="stat-head">
+                            <ui:Label text="Soif" picking-mode="Ignore" class="stat-label" />
+                            <ui:Label name="stat-thirst-word" picking-mode="Ignore" class="stat-word" />
+                        </ui:VisualElement>
                         <ui:VisualElement picking-mode="Ignore" class="stat-bar">
                             <ui:VisualElement name="stat-thirst" picking-mode="Ignore" class="stat-fill" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement picking-mode="Ignore" class="stat-row">
-                        <ui:Label text="Fatigue" picking-mode="Ignore" class="stat-label" />
+                        <ui:VisualElement picking-mode="Ignore" class="stat-head">
+                            <ui:Label text="Fatigue" picking-mode="Ignore" class="stat-label" />
+                            <ui:Label name="stat-fatigue-word" picking-mode="Ignore" class="stat-word" />
+                        </ui:VisualElement>
                         <ui:VisualElement picking-mode="Ignore" class="stat-bar">
                             <ui:VisualElement name="stat-fatigue" picking-mode="Ignore" class="stat-fill" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="inventory-encumbered" text="Surchargé : déplacement ralenti" picking-mode="Ignore" class="inventory-warning" />
+                    <ui:Label name="inventory-encumbered" text="Surchargé : marche seulement, plus lente." picking-mode="Ignore" class="inventory-warning" />
                 </ui:VisualElement>
                 <ui:VisualElement class="inventory-items">
                     <ui:VisualElement picking-mode="Ignore" class="inventory-header">
-                        <ui:Label text="Inventaire" picking-mode="Ignore" class="inventory-title" />
+                        <ui:Label text="INVENTAIRE" picking-mode="Ignore" class="panel-title" />
                         <ui:Label name="inventory-weight" text="0,0 / 6 kg" picking-mode="Ignore" class="inventory-weight" />
+                    </ui:VisualElement>
+                    <ui:VisualElement picking-mode="Ignore" class="capacity-bar">
+                        <ui:VisualElement name="inventory-capacity" picking-mode="Ignore" class="capacity-fill" />
                     </ui:VisualElement>
                     <ui:VisualElement class="item-columns">
                         <ui:Label name="sort-name" text="Nom" class="item-column item-name" />
@@ -103,14 +126,44 @@
                     <ui:ScrollView name="item-list" class="item-list" />
                     <ui:Label name="inventory-empty" text="Vous ne portez rien." picking-mode="Ignore" class="inventory-empty" />
                     <ui:Label name="item-detail" picking-mode="Ignore" class="item-detail" />
-                    <ui:Label name="inventory-hints" picking-mode="Ignore" class="inventory-hints" />
+                    <ui:VisualElement name="inventory-hints" picking-mode="Ignore" class="hints" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="pause" class="pause">
+            <ui:VisualElement name="pause-main" class="menu">
+                <ui:Label text="PAUSE" picking-mode="Ignore" class="screen-title menu-title" />
+                <ui:Label name="pause-resume" text="Reprendre" class="menu-item" />
+                <ui:Label name="pause-options" text="Options" class="menu-item" />
+                <ui:Label name="pause-quit" text="Quitter" class="menu-item" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pause-settings" class="menu">
+                <ui:Label text="OPTIONS" picking-mode="Ignore" class="screen-title menu-title" />
+                <ui:VisualElement name="option-sensitivity" class="menu-item option-row">
+                    <ui:Label text="Sensibilité de la souris" picking-mode="Ignore" class="option-label" />
+                    <ui:VisualElement picking-mode="Ignore" class="option-bar">
+                        <ui:VisualElement name="option-sensitivity-fill" picking-mode="Ignore" class="option-fill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="option-invert" class="menu-item option-row">
+                    <ui:Label text="Inverser la vue verticale" picking-mode="Ignore" class="option-label" />
+                    <ui:Label name="option-invert-value" picking-mode="Ignore" class="option-value" />
+                </ui:VisualElement>
+                <ui:VisualElement name="option-fullscreen" class="menu-item option-row">
+                    <ui:Label text="Plein écran" picking-mode="Ignore" class="option-label" />
+                    <ui:Label name="option-fullscreen-value" picking-mode="Ignore" class="option-value" />
+                </ui:VisualElement>
+                <ui:Label name="option-back" text="Retour" class="menu-item" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pause-hints" picking-mode="Ignore" class="hints menu-hints" />
+        </ui:VisualElement>
         <ui:VisualElement name="game-over" picking-mode="Ignore" class="game-over">
-            <ui:Label name="game-over-title" text="Vous êtes mort" picking-mode="Ignore" class="game-over-title" />
+            <ui:Label name="game-over-title" text="VOUS ÊTES MORT" picking-mode="Ignore" class="screen-title game-over-title" />
             <ui:Label name="game-over-time" text="Temps survécu : 00:00" picking-mode="Ignore" class="game-over-line" />
-            <ui:Label name="game-over-prompt" text="Recommencer" picking-mode="Ignore" class="game-over-line game-over-prompt" />
+            <ui:VisualElement picking-mode="Ignore" class="prompt-row game-over-prompt-row">
+                <ui:Label name="game-over-key" picking-mode="Ignore" class="keycap" />
+                <ui:Label name="game-over-prompt" text="Recommencer" picking-mode="Ignore" class="prompt-action" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

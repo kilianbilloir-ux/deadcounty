@@ -12,6 +12,7 @@ namespace DeadCounty.Player
     {
         const float LowNeed = 0.2f;
         const float SleepFadeSpeed = 2f;
+        const float BleedingPulseRate = 3f;
 
         PlayerHealth health;
         PlayerNeeds needs;
@@ -59,6 +60,8 @@ namespace DeadCounty.Player
             var alive = health.IsAlive;
             var model = needs.Model;
             Show(bleeding, alive && health.Bleeding);
+            // Bleeding is the one affliction that kills fast: it pulses.
+            if (health.Bleeding) bleeding.style.opacity = 0.55f + 0.45f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * BleedingPulseRate));
             Show(hungry, alive && model.Hunger <= LowNeed);
             Show(thirsty, alive && model.Thirst <= LowNeed);
             Show(tired, alive && model.Fatigue <= LowNeed);
