@@ -12,6 +12,11 @@ namespace DeadCounty.Animation
         // Hands digging through a drawer, in turn (Hz, deg).
         const float RummageFrequency = 2.2f;
         const float RummageAngle = 14f;
+        // At full ArmBias one outstretched arm hangs this much lower and bends this much more than the other (deg).
+        const float ArmBiasPitch = 18f;
+        const float ArmBiasBend = 25f;
+        // A reaching right hand turns the chest with it (deg).
+        const float ReachTwist = 10f;
 
         [Tooltip("Motion source implementing IHumanoidMotion.")]
         [SerializeField] MonoBehaviour controller;
@@ -68,6 +73,12 @@ namespace DeadCounty.Animation
             get => limp;
             set => limp = value;
         }
+
+        // Seconds added to this body's idle clock, so a crowd does not shift its weight as one.
+        public float IdlePhase { get; set; }
+
+        // -1 to 1: which outstretched arm droops, and how much. Zombies get theirs from their seed.
+        public float ArmBias { get; set; }
 
         public bool LeftFootPlanted { get; private set; }
         public bool RightFootPlanted { get; private set; }
@@ -147,6 +158,7 @@ namespace DeadCounty.Animation
             var runness = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(g.RunTransitionSpeed - g.RunBlendBelow, g.RunTransitionSpeed + g.RunBlendAbove, gaitSpeed)) * (1f - crouch);
             var sprintness = Mathf.InverseLerp(g.SprintStartSpeed, g.SprintFullSpeed, gaitSpeed) * (1f - crouch);
             var moving = Mathf.Clamp01(gaitSpeed / g.FullStrideSpeed);
+            var still = 1f - moving;
             var cadence = (g.CadenceBase + g.CadencePerSpeed * gaitSpeed) * (1f - g.CrouchCadenceDrop * crouch);
             phase = Mathf.Repeat(phase + cadence * dt, 1f);
             var lift = Mathf.Lerp(Mathf.Lerp(g.WalkLift, g.RunLift, runness), g.SprintLift, sprintness) * moving * (1f - g.CrouchLiftDrop * crouch);
@@ -210,9 +222,13 @@ namespace DeadCounty.Animation
             var hipTarget = (grounded ? Mathf.Clamp(cap, nominal - g.MaxDip, nominal) : nominal) - landingDrop;
             hipY = Mathf.SmoothDamp(hipY, hipTarget, ref hipYVelocity, g.HipSmoothTime, Mathf.Infinity, dt);
 
+            // Standing, the weight settles on one leg and stays there a while before crossing to the other.
+            var cross = Mathf.Sin((clock + IdlePhase) * 2f * Mathf.PI / g.IdleShiftPeriod);
+            var settle = cross * (1.5f - 0.5f * cross * cross) * still * (1f - crouch) * (1f - air);
             var stance = 1f - g.RunSwayDrop * runness;
-            var sway = g.WalkSway * (right.Support - left.Support) * stance * moving;
-            var pelvisRoll = -g.PelvisRoll * (left.Support - right.Support) * stance * moving * (limping ? limp.PelvisRollScale : 1f);
+            var sway = g.WalkSway * (right.Support - left.Support) * stance * moving + g.IdleShift * settle;
+            var pelvisRoll = -g.PelvisRoll * (left.Support - right.Support) * stance * moving * (limping ? limp.PelvisRollScale : 1f)
+                + g.IdleShiftRoll * settle;
             var half = 0.5f * (leftHalf + rightHalf);
             var pelvisYaw = Mathf.Lerp(g.PelvisYaw, g.SprintPelvisYaw, sprintness) * (half > 0.01f ? (left.Forward - right.Forward) / (2f * half) : 0f) * moving;
             hips.localPosition = new Vector3(sway, hipY, hipForward);
@@ -225,7 +241,6 @@ namespace DeadCounty.Animation
             var lean = Mathf.Lerp(g.WalkLean, g.RunLean, runness) + g.SprintLean * sprintness
                 + Mathf.Clamp(forwardAccel * g.AccelerationLean, -g.MaxBrakeLean, g.MaxAccelerationLean) * (1f - air)
                 + g.CrouchLean * crouch;
-            var still = 1f - moving;
             // Out of breath, the chest heaves deeper and faster, walking or not.
             var breathe = Mathf.Sin(clock * 2f * Mathf.PI * g.IdleBreathFrequency * (1f + 1.5f * pose.Pant)) * g.IdleBreathAmplitude * (1f + 3f * pose.Pant)
                 * Mathf.Max(still, pose.Pant);
@@ -240,9 +255,14 @@ namespace DeadCounty.Animation
             var headTilt = Mathf.Clamp(motion.AimPitch * g.HeadPitchFollow, -g.HeadPitchLimit, g.HeadPitchLimit) * follow;
             // The neck makes up for most of the hunch and lunge to keep looking ahead, not for feeding.
             var posePitch = pose.Hunch + g.LungePitch * pose.Lunge;
-            spine.localRotation = Quaternion.Euler(lean + breathe + posePitch + g.FeedPitch * pose.Feed + pose.FlinchPitch, -pelvisYaw * 0.9f + headYaw * 0.3f, idleSway + pose.FlinchRoll);
+            // The chest takes back most of the idle pelvis roll and the neck the rest, so the head stays level.
+            var lurch = g.StepLurch * (left.Support - right.Support) * moving;
+            var wobble = g.HeadWobble * Mathf.Sin(phase * 2f * Mathf.PI) * moving;
+            spine.localRotation = Quaternion.Euler(lean + breathe + posePitch + g.FeedPitch * pose.Feed + pose.FlinchPitch,
+                -pelvisYaw * 0.9f + headYaw * 0.3f - ReachTwist * pose.Reach, idleSway + lurch - 0.7f * g.IdleShiftRoll * settle + pose.FlinchRoll);
             // The head whips a little further than the torso.
-            neck.localRotation = Quaternion.Euler(headPitch - (lean + posePitch) * 0.7f + headTilt + pose.FlinchPitch * 0.5f, headYaw * 0.7f, pose.HeadRoll + pose.FlinchRoll * 0.5f);
+            neck.localRotation = Quaternion.Euler(headPitch - (lean + posePitch) * 0.7f + headTilt + pose.FlinchPitch * 0.5f, headYaw * 0.7f + ReachTwist * pose.Reach,
+                pose.HeadRoll + wobble - 0.5f * lurch - 0.3f * g.IdleShiftRoll * settle + pose.FlinchRoll * 0.5f);
 
             // Each arm swings with the opposite leg.
             var armBlend = 1f - Mathf.Exp(-15f * dt);
@@ -257,8 +277,12 @@ namespace DeadCounty.Animation
             var reach = Mathf.Clamp01(armsForward / 0.8f);
             var reachPitch = Mathf.Lerp(g.ArmsForwardPitch, g.ArmsRaisedPitch, Mathf.InverseLerp(0.8f, 1f, armsForward));
             var dig = Mathf.Sin(clock * 2f * Mathf.PI * RummageFrequency) * RummageAngle * pose.Rummage;
-            Arm(leftShoulder, leftElbow, -armSwing * leftArmDrive + raise, -g.ArmSpread, bend, reach, reachPitch + dig, g.ReachElbowBend + dig);
-            Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, reach, reachPitch - dig, g.ReachElbowBend - dig);
+            var leftDroop = Mathf.Max(0f, ArmBias);
+            var rightDroop = Mathf.Max(0f, -ArmBias);
+            Arm(leftShoulder, leftElbow, -armSwing * leftArmDrive + raise, -g.ArmSpread, bend, reach,
+                reachPitch + dig + ArmBiasPitch * leftDroop, g.ReachElbowBend + dig + ArmBiasBend * leftDroop);
+            Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, Mathf.Max(reach, pose.Reach),
+                reachPitch - dig + ArmBiasPitch * rightDroop, g.ReachElbowBend - dig + ArmBiasBend * rightDroop);
         }
 
         float Duty(float walkDuty, float runness, float sprintness) => Mathf.Lerp(Mathf.Lerp(walkDuty, gait.RunDuty, runness), gait.SprintDuty, sprintness);
@@ -273,6 +297,8 @@ namespace DeadCounty.Animation
             pose.LookWeight = Mathf.Lerp(pose.LookWeight, target.LookWeight, k);
             pose.Lunge = Mathf.Lerp(pose.Lunge, target.Lunge, k);
             pose.Feed = Mathf.Lerp(pose.Feed, target.Feed, k);
+            // A hand goes out faster than a posture changes.
+            pose.Reach = Mathf.Lerp(pose.Reach, target.Reach, 1f - Mathf.Exp(-dt / (0.4f * gait.PoseSmoothTime)));
             pose.Rummage = Mathf.Lerp(pose.Rummage, target.Rummage, k);
             pose.Pant = Mathf.Lerp(pose.Pant, target.Pant, k);
             pose.FlinchPitch = target.FlinchPitch;

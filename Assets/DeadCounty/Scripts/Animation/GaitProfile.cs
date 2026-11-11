@@ -83,6 +83,14 @@ namespace DeadCounty.Animation
         public float IdleSwayAmplitude;
         [Tooltip("Hz.")]
         public float IdleSwayFrequency = 0.3f;
+        [Tooltip("Standing still, the hips settle this far over one leg, then the other.")]
+        public float IdleShift = 0.05f;
+        [Tooltip("Pelvis roll at the end of that shift; the chest and the head stay level.")]
+        public float IdleShiftRoll = 4.5f;
+        [Tooltip("Seconds for the weight to go to one leg and back.")]
+        public float IdleShiftPeriod = 9f;
+        [Tooltip("Torso roll over the stance leg at each step.")]
+        public float StepLurch;
 
         [Header("Head")]
         public float HeadYawLimit = 70f;
@@ -94,6 +102,8 @@ namespace DeadCounty.Animation
         public float HeadPitchFollow = 0.6f;
         [Tooltip("Fraction of the head aim lost when sprinting.")]
         public float SprintHeadFollowDrop = 0.7f;
+        [Tooltip("Head roll swinging once per stride.")]
+        public float HeadWobble;
 
         [Header("Arms")]
         public float WalkArmSwing = 18f;
@@ -144,7 +154,8 @@ namespace DeadCounty.Animation
         public float LungeHipShift = 0.1f;
         public float FeedPitch = 60f;
 
-        // Zombie shuffle: no flight phase or sprint at zombie speeds, a slow sway instead of breathing.
+        // Zombie shuffle: no flight phase or sprint at zombie speeds, a slow sway instead of breathing, a torso that
+        // tips over each step and a head that lolls with it.
         public static GaitProfile CreateShambler()
         {
             var profile = CreateInstance<GaitProfile>();
@@ -165,6 +176,11 @@ namespace DeadCounty.Animation
             profile.IdleBreathAmplitude = 0f;
             profile.IdleSwayAmplitude = 2f;
             profile.IdleSwayFrequency = 0.3f;
+            profile.IdleShift = 0.065f;
+            profile.IdleShiftRoll = 5f;
+            profile.IdleShiftPeriod = 6.5f;
+            profile.StepLurch = 5f;
+            profile.HeadWobble = 4f;
             return profile;
         }
     }

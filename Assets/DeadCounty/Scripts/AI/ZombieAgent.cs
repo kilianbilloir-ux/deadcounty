@@ -17,6 +17,9 @@ namespace DeadCounty.AI
         const int DormantAnimationInterval = 8;
         const float TwitchDuration = 0.18f;
         const float TwitchAngle = 9f;
+        // Noticing something jerks the torso and the head back (deg), then lets go.
+        const float StartleAngle = 12f;
+        const float StartleDuration = 0.35f;
 
         [Header("Setup")]
         [SerializeField] ZombieProfile profile;
@@ -38,6 +41,7 @@ namespace DeadCounty.AI
         Vector3 spawnPosition;
         Quaternion spawnRotation;
         float twitchPeriod, twitchPhase;
+        float startledAt = float.NegativeInfinity;
         int ownId;
         bool dead;
 
@@ -71,6 +75,8 @@ namespace DeadCounty.AI
             {
                 var pose = commands.Pose;
                 if (deterministic) return pose;
+                var startle = 1f - (Time.time - startledAt) / StartleDuration;
+                if (startle > 0f) pose.FlinchPitch -= StartleAngle * startle;
                 var cycle = Time.time / twitchPeriod + twitchPhase;
                 var into = Mathf.Repeat(cycle, 1f) * twitchPeriod;
                 if (into >= TwitchDuration) return pose;
@@ -116,7 +122,15 @@ namespace DeadCounty.AI
                 tuning.WanderSpeedJitter = 0f;
                 tuning.SpeedJitter = 0f;
             }
-            if (animator != null) animator.Limp = SeededLimp(animator.Limp);
+            if (animator != null)
+            {
+                animator.Limp = SeededLimp(animator.Limp);
+                if (!deterministic)
+                {
+                    animator.IdlePhase = 20f * (float)looks.NextDouble();
+                    animator.ArmBias = 2f * (float)looks.NextDouble() - 1f;
+                }
+            }
             spawnPosition = transform.position;
             spawnRotation = transform.rotation;
             brain = new ZombieBrain(tuning, seed, spawnPosition);
@@ -156,7 +170,11 @@ namespace DeadCounty.AI
             brain.Tick(dt, snapshot, this, ref commands);
             noisePending = false;
             noiseMargin = float.NegativeInfinity;
-            if (brain.TransitionedThisTick) AIEvents.RaiseTransition(ownId, brain.LastTransition, motor.Position);
+            if (brain.TransitionedThisTick)
+            {
+                AIEvents.RaiseTransition(ownId, brain.LastTransition, motor.Position);
+                if (brain.LastTransition.To == ZombieState.Alert) startledAt = Time.time;
+            }
             if (commands.EmitCall) NoiseSystem.Emit(motor.Position, tuning.CallRadius, NoiseKind.ZombieCall, ownId);
         }
 

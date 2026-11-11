@@ -55,12 +55,17 @@ MonoBehaviour:
   IdleBreathFrequency: 0.2705634
   IdleSwayAmplitude: 2
   IdleSwayFrequency: 0.3
+  IdleShift: 0.065
+  IdleShiftRoll: 5
+  IdleShiftPeriod: 6.5
+  StepLurch: 5
   HeadYawLimit: 85
   HeadPitchLimit: 30
   HeadClampsAtLimit: 1
   HeadRecenterAngle: 110
   HeadPitchFollow: 0.6
   SprintHeadFollowDrop: 0.7
+  HeadWobble: 4
   WalkArmSwing: 6
   RunArmSwing: 40
   SprintArmSwing: 25
