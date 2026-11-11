@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using DeadCounty.Core;
 using DeadCounty.UI;
+using DeadCounty.World;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -13,7 +14,8 @@ namespace DeadCounty.Player
     // takes the danger colour when low, the stamina bar shows while not full and blinks when exhausted, the
     // flashlight and clock readouts show for a few seconds when they change, with the need gauges. Also draws the
     // hit flash and the game over screen from PlayerDeathFlow. The only allocations are the clock and survival
-    // time strings when they change.
+    // time strings when they change. The interaction prompt sits next to what the player can use, its name
+    // above the key and the action (GDD 8.11, after Valheim).
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -23,6 +25,9 @@ namespace DeadCounty.Player
         const float ReadoutShowTime = 4f;
         const float FadeSpeed = 3f;
         const float ExhaustedBlinkRate = 3f;
+        // Prompt offset from the projected interaction point, in panel pixels.
+        const float PromptOffsetX = 16f;
+        const float PromptOffsetY = -22f;
 
         [SerializeField] PanelSettings panelSettings;
         [SerializeField] VisualTreeAsset hudLayout;
@@ -36,10 +41,15 @@ namespace DeadCounty.Player
         PlayerNeeds needs;
         PlayerFlashlight flashlight;
         PlayerDeathFlow deathFlow;
+        PlayerInteractor interactor;
         DayNightDirector director;
         VisualElement hud, healthRow, staminaRow, readouts, healthFill, staminaFill, flash, gameOver;
         VisualElement hungerNeed, thirstNeed, fatigueNeed;
         RadialGauge hungerGauge, thirstGauge, fatigueGauge;
+        VisualElement interaction;
+        Label interactionName, interactionAction;
+        Interactable shownInteractable;
+        string shownAction, interactKeys;
         Label flashlightLabel, time, gameOverTitle, gameOverTime, gameOverPrompt;
         StringBuilder text;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
@@ -63,8 +73,10 @@ namespace DeadCounty.Player
             needs = GetComponentInChildren<PlayerNeeds>(true);
             flashlight = GetComponentInChildren<PlayerFlashlight>(true);
             deathFlow = GetComponent<PlayerDeathFlow>();
+            interactor = GetComponentInChildren<PlayerInteractor>(true);
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null || needs == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina and a PlayerNeeds in its children");
+            if (health == null || stamina == null || needs == null || interactor == null)
+                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds and a PlayerInteractor in its children");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -87,6 +99,10 @@ namespace DeadCounty.Player
             hungerGauge = Find<RadialGauge>(root, "hunger-gauge");
             thirstGauge = Find<RadialGauge>(root, "thirst-gauge");
             fatigueGauge = Find<RadialGauge>(root, "fatigue-gauge");
+            interaction = Find<VisualElement>(root, "interaction");
+            interactionName = Find<Label>(root, "interaction-name");
+            interactionAction = Find<Label>(root, "interaction-action");
+            interactKeys = BindingKeys("Player/Interact");
             flashlightLabel = Find<Label>(root, "flashlight");
             time = Find<Label>(root, "time");
             gameOverTitle = Find<Label>(root, "game-over-title");
@@ -100,12 +116,18 @@ namespace DeadCounty.Player
         T Find<T>(VisualElement root, string elementName) where T : VisualElement =>
             root.Q<T>(elementName) ?? throw new InvalidOperationException($"PlayerHudController on '{name}': the HUD has no '{elementName}' {typeof(T).Name}");
 
-        // Respawn is bound to Jump; the prompt names the keyboard and gamepad buttons from the action itself.
-        static string RestartPrompt()
+        // Respawn is bound to Jump.
+        static string RestartPrompt() => Prompt(BindingKeys("Player/Jump"), "Recommencer");
+
+        static string Prompt(string keys, string action) => keys == null ? action : $"[{keys}] {action}";
+
+        // The keyboard and gamepad buttons of an action, read from its bindings: "E / Y".
+        static string BindingKeys(string actionPath)
         {
-            var jump = InputSystem.actions?.FindAction("Player/Jump");
-            if (jump == null) return "Recommencer";
-            return $"[{jump.GetBindingDisplayString(group: "Keyboard&Mouse")} / {jump.GetBindingDisplayString(group: "Gamepad")}] Recommencer";
+            var action = InputSystem.actions?.FindAction(actionPath);
+            if (action == null) return null;
+            const InputBinding.DisplayStringOptions options = InputBinding.DisplayStringOptions.DontIncludeInteractions;
+            return $"{action.GetBindingDisplayString(options, "Keyboard&Mouse")} / {action.GetBindingDisplayString(options, "Gamepad")}";
         }
 
         // Not in Awake: the pools are created in the health and stamina Awakes, which may run after this one.
@@ -169,6 +191,7 @@ namespace DeadCounty.Player
             flashValue = Mathf.Max(flashValue - dt / hitFlashTime, 0f);
             flash.style.opacity = flashValue * hitFlashAlpha;
             hud.style.display = alive ? DisplayStyle.Flex : DisplayStyle.None;
+            UpdateInteraction(alive);
             UpdateGameOver();
         }
 
@@ -183,6 +206,31 @@ namespace DeadCounty.Player
             gauge.Value = value;
             gauge.EnableInClassList("need-gauge--low", value <= LowNeed);
             Fade(need, ref opacity, alive && (value < NeedShowBelow || readoutsShown), dt);
+        }
+
+        // Text changes only when the target or its action does; the position follows the camera every frame.
+        void UpdateInteraction(bool alive)
+        {
+            var current = alive ? interactor.Current : null;
+            var view = Camera.main;
+            if (current == null || view == null)
+            {
+                interaction.style.display = DisplayStyle.None;
+                shownInteractable = null;
+                return;
+            }
+            var action = current.Action;
+            if (current != shownInteractable || action != shownAction)
+            {
+                shownInteractable = current;
+                shownAction = action;
+                interactionName.text = current.DisplayName;
+                interactionAction.text = Prompt(interactKeys, action);
+            }
+            var point = RuntimePanelUtils.CameraTransformWorldToPanel(interaction.panel, current.PromptPoint, view);
+            interaction.style.left = point.x + PromptOffsetX;
+            interaction.style.top = point.y + PromptOffsetY;
+            interaction.style.display = DisplayStyle.Flex;
         }
 
         void UpdateClock()

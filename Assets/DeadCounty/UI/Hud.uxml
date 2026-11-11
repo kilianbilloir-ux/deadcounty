@@ -35,6 +35,10 @@
                 <ui:Label name="time" text="Jour 1 — 11:00" picking-mode="Ignore" class="readout time-readout" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="interaction" picking-mode="Ignore" class="interaction">
+            <ui:Label name="interaction-name" picking-mode="Ignore" class="interaction-name" />
+            <ui:Label name="interaction-action" picking-mode="Ignore" class="interaction-action" />
+        </ui:VisualElement>
         <ui:VisualElement name="game-over" picking-mode="Ignore" class="game-over">
             <ui:Label name="game-over-title" text="Vous êtes mort" picking-mode="Ignore" class="game-over-title" />
             <ui:Label name="game-over-time" text="Temps survécu : 00:00" picking-mode="Ignore" class="game-over-line" />

@@ -41,6 +41,7 @@ namespace DeadCounty.EditorTools
             Reserved.Clear();
             ReservedCircles.Clear();
             BuiltLamps.Clear();
+            DoorSpots.Clear();
             ConfigureProject();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
@@ -66,6 +67,7 @@ namespace DeadCounty.EditorTools
             EnsureGaitProfiles();
             BuildPlayer();
             BakeNavMesh(env.gameObject);
+            BuildDoors();
             BuildZombies();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -188,6 +190,7 @@ namespace DeadCounty.EditorTools
                 Piece(start, end, o.Top, style.Height);
                 cursor = end;
                 if (style.Shutter != null && o.Bottom > 0f) WindowTrim(wall, o, style.Shutter);
+                RecordDoorSpot(wall, o);
             }
             Piece(cursor, length, 0f, style.Height);
             return wall;

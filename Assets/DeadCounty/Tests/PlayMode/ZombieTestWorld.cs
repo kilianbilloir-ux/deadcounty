@@ -143,6 +143,13 @@ namespace DeadCounty.Tests
             info.SetValue(target, value);
         }
 
+        public DeadCounty.World.Door Door(Vector3 hinge, float yaw)
+        {
+            var door = TestDoor.Create(hinge, yaw);
+            owned.Add(door.gameObject);
+            return door;
+        }
+
         // An environment box on the Default layer, tagged Wall or Glass.
         public GameObject Box(Vector3 center, Vector3 size, string tag)
         {

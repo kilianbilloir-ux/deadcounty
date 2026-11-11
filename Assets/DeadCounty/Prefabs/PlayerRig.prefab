@@ -1866,6 +1866,7 @@ GameObject:
   - component: {fileID: 6087673885327060316}
   - component: {fileID: 5457722342757846616}
   - component: {fileID: 9131007080392847135}
+  - component: {fileID: 6630331365674300}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2114,6 +2115,20 @@ MonoBehaviour:
     DehydratedDamagePerMinute: 50
     ExhaustedStaminaCapacity: 0.5
   exhaustionVolume: {fileID: 8573854563993322308}
+--- !u!114 &6630331365674300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e46105a0cecac4a699fe768e3490aa32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerInteractor
+  reach: 1.8
+  maxAngle: 60
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0

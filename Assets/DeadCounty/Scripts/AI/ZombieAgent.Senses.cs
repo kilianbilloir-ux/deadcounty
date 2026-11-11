@@ -95,7 +95,7 @@ namespace DeadCounty.AI
                 {
                     ref readonly var noise = ref Noises[i];
                     lastNoiseId = noise.Id;
-                    if (noise.SourceId == ownId || now - noise.Time > NoiseMaxAge) continue;
+                    if (noise.SourceId == ownId || now - noise.Time > NoiseMaxAge || IsOwnDoorNoise(noise)) continue;
                     Listen(noise, ear, multiplier);
                 }
             } while (count == Noises.Length);

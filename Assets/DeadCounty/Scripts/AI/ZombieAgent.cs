@@ -142,6 +142,7 @@ namespace DeadCounty.AI
         {
             var chasing = brain.State is ZombieState.Chase or ZombieState.Attack;
             var hasTarget = target != null;
+            StopAtShutDoor(dt);
             if (motor.Move(commands, chasing, hasTarget ? target.Position : default, hasTarget, dt)) MotionResetId++;
             CurrentSpeed = motor.MeasuredSpeed;
             UpdateAim();
@@ -233,7 +234,7 @@ namespace DeadCounty.AI
             snapshot.Time = Time.time;
             snapshot.Position = position;
             snapshot.Forward = motor.Heading;
-            snapshot.ArrivedAtDestination = motor.Arrived;
+            snapshot.ArrivedAtDestination = motor.Arrived || calmAtDoor;
             snapshot.PathFailed = motor.PathFailed;
             if (target != null)
             {
