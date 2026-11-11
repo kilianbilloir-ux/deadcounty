@@ -47,6 +47,8 @@ namespace DeadCounty.EditorTools
             // Kept in tune: TitleMusic pitches the bell to the drone's notes itself.
             CueAsset("Music/TitleDrone", SoundChannel.Music, 1, InterfaceRecipes.TitleDrone, 0.5f, 0f);
             CueAsset("Music/TitleToll", SoundChannel.Music, 1, InterfaceRecipes.Toll, 0.35f, 0f);
+            // Recorded only: without its take in Audio/Recorded the pause menu falls back on the title drone.
+            CueAsset("Music/PauseTheme", SoundChannel.Music, 1, InterfaceRecipes.TitleDrone, 0.4f, 0f);
 
             const SoundChannel ui = SoundChannel.Interface;
             CueAsset("Interface/Move", ui, 3, InterfaceRecipes.Move, 0.22f, 0.04f);
@@ -102,6 +104,18 @@ namespace DeadCounty.EditorTools
             music.FindProperty("drone").objectReferenceValue = Cue("Music/TitleDrone");
             music.FindProperty("toll").objectReferenceValue = Cue("Music/TitleToll");
             music.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Pause music on the rig that holds the menu; a theme already assigned (Inspector tweak) is kept.
+        static bool EnsurePauseMusic(GameObject rig)
+        {
+            var added = AddMissing<PauseMusic>(rig);
+            var so = new SerializedObject(rig.GetComponent<PauseMusic>());
+            var theme = so.FindProperty("theme");
+            if (theme.objectReferenceValue != null) return added;
+            theme.objectReferenceValue = Cue("Music/PauseTheme");
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return true;
         }
 
         // Interface sounds on the HUD's rig; cues already assigned (Inspector tweaks) are kept.

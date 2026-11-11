@@ -129,6 +129,7 @@ namespace DeadCounty.EditorTools
             AddMissingPlayerComponents(rig, player);
             AssignHudAssets(rig);
             EnsureUiSounds(rig);
+            EnsurePauseMusic(rig);
             EnsurePlayerAudio(rig);
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(rig, PlayerPrefabPath);
@@ -154,6 +155,7 @@ namespace DeadCounty.EditorTools
                 changed |= AddMissing<UIDocument>(root);
                 AssignHudAssets(root);
                 changed |= EnsureUiSounds(root);
+                changed |= EnsurePauseMusic(root);
                 changed |= EnsurePlayerAudio(root);
                 // AssignHudAssets writes straight into the prefab contents; save unconditionally.
                 return PrefabUtility.SaveAsPrefabAsset(root, path);

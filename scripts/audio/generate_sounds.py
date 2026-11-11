@@ -66,6 +66,9 @@ LOOPS = [
     ("Music/TitleDrone", 60, 48.0, 0.2, "medium",
      "TrackType: Music, VocalType: Instrumental, Genre: Dark Ambient, a bleak slow drone for the title screen of a zombie survival game "
      "set in a deserted rural county: low bowed strings, a few distant detuned piano notes, a cold wind texture, sparse, melancholic, no drums, 60 BPM"),
+    ("Music/PauseTheme", 75, 60.0, 0.12, "medium",
+     "TrackType: Music, VocalType: Instrumental, Genre: Ambient, a quiet contemplative piece for a pause menu: a soft felt piano playing "
+     "slow sparse notes over a warm low pad, gentle tape hiss, calm and a little sad, no drums, 60 BPM"),
 ]
 LOOP_FADE = 2.0
 

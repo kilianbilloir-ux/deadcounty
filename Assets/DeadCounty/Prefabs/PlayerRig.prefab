@@ -3952,6 +3952,7 @@ GameObject:
   - component: {fileID: 8259299151959908222}
   - component: {fileID: 1303728362577461157}
   - component: {fileID: 2206476033113840169}
+  - component: {fileID: 5754119311652940648}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -4159,6 +4160,21 @@ MonoBehaviour:
   menuClose: {fileID: 11400000, guid: 73ec02bc9ce1946d8ad69207efc4c984, type: 2}
   bagOpen: {fileID: 11400000, guid: 066282f4c2b464afcb52356dd832cb21, type: 2}
   bagClose: {fileID: 11400000, guid: d48b618da9f6c474aabcc6a8ca8559ce, type: 2}
+--- !u!114 &5754119311652940648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20ea0afbdd1c34759952b358d9068496, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.PauseMusic
+  theme: {fileID: 11400000, guid: 84df8f4954e814377948eb83a6453cd7, type: 2}
+  fadeIn: 2.5
+  fadeOut: 0.8
 --- !u!1 &5919160138977479485
 GameObject:
   m_ObjectHideFlags: 0

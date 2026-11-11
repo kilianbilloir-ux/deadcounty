@@ -125,6 +125,23 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
+        public IEnumerator PausingBringsTheMusicInAndResumingTakesItOut()
+        {
+            var music = Rig.GetComponent<DeadCounty.Audio.PauseMusic>();
+            Assert.That(music.Playing, Is.False, "silent in play");
+
+            yield return Press(Key.Escape);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.That(music.Playing, "playing while the clock is stopped");
+            Assert.That(music.Level, Is.GreaterThan(0.1f).And.LessThan(1f), "fading in");
+
+            yield return Press(Key.Escape);
+            yield return new WaitForSecondsRealtime(1.2f);
+            Assert.That(music.Level, Is.Zero);
+            Assert.That(music.Playing, Is.False, "held once faded out");
+        }
+
+        [UnityTest]
         public IEnumerator EscapeClosesTheInventoryWithoutPausing()
         {
             yield return Press(Key.Tab);
