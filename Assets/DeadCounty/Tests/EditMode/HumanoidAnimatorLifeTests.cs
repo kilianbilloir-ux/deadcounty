@@ -98,6 +98,34 @@ namespace DeadCounty.Tests
             Assert.That(ShoulderPitch(rig.LeftShoulder), Is.GreaterThan(-10f), "left arm stays down");
         }
 
+        // The player's body turns at about 500 deg/s when a walk changes direction: a quarter turn in ten frames.
+        [TestCase(520f)]
+        [TestCase(-520f)]
+        public void ASnapTurnWhileWalkingKeepsBothLegsUnderTheBody(float yawRate)
+        {
+            using var rig = new HumanoidTestRig(ScriptableObject.CreateInstance<GaitProfile>());
+            rig.Initialize();
+            var stride = 0f;
+            for (var frame = 0; frame < 150; frame++)
+            {
+                rig.Step(1.5f);
+                stride = Mathf.Max(stride, -rig.Root.InverseTransformPoint(rig.LeftAnkle.position).z, -rig.Root.InverseTransformPoint(rig.RightAnkle.position).z);
+            }
+            float crossed = float.NegativeInfinity, behind = 0f, bank = 0f;
+            for (var frame = 0; frame < 50; frame++)
+            {
+                rig.Step(1.5f, frame < 10 ? yawRate : 0f);
+                var left = rig.Root.InverseTransformPoint(rig.LeftAnkle.position);
+                var right = rig.Root.InverseTransformPoint(rig.RightAnkle.position);
+                crossed = Mathf.Max(crossed, left.x, -right.x);
+                behind = Mathf.Max(behind, -left.z, -right.z);
+                bank = Mathf.Max(bank, Mathf.Abs(Mathf.DeltaAngle(0f, rig.Model.localEulerAngles.z)));
+            }
+            Assert.That(crossed, Is.LessThan(0f), "each foot stays on its own side");
+            Assert.That(behind, Is.LessThan(stride + 0.05f), "no leg trails further than in a straight walk");
+            Assert.That(bank, Is.LessThan(3f), "the body pivots without leaning into the turn");
+        }
+
         [TestCase(1f)]
         [TestCase(-1f)]
         public void ArmBiasDroopsOneOutstretchedArm(float bias)

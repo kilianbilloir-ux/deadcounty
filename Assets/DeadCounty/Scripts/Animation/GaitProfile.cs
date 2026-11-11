@@ -75,6 +75,8 @@ namespace DeadCounty.Animation
         [Tooltip("Scale of the physical (centripetal) bank into turns.")]
         public float BankScale = 1f;
         public float MaxTurnLean = 12f;
+        [Tooltip("Seconds the body takes to lean into a turn: a snap turn is over before it has.")]
+        public float BankSmoothTime = 0.2f;
         [Tooltip("Spine pitch while standing still.")]
         public float IdleBreathAmplitude = 1.5f;
         [Tooltip("Hz.")]

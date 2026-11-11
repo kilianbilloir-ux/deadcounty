@@ -17,6 +17,12 @@ namespace DeadCounty.Animation
         const float ArmBiasBend = 25f;
         // A reaching right hand turns the chest with it (deg).
         const float ReachTwist = 10f;
+        // Turning faster than PivotStartRate (deg/s) the body starts to pivot instead of following a curve: at
+        // PivotFullRate the feet hold back only PivotFoothold of the turn and the body leans only that share. A
+        // foothold kept still under a quarter-turn snap ends up crossed and trailing far behind.
+        const float PivotStartRate = 180f;
+        const float PivotFullRate = 450f;
+        const float PivotFoothold = 0.15f;
 
         [Tooltip("Motion source implementing IHumanoidMotion.")]
         [SerializeField] MonoBehaviour controller;
@@ -49,7 +55,7 @@ namespace DeadCounty.Animation
         // Signed body yaw since the last Evaluate, in radians; stance slides each foothold by it.
         float frameYawDeltaRad;
         // Bank applied to the model last Evaluate, in degrees; footholds ride its changes.
-        float lastBank;
+        float lastBank, bankVelocity;
         // Instantaneous ground speed: stance slides back by the body's travel, not its stepping speed.
         float translationSpeed;
         float bob, hipY, hipYVelocity, headYaw, leftArmDrive, rightArmDrive, leftTrackX, rightTrackX, clock;
@@ -118,7 +124,7 @@ namespace DeadCounty.Animation
             lastYaw = transform.eulerAngles.y;
             smoothVelocity = transform.forward * motion.CurrentSpeed;
             translationSpeed = motion.CurrentSpeed;
-            forwardAccel = yawRate = airVerticalSpeed = landingDrop = frameYawDeltaRad = 0f;
+            forwardAccel = yawRate = airVerticalSpeed = landingDrop = frameYawDeltaRad = bankVelocity = 0f;
             visualY = transform.position.y;
             visualYVelocity = 0f;
             leftTrack = rightTrack = default;
@@ -153,8 +159,11 @@ namespace DeadCounty.Animation
             UpdateLanding(grounded, dt);
             SmoothSteps(grounded, dt);
 
-            // Turning on the spot still takes small steps.
-            var gaitSpeed = Mathf.Max(speed, Mathf.Abs(yawRate) * Mathf.Deg2Rad * g.TurnStepFactor * (1f - air));
+            // Turning on the spot still takes small steps, never running ones however fast the turn.
+            var turnSteps = Mathf.Min(Mathf.Abs(yawRate) * Mathf.Deg2Rad * g.TurnStepFactor, g.RunTransitionSpeed - g.RunBlendBelow);
+            var gaitSpeed = Mathf.Max(speed, turnSteps * (1f - air));
+            // 0 in a curve the body can lean into, 1 in a snap turn it pivots through.
+            var pivot = Mathf.InverseLerp(PivotStartRate, PivotFullRate, Mathf.Abs(frameYawDeltaRad) * Mathf.Rad2Deg / dt);
             var runness = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(g.RunTransitionSpeed - g.RunBlendBelow, g.RunTransitionSpeed + g.RunBlendAbove, gaitSpeed)) * (1f - crouch);
             var sprintness = Mathf.InverseLerp(g.SprintStartSpeed, g.SprintFullSpeed, gaitSpeed) * (1f - crouch);
             var moving = Mathf.Clamp01(gaitSpeed / g.FullStrideSpeed);
@@ -163,10 +172,12 @@ namespace DeadCounty.Animation
             phase = Mathf.Repeat(phase + cadence * dt, 1f);
             var lift = Mathf.Lerp(Mathf.Lerp(g.WalkLift, g.RunLift, runness), g.SprintLift, sprintness) * moving * (1f - g.CrouchLiftDrop * crouch);
 
-            // Banked into turns like a runner. Posed before the feet so the yaw compensation reads
-            // this frame's bank, and the stored footholds are carried through the frame's roll.
-            var bank = Mathf.Atan(speed * yawRate * Mathf.Deg2Rad / 9.81f) * Mathf.Rad2Deg * g.BankScale;
-            bank = Mathf.Clamp(bank, -g.MaxTurnLean, g.MaxTurnLean) * (1f - air);
+            // Banked into turns like a runner, eased in from the frame's own turn rate. Posed before the feet so
+            // the yaw compensation reads this frame's bank, and the stored footholds are carried through the
+            // frame's roll.
+            var bankTarget = Mathf.Atan(speed * frameYawDeltaRad / dt / 9.81f) * Mathf.Rad2Deg * g.BankScale;
+            bankTarget = Mathf.Clamp(bankTarget, -g.MaxTurnLean, g.MaxTurnLean) * (1f - air) * Mathf.Lerp(1f, PivotFoothold, pivot);
+            var bank = Mathf.SmoothDamp(lastBank, bankTarget, ref bankVelocity, g.BankSmoothTime, Mathf.Infinity, dt);
             model.localRotation = Quaternion.Euler(0f, 0f, -bank);
             var bankDelta = (bank - lastBank) * Mathf.Deg2Rad;
             lastBank = bank;
@@ -195,8 +206,9 @@ namespace DeadCounty.Animation
             var leftHalf = Mathf.Min(gaitSpeed * leftDuty / (2f * cadence), g.MaxHalfStride);
             var rightHalf = Mathf.Min(gaitSpeed * rightDuty / (2f * cadence), g.MaxHalfStride);
             var advance = translationSpeed * dt;
-            var left = FootCycle(ref leftTrack, leftPhase, leftDuty, leftHalf, g.StanceBias * leftHalf, lift * (leftBad ? limp.BadLiftScale : 1f), advance, dt, leftTrackX, frameYawDeltaRad);
-            var right = FootCycle(ref rightTrack, rightPhase, rightDuty, rightHalf, g.StanceBias * rightHalf, lift * (rightBad ? limp.BadLiftScale : 1f), advance, dt, rightTrackX, frameYawDeltaRad);
+            var footYaw = frameYawDeltaRad * Mathf.Lerp(1f, PivotFoothold, pivot);
+            var left = FootCycle(ref leftTrack, leftPhase, leftDuty, leftHalf, g.StanceBias * leftHalf, lift * (leftBad ? limp.BadLiftScale : 1f), advance, dt, leftTrackX, footYaw);
+            var right = FootCycle(ref rightTrack, rightPhase, rightDuty, rightHalf, g.StanceBias * rightHalf, lift * (rightBad ? limp.BadLiftScale : 1f), advance, dt, rightTrackX, footYaw);
             LeftFootPlanted = leftPhase < leftDuty;
             RightFootPlanted = rightPhase < rightDuty;
             // Boot pitch of each foot, for tests measuring slip while the boot is flat.
