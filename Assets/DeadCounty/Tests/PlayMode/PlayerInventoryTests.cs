@@ -83,6 +83,43 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
+        public IEnumerator TheBackpackIsOnTheBackOnlyWhileItIsCarried()
+        {
+            var loadout = Rig.GetComponentInChildren<PlayerLoadout>();
+            var pack = loadout.transform.Find("Model/Hanches/Colonne/Sac_A_Dos").gameObject;
+            var bedroll = loadout.transform.Find("Model/Hanches/Colonne/Couverture").gameObject;
+            Assert.That(loadout.BackpackWorn && pack.activeSelf && bedroll.activeSelf, "worn with the starting kit");
+
+            Assert.That(inventory.Drop(Load("IT_SacADos")), Is.True);
+            yield return null;
+            Assert.That(loadout.BackpackWorn, Is.False);
+            Assert.That(pack.activeSelf || bedroll.activeSelf, Is.False, "off the back once dropped");
+
+            Object.FindObjectsByType<WorldItem>(FindObjectsInactive.Exclude).Single().Interact(inventory.transform, false);
+            yield return null;
+            Assert.That(loadout.BackpackWorn && pack.activeSelf, "back on once picked up");
+        }
+
+        [UnityTest]
+        public IEnumerator AnItemBeingUsedIsHeldInTheHandThenPutAway()
+        {
+            var loadout = Rig.GetComponentInChildren<PlayerLoadout>();
+            var hand = loadout.transform.Find("Model/Hanches/Colonne/Epaule_D/Coude_D");
+            needs.Model.Restore(-0.5f, 0f);
+            Assert.That(inventory.Use(Load("IT_Haricots")), Is.True);
+            yield return null;
+            Assert.That(loadout.Using);
+            var held = hand.Find("Objet_En_Main");
+            Assert.That(held, Is.Not.Null, "the can is in the right hand");
+            Assert.That(held.GetComponentsInChildren<Collider>(), Is.Empty, "a held item must not bump into the world");
+            Assert.That(controller.Pose.HandToMouth, Is.EqualTo(1f), "the hand goes up to the mouth");
+
+            yield return new WaitForSeconds(1.5f);
+            Assert.That(loadout.Using, Is.False);
+            Assert.That(hand.Find("Objet_En_Main"), Is.Null, "put away after the use");
+        }
+
+        [UnityTest]
         public IEnumerator ADroppedItemCanBePickedUpAgain()
         {
             var water = Load("IT_Eau");

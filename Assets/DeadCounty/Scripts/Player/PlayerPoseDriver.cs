@@ -5,7 +5,7 @@ namespace DeadCounty.Player
 {
     // Body language on top of the procedural gait.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerInteractor), typeof(PlayerHealth))]
-    [RequireComponent(typeof(PlayerStamina), typeof(ProceduralHumanoidAnimator))]
+    [RequireComponent(typeof(PlayerStamina), typeof(ProceduralHumanoidAnimator), typeof(PlayerLoadout))]
     public class PlayerPoseDriver : MonoBehaviour
     {
         const float ReachTime = 0.45f;
@@ -18,6 +18,7 @@ namespace DeadCounty.Player
         PlayerHealth health;
         PlayerStamina stamina;
         ProceduralHumanoidAnimator animator;
+        PlayerLoadout loadout;
         float flinchPitch, flinchRoll;
 
         void Awake()
@@ -27,6 +28,7 @@ namespace DeadCounty.Player
             health = GetComponent<PlayerHealth>();
             stamina = GetComponent<PlayerStamina>();
             animator = GetComponent<ProceduralHumanoidAnimator>();
+            loadout = GetComponent<PlayerLoadout>();
         }
 
         void OnEnable() => health.Damaged += OnDamaged;
@@ -59,6 +61,10 @@ namespace DeadCounty.Player
                 pose.Feed = 0.3f;
                 pose.LookWeight = 0.2f;
                 pose.Rummage = 1f;
+            }
+            else if (loadout.Using)
+            {
+                pose.HandToMouth = 1f;
             }
             else if (Time.time - interactor.LastUseTime < ReachTime)
             {

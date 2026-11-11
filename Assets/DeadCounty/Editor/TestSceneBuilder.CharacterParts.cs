@@ -83,6 +83,11 @@ namespace DeadCounty.EditorTools
             yield return (SpinePath, "Sac_A_Dos", Loft("Backpack", R(0.02f, 0.3f, 0.15f, -0.195f), R(0.1f, 0.33f, 0.18f, -0.21f), R(0.33f, 0.32f, 0.17f, -0.205f), R(0.43f, 0.26f, 0.12f, -0.185f)), "Backpack");
             yield return (SpinePath, "Rabat", Loft("BackpackFlap", R(0.31f, 0.335f, 0.185f, -0.208f), R(0.4f, 0.3f, 0.15f, -0.195f), R(0.445f, 0.24f, 0.1f, -0.18f)), "BackpackDark");
             yield return (SpinePath, "Poche_Sac", Loft("BackpackPocket", R(0.06f, 0.2f, 0.05f, -0.31f), R(0.2f, 0.21f, 0.06f, -0.315f), R(0.24f, 0.19f, 0.04f, -0.31f)), "BackpackDark");
+            // A torch clipped to the left strap, pointing ahead: lofts run along Y, hence the quarter turn.
+            var ahead = Quaternion.Euler(90f, 0f, 0f);
+            var clip = new Vector3(-0.11f, 0.33f, 0.185f);
+            yield return (SpinePath, "Lampe", Loft("Torch", 0.3f, ahead, clip, new[] { R(-0.05f, 0.036f, 0.036f), R(0.03f, 0.036f, 0.036f), R(0.05f, 0.05f, 0.05f) }), "Metal");
+            yield return (SpinePath, "Lampe_Verre", Loft("TorchLens", 0.3f, ahead, clip, new[] { R(0.05f, 0.042f, 0.042f), R(0.056f, 0.042f, 0.042f) }), "Glass");
             // Rolled along X on top of the pack: lofts run along Y, hence the quarter turn.
             var across = Quaternion.Euler(0f, 0f, 90f);
             var rollCentre = new Vector3(0f, 0.5f, -0.2f);

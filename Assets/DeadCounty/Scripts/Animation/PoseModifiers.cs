@@ -21,6 +21,8 @@ namespace DeadCounty.Animation
         [Range(0f, 1f)] public float Feed;
         [Tooltip("Right hand out to push a door or pick something up.")]
         [Range(0f, 1f)] public float Reach;
+        [Tooltip("Right hand brought up to the mouth: eating, drinking.")]
+        [Range(0f, 1f)] public float HandToMouth;
         [Tooltip("Hands digging through furniture, in turn.")]
         [Range(0f, 1f)] public float Rummage;
         [Tooltip("Out of breath: deeper, faster breathing, even on the move.")]
