@@ -142,7 +142,31 @@
     position: absolute;
     left: 0;
     top: 0;
+    flex-direction: row;
+    align-items: center;
     display: none;
+}
+
+.interaction-progress {
+    width: 30px;
+    height: 30px;
+    margin-right: 8px;
+    --gauge-track: rgba(10, 11, 13, 0.55);
+    --gauge-fill: rgb(212, 185, 118);
+    --gauge-thickness: 4;
+    display: none;
+}
+
+.loot-toast {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 150px;
+    -unity-text-align: middle-center;
+    font-size: 18px;
+    color: rgb(217, 217, 217);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    opacity: 0;
 }
 
 .interaction-name {

@@ -67,7 +67,7 @@ namespace DeadCounty.Tests
         public void ABandageHealsTwentyPoints()
         {
             var bandage = Load("IT_Bandage");
-            inventory.Receive(bandage, 1);
+            inventory.Items.Add(bandage, 1);
             Health.Pool.Apply(50f);
             Assert.That(inventory.Use(bandage), Is.True);
             Assert.That(Health.Pool.Current, Is.EqualTo(70f));
@@ -96,7 +96,7 @@ namespace DeadCounty.Tests
             heavy = ScriptableObject.CreateInstance<ItemDefinition>();
             heavy.DisplayName = "Parpaing";
             heavy.Weight = 15f;
-            inventory.Receive(heavy, 1);
+            inventory.Items.Add(heavy, 1);
             yield return null;
             Assert.That(controller.Encumbered);
 
@@ -115,7 +115,7 @@ namespace DeadCounty.Tests
         [UnityTest]
         public IEnumerator RespawnGivesBackTheStartingKit()
         {
-            inventory.Receive(Load("IT_Soda"), 3);
+            inventory.Items.Add(Load("IT_Soda"), 3);
             inventory.Drop(Load("IT_Eau"));
             Health.ApplyHit(10000f, Health.transform.position + Vector3.forward);
             var deathFlow = Rig.GetComponent<PlayerDeathFlow>();
