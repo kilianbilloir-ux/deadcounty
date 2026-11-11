@@ -54,6 +54,7 @@ namespace DeadCounty.Player
             if (!item.Usable || !health.IsAlive || !Items.Remove(item)) return false;
             needs.Model.Restore(item.Hunger, item.Thirst);
             health.Heal(item.Health);
+            if (item.StopsBleeding) health.StopBleeding();
             return true;
         }
 

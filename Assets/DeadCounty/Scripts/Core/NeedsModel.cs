@@ -18,6 +18,10 @@ namespace DeadCounty.Core
         public float DehydratedDamagePerMinute;
         [Tooltip("Share of the stamina capacity left while fatigue is empty.")]
         public float ExhaustedStaminaCapacity;
+        [Tooltip("Minutes of sleep for an empty fatigue gauge to fill.")]
+        public float RestMinutes;
+        [Tooltip("Hunger and thirst drain this many times slower while asleep.")]
+        public float SleepDrainFactor;
 
         // GDD 8.4: a 100 health player starves in 3 min and dies of thirst in 2.
         public static NeedsSettings Default => new()
@@ -29,19 +33,22 @@ namespace DeadCounty.Core
             StarvingDamagePerMinute = 100f / 3f,
             DehydratedDamagePerMinute = 50f,
             ExhaustedStaminaCapacity = 0.5f,
+            // 8 game hours with a 10 min day.
+            RestMinutes = 10f / 3f,
+            SleepDrainFactor = 0.5f,
         };
     }
 
     // Hunger, thirst and fatigue from 1 (fine) down to 0, draining over time (GDD 8.4). Empty hunger and thirst
-    // cost health; empty fatigue costs no health but halves the stamina capacity.
+    // cost health; empty fatigue costs no health but halves the stamina capacity. Sleep fills fatigue back.
     public class NeedsModel
     {
         readonly NeedsSettings settings;
 
         public NeedsModel(NeedsSettings settings)
         {
-            if (!(settings.HungerMinutes > 0f) || !(settings.ThirstMinutes > 0f) || !(settings.FatigueMinutes > 0f))
-                throw new ArgumentOutOfRangeException(nameof(settings), "NeedsModel needs positive drain times");
+            if (!(settings.HungerMinutes > 0f) || !(settings.ThirstMinutes > 0f) || !(settings.FatigueMinutes > 0f) || !(settings.RestMinutes > 0f))
+                throw new ArgumentOutOfRangeException(nameof(settings), "NeedsModel needs positive drain and rest times");
             this.settings = settings;
             Reset();
         }
@@ -60,6 +67,17 @@ namespace DeadCounty.Core
             Thirst = Drain(Thirst, settings.ThirstMinutes, dt, out var dehydrated);
             var fatigueMinutes = sprinting ? settings.FatigueMinutes / settings.SprintFatigueFactor : settings.FatigueMinutes;
             Fatigue = Drain(Fatigue, fatigueMinutes, dt, out _);
+            return (starving * settings.StarvingDamagePerMinute + dehydrated * settings.DehydratedDamagePerMinute) / 60f;
+        }
+
+        // Asleep: fatigue fills back while hunger and thirst, and the harm they do once empty, go SleepDrainFactor
+        // times as fast. Returns the health lost, as Tick.
+        public float Sleep(float dt)
+        {
+            var slowed = dt * settings.SleepDrainFactor;
+            Hunger = Drain(Hunger, settings.HungerMinutes, slowed, out var starving);
+            Thirst = Drain(Thirst, settings.ThirstMinutes, slowed, out var dehydrated);
+            Fatigue = Mathf.Min(Fatigue + dt / (settings.RestMinutes * 60f), 1f);
             return (starving * settings.StarvingDamagePerMinute + dehydrated * settings.DehydratedDamagePerMinute) / 60f;
         }
 

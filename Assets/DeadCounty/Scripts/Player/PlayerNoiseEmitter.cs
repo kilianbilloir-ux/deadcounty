@@ -20,6 +20,9 @@ namespace DeadCounty.Player
         int sourceId;
         float stepTimer, pantingTimer, loudest, landingLoudest;
 
+        // Source id of the player's noises.
+        public int SourceId => sourceId;
+
         void Awake()
         {
             controller = GetComponent<ThirdPersonController>();

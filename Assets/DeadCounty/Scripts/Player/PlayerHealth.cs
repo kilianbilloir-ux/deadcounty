@@ -5,7 +5,8 @@ using UnityEngine;
 namespace DeadCounty.Player
 {
     // Player hit points. A hit knocks the player back away from its source and staggers them, then grants a
-    // short invulnerability so one swing cannot land several times.
+    // short invulnerability so one swing cannot land several times. A hit may also open a bleeding wound that
+    // drains health until a bandage stops it (GDD 8.4).
     [RequireComponent(typeof(ThirdPersonController))]
     public class PlayerHealth : MonoBehaviour
     {
@@ -17,6 +18,11 @@ namespace DeadCounty.Player
         [SerializeField] float knockbackDuration = 0.12f;
         [SerializeField] float staggerTime = 0.4f;
         [SerializeField] float staggerSpeedFactor = 0.4f;
+
+        [Header("Bleeding")]
+        [SerializeField, Range(0f, 1f)] float bleedChance = 0.25f;
+        [Tooltip("A bleeding player who does nothing dies in about 3 min from full health.")]
+        [SerializeField] float bleedDamagePerSecond = 0.5f;
 
         ThirdPersonController controller;
         float invulnerableUntil = float.NegativeInfinity;
@@ -31,6 +37,7 @@ namespace DeadCounty.Player
         public float LastHitTime { get; private set; } = float.NegativeInfinity;
         // Debug god mode: every hit is ignored.
         public bool Invulnerable { get; set; }
+        public bool Bleeding { get; private set; }
 
         public event Action<PlayerHealth> Damaged;
         public event Action<PlayerHealth> Died;
@@ -56,6 +63,7 @@ namespace DeadCounty.Player
             var direction = away.sqrMagnitude > 1e-4f ? away.normalized : -transform.forward;
             controller.Knockback(direction * knockbackDistance, knockbackDuration);
             controller.Stagger(staggerTime, staggerSpeedFactor);
+            if (!killed && UnityEngine.Random.value < bleedChance) Bleeding = true;
 
             Damaged?.Invoke(this);
             if (killed) Died?.Invoke(this);
@@ -71,10 +79,18 @@ namespace DeadCounty.Player
 
         public void Heal(float amount) => Pool.Heal(amount);
 
+        public void StopBleeding() => Bleeding = false;
+
+        void Update()
+        {
+            if (Bleeding) ApplyDrain(bleedDamagePerSecond * Time.deltaTime);
+        }
+
         public void Restore()
         {
             Pool.Reset();
             invulnerableUntil = float.NegativeInfinity;
+            Bleeding = false;
         }
     }
 }

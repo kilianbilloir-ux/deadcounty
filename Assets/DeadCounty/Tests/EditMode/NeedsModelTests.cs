@@ -45,16 +45,11 @@ namespace DeadCounty.Tests
             thirsty.Tick(12f * Minute, false);
             Assert.That(thirsty.Tick(2f * Minute, false), Is.EqualTo(100f).Within(1e-2f));
 
-            var starving = new NeedsModel(new NeedsSettings
-            {
-                HungerMinutes = 1f,
-                ThirstMinutes = 1000f,
-                FatigueMinutes = 1000f,
-                SprintFatigueFactor = 2f,
-                StarvingDamagePerMinute = 100f / 3f,
-                DehydratedDamagePerMinute = 50f,
-                ExhaustedStaminaCapacity = 0.5f,
-            });
+            var settings = NeedsSettings.Default;
+            settings.HungerMinutes = 1f;
+            settings.ThirstMinutes = 1000f;
+            settings.FatigueMinutes = 1000f;
+            var starving = new NeedsModel(settings);
             starving.Tick(Minute, false);
             Assert.That(starving.Tick(3f * Minute, false), Is.EqualTo(100f).Within(1e-2f));
         }
@@ -110,6 +105,27 @@ namespace DeadCounty.Tests
             model.Restore(0.25f, 0f);
             Assert.That(model.Hunger, Is.EqualTo(0.4f + 0.25f).Within(1e-3f));
             Assert.That(model.Thirst, Is.Zero.Within(1e-4f));
+        }
+
+        [Test]
+        public void SleepFillsFatigueInEightGameHoursWhileHungerAndThirstSlowDown()
+        {
+            var model = Create();
+            model.Tick(10f * Minute, false);
+            Assert.That(model.Sleep(Minute), Is.Zero);
+            Assert.That(model.Fatigue, Is.EqualTo(0.6f + 60f / 200f).Within(1e-3f));
+            Assert.That(model.Hunger, Is.EqualTo(0.5f - 30f / 1200f).Within(1e-3f));
+            Assert.That(model.Thirst, Is.EqualTo(1f / 6f - 30f / 720f).Within(1e-3f));
+            model.Sleep(Minute);
+            Assert.That(model.Fatigue, Is.EqualTo(1f), "fatigue stops at full");
+        }
+
+        [Test]
+        public void AnEmptyGaugeHurtsHalfAsMuchAsleep()
+        {
+            var model = Create();
+            model.Tick(12f * Minute + 1f, false);
+            Assert.That(model.Sleep(2f * Minute), Is.EqualTo(50f).Within(0.1f), "thirst kills in 2 min awake, 4 min asleep");
         }
     }
 }
