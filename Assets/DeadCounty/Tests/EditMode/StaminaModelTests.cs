@@ -144,6 +144,19 @@ namespace DeadCounty.Tests
         }
 
         [Test]
+        public void ConstructorRejectsNonPositiveOrNonFiniteMax()
+        {
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new StaminaModel(new StaminaSettings { Max = 0f }));
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new StaminaModel(new StaminaSettings { Max = -10f }));
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new StaminaModel(new StaminaSettings { Max = float.NaN }));
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new StaminaModel(new StaminaSettings { Max = float.PositiveInfinity }));
+        }
+
+        [Test]
+        public void NormalizedIsOneOnFullDefaultModel() =>
+            Assert.That(Create().Normalized, Is.EqualTo(1f));
+
+        [Test]
         public void ResetRefillsAndClearsExhaustion()
         {
             var model = Create();

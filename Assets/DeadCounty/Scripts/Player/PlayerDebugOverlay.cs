@@ -4,12 +4,13 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Development overlay toggled with F1: player state, health, stamina, noise radius and camera framing values.
-    // K deals a 25 damage hit from in front of the player to test the hit reaction and death flow.
+    // Development overlay toggled with F1 (hidden by default): player state, health, stamina, noise radius and
+    // camera framing values. While it is open, K deals a 25 damage hit from in front of the player to test the hit
+    // reaction and death flow.
     // The noise radius is also drawn as a gizmo (Scene view, or Game view with Gizmos enabled).
     public class PlayerDebugOverlay : MonoBehaviour
     {
-        [SerializeField] bool visible = true;
+        [SerializeField] bool visible;
 
         ThirdPersonController player;
         PlayerHealth health;
@@ -33,7 +34,7 @@ namespace DeadCounty.Player
             // Direct device reads: debug keys do not belong in the gameplay action map.
             var keyboard = Keyboard.current;
             if (keyboard != null && keyboard.f1Key.wasPressedThisFrame) visible = !visible;
-            if (keyboard != null && keyboard.kKey.wasPressedThisFrame)
+            if (visible && keyboard != null && keyboard.kKey.wasPressedThisFrame)
                 health.ApplyHit(25f, player.transform.position + player.transform.forward);
             fps = Mathf.Lerp(fps, 1f / Mathf.Max(Time.unscaledDeltaTime, 1e-4f), 0.1f);
         }

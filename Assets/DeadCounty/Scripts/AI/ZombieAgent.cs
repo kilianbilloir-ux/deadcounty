@@ -133,6 +133,7 @@ namespace DeadCounty.AI
             RefreshSnapshot();
             brain.Tick(dt, snapshot, this, ref commands);
             noisePending = false;
+            noiseMargin = float.NegativeInfinity;
             if (brain.TransitionedThisTick) AIEvents.RaiseTransition(ownId, brain.LastTransition, motor.Position);
             if (commands.EmitCall) NoiseSystem.Emit(motor.Position, tuning.CallRadius, NoiseKind.ZombieCall, ownId);
         }
@@ -151,7 +152,9 @@ namespace DeadCounty.AI
         // Back to the recorded spawn pose, calm and at full health; revives a dead zombie.
         public void ResetToSpawn()
         {
+            if (!isActiveAndEnabled) throw new InvalidOperationException($"{name}: ResetToSpawn on a disabled or inactive zombie");
             if (RecordIndex < 0) throw new InvalidOperationException($"{name}: ResetToSpawn before registering with the ZombieManager");
+            if (manager == null) throw new InvalidOperationException($"{name}: ResetToSpawn needs an enabled ZombieManager");
             var record = manager.GetRecord(RecordIndex);
             dead = false;
             navAgent.enabled = true;
@@ -165,6 +168,12 @@ namespace DeadCounty.AI
             CurrentSpeed = 0f;
             UpdateAim();
             MotionResetId++;
+            if (animator != null)
+            {
+                animator.enabled = true;
+                animator.Snap();
+                ApplyLodToAnimator();
+            }
             if (isActiveAndEnabled) manager.Register(this);
         }
 
@@ -179,9 +188,14 @@ namespace DeadCounty.AI
                 CurrentSpeed = 0f;
             }
             else if (wasDormant) motor.SetDormant(false);
+            ApplyLodToAnimator();
+        }
+
+        void ApplyLodToAnimator()
+        {
             if (animator == null) return;
-            animator.GroundRays = lod == ZombieLod.Near;
-            animator.UpdateEvery = lod switch
+            animator.GroundRays = Lod == ZombieLod.Near;
+            animator.UpdateEvery = Lod switch
             {
                 ZombieLod.Far => FarAnimationInterval,
                 ZombieLod.Dormant => DormantAnimationInterval,
@@ -202,11 +216,15 @@ namespace DeadCounty.AI
 
         void OnDied(ZombieHealth _)
         {
+            if (dead) return;
             dead = true;
             motor.Halt();
             CurrentSpeed = 0f;
             navAgent.enabled = false;
-            manager.ReportDeath(this);
+            // A corpse must not keep idling: the animator would hold its last pose and sway forever.
+            if (animator != null) animator.enabled = false;
+            if (manager != null) manager.ReportDeath(this);
+            else Debug.LogWarning($"{name}: died without an enabled ZombieManager, staying frozen until ResetToSpawn.", this);
         }
 
         void RefreshSnapshot()

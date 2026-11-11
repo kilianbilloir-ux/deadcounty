@@ -13,11 +13,10 @@ namespace DeadCounty.Player
         const float HeadHeightRatio = 0.92f;
         const float ChestHeightRatio = 0.65f;
 
-        [SerializeField] bool flashlightOn;
-
         CharacterController body;
         ThirdPersonController controller;
         PlayerHealth health;
+        PlayerFlashlight flashlight;
 
         public static PerceptionTarget Player { get; private set; }
 
@@ -27,11 +26,7 @@ namespace DeadCounty.Player
         public Vector3 Velocity { get; private set; }
         public float Speed { get; private set; }
         public bool IsCrouching { get; private set; }
-        public bool FlashlightOn
-        {
-            get => flashlightOn;
-            set => flashlightOn = value;
-        }
+        public bool FlashlightOn => flashlight != null && flashlight.IsOn;
         // False in ghost mode: zombies neither see nor hear the player.
         public bool Visible { get; set; } = true;
         public bool IsAlive => health.IsAlive;
@@ -43,6 +38,7 @@ namespace DeadCounty.Player
             body = GetComponent<CharacterController>();
             controller = GetComponent<ThirdPersonController>();
             health = GetComponent<PlayerHealth>();
+            flashlight = GetComponent<PlayerFlashlight>();
         }
 
         void OnEnable()

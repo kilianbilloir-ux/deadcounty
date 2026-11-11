@@ -21,6 +21,11 @@ namespace DeadCounty.Player
         ThirdPersonController controller;
         float invulnerableUntil = float.NegativeInfinity;
 
+        void OnValidate()
+        {
+            if (!float.IsFinite(maxHealth) || maxHealth <= 0f) maxHealth = 100f;
+        }
+
         public HealthPool Pool { get; private set; }
         public bool IsAlive => !Pool.IsDead;
         public float LastHitTime { get; private set; } = float.NegativeInfinity;
@@ -35,9 +40,10 @@ namespace DeadCounty.Player
         }
 
         // Returns true when the damage was applied, false while dead or invulnerable.
+        // !(damage > 0) rejects NaN, where <= would let it through.
         public bool ApplyHit(float damage, Vector3 sourcePosition)
         {
-            if (damage <= 0f || !IsAlive || Time.time < invulnerableUntil) return false;
+            if (!(damage > 0f) || !IsAlive || Time.time < invulnerableUntil) return false;
             var killed = Pool.Apply(damage);
             LastHitTime = Time.time;
             invulnerableUntil = Time.time + invulnerabilityTime;

@@ -23,7 +23,7 @@ namespace DeadCounty.Tests
         // Fastest horizontal ankle motion over frames where the foot was planted in this and the previous
         // frame, after a 1 s settling time, over 3 s at constant speed. `flightFrames` counts the frames with
         // both feet off the ground.
-        static float MaxStanceSlip(HumanoidTestRig rig, float speed, out int stanceFrames, out int flightFrames)
+        static float MaxStanceSlip(HumanoidTestRig rig, float speed, out int stanceFrames, out int flightFrames, float yawRate = 0f, float maxRollDeg = float.PositiveInfinity)
         {
             rig.Initialize();
             var max = 0f;
@@ -32,21 +32,28 @@ namespace DeadCounty.Tests
             var lastLeft = rig.LeftAnkle.position;
             var lastRight = rig.RightAnkle.position;
             bool wasLeftPlanted = false, wasRightPlanted = false;
+            float lastLeftRoll = 0f, lastRightRoll = 0f;
             for (var frame = 0; frame < 180; frame++)
             {
-                rig.Step(speed);
+                rig.Step(speed, yawRate);
                 var left = rig.LeftAnkle.position;
                 var right = rig.RightAnkle.position;
                 if (frame >= 60)
                 {
                     if (!rig.Animator.LeftFootPlanted && !rig.Animator.RightFootPlanted) flight++;
-                    if (wasLeftPlanted && rig.Animator.LeftFootPlanted) Measure(left - lastLeft);
-                    if (wasRightPlanted && rig.Animator.RightFootPlanted) Measure(right - lastRight);
+                    if (wasLeftPlanted && rig.Animator.LeftFootPlanted
+                        && Mathf.Abs(rig.Animator.LeftFootRoll) <= maxRollDeg && Mathf.Abs(lastLeftRoll) <= maxRollDeg)
+                        Measure(left - lastLeft);
+                    if (wasRightPlanted && rig.Animator.RightFootPlanted
+                        && Mathf.Abs(rig.Animator.RightFootRoll) <= maxRollDeg && Mathf.Abs(lastRightRoll) <= maxRollDeg)
+                        Measure(right - lastRight);
                 }
                 lastLeft = left;
                 lastRight = right;
                 wasLeftPlanted = rig.Animator.LeftFootPlanted;
                 wasRightPlanted = rig.Animator.RightFootPlanted;
+                lastLeftRoll = rig.Animator.LeftFootRoll;
+                lastRightRoll = rig.Animator.RightFootRoll;
             }
             stanceFrames = frames;
             flightFrames = flight;
@@ -80,6 +87,72 @@ namespace DeadCounty.Tests
             using var rig = Shambler(true, leftIsBad);
             var slip = MaxStanceSlip(rig, speed, out var frames, out _);
             TestContext.WriteLine($"max slip {slip:0.00000} m/s over {frames} stance frames");
+            Assert.That(frames, Is.GreaterThan(30));
+            Assert.That(slip, Is.LessThanOrEqualTo(0.02f));
+        }
+
+        // Turning on the spot slides each foothold back by the frame's yaw: no bank, exact.
+        [TestCase(120f)]
+        [TestCase(-120f)]
+        public void TurnInPlaceKeepsPlantedFeetInPlace(float yawRate)
+        {
+            using var rig = Survivor();
+            var slip = MaxStanceSlip(rig, 0f, out var frames, out _, yawRate);
+            TestContext.WriteLine($"turn-in-place slip {slip:0.00000} m/s over {frames} stance frames (yaw {yawRate})");
+            Assert.That(frames, Is.GreaterThan(30));
+            Assert.That(slip, Is.LessThanOrEqualTo(0.003f));
+        }
+
+        // Turning while walking banks the body, so the rising ankle of a toeing-off boot reads as slip:
+        // only measure while the boot is flat (|roll| <= 3 deg needs moving ~= 1). The toe pivoting about
+        // its contact (~0.16 m/s at 60 deg/s) is out of scope. N > 1 LOD is untested on purpose: with the
+        // rotate-then-move integration the rig and the game agree frame by frame, but an accumulated
+        // multi-frame step has no exact single-frame correction (second order in yaw x travel).
+        // Entering a turn banks the body within a few frames; planted feet must ride it, not jump.
+        // Flat-foot gated like WalkWhileTurning: the re-step itself moves ankles, only the excess counts.
+        // Measured 0.05 with the transport; the un-transported bank drag alone adds ~0.16.
+        [TestCase(120f)]
+        [TestCase(-120f)]
+        public void TurnEntryKeepsFeetBounded(float yawRate)
+        {
+            using var rig = Survivor();
+            rig.Initialize();
+            for (var frame = 0; frame < 60; frame++) rig.Step(1.5f);
+            var max = 0f;
+            var frames = 0;
+            var lastLeft = rig.LeftAnkle.position;
+            var lastRight = rig.RightAnkle.position;
+            var wasLeftPlanted = rig.Animator.LeftFootPlanted;
+            var wasRightPlanted = rig.Animator.RightFootPlanted;
+            for (var frame = 0; frame < 15; frame++)
+            {
+                rig.Step(1.5f, yawRate);
+                var left = rig.LeftAnkle.position;
+                var right = rig.RightAnkle.position;
+                if (wasLeftPlanted && rig.Animator.LeftFootPlanted && Mathf.Abs(rig.Animator.LeftFootRoll) <= 3f) Track(left - lastLeft);
+                if (wasRightPlanted && rig.Animator.RightFootPlanted && Mathf.Abs(rig.Animator.RightFootRoll) <= 3f) Track(right - lastRight);
+                lastLeft = left;
+                lastRight = right;
+                wasLeftPlanted = rig.Animator.LeftFootPlanted;
+                wasRightPlanted = rig.Animator.RightFootPlanted;
+            }
+            TestContext.WriteLine($"turn-entry slip {max:0.00000} m/s over {frames} flat stance frames (yaw {yawRate})");
+            Assert.That(frames, Is.GreaterThan(5));
+            Assert.That(max, Is.LessThanOrEqualTo(0.10f), $"turn-entry slip {max:0.000} m/s over {frames} frames");
+
+            void Track(Vector3 delta)
+            {
+                max = Mathf.Max(max, new Vector2(delta.x, delta.z).magnitude / Dt);
+                frames++;
+            }
+        }
+        [TestCase(60f)]
+        [TestCase(-60f)]
+        public void WalkWhileTurningKeepsFlatFootPlanted(float yawRate)
+        {
+            using var rig = Survivor();
+            var slip = MaxStanceSlip(rig, 1.5f, out var frames, out _, yawRate, 3f);
+            TestContext.WriteLine($"walking-turn slip {slip:0.00000} m/s over {frames} flat stance frames (yaw {yawRate})");
             Assert.That(frames, Is.GreaterThan(30));
             Assert.That(slip, Is.LessThanOrEqualTo(0.02f));
         }
@@ -164,6 +237,25 @@ namespace DeadCounty.Tests
             for (var frame = 0; frame < 120; frame++) rig.Step(0f);
             var look = Vector3.ProjectOnPlane(rig.Neck.forward, Vector3.up);
             Assert.That(Vector3.SignedAngle(rig.Root.forward, look, Vector3.up), Is.EqualTo(expectedYaw).Within(2f));
+        }
+
+        // Without a snap, a warp reads as a sprint: the lean clamps and the spine pitches hard.
+        [Test]
+        public void TeleportWithoutSnapSpikesLean()
+        {
+            using var rig = Survivor();
+            rig.Initialize();
+            rig.Motion.AimYaw = rig.Root.eulerAngles.y;
+            for (var frame = 0; frame < 60; frame++) rig.Step(1.5f);
+            rig.Root.position += rig.Root.forward * 2.5f;
+            for (var frame = 0; frame < 3; frame++)
+            {
+                rig.Motion.AimYaw = rig.Root.eulerAngles.y;
+                rig.Step(1.5f);
+            }
+            var tilt = Vector3.Angle(Vector3.up, rig.Spine.localRotation * Vector3.up);
+            TestContext.WriteLine($"un-snapped warp lean {tilt:0.0} deg");
+            Assert.That(tilt, Is.GreaterThan(6f), "a warp with no snap should spike the lean");
         }
 
         // Without the snap, the warp reads as a 1800 m/s surge and a 5400 deg/s turn: full lean and bank.

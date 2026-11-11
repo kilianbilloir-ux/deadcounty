@@ -31,7 +31,7 @@ namespace DeadCounty.EditorTools
                 }
                 Post("Borne", canopy, new Vector3(x, 0f, -3.2f), 0.9f, 0.1f, "SignYellow");
                 Post("Borne", canopy, new Vector3(x, 0f, 3.2f), 0.9f, 0.1f, "SignYellow");
-                SpotLight(canopy, "Lumiere_Auvent", new Vector3(x * 1.6f, 4.5f, 0f), Quaternion.Euler(90f, 0f, 0f), ColdWhite, 8f, 9f, 120f, false);
+                BuiltLamps.Add(SpotLight(canopy, "Lumiere_Auvent", new Vector3(x * 1.6f, 4.5f, 0f), Quaternion.Euler(90f, 0f, 0f), ColdWhite, 8f, 9f, 120f, false));
             }
 
             var shop = Group(lot, "Boutique", new Vector3(-3f, 0.1f, -13.5f));
@@ -171,7 +171,7 @@ namespace DeadCounty.EditorTools
             PalletStack(w, new Vector3(27f, 0.1f, 17f), 3);
             for (var i = 0; i < 3; i++) Barrel(w, new Vector3(27.5f, 0.1f, 3f + i * 0.7f), "SignRed");
             Box("Lampe_Porte", w, new Vector3(15f, 3.1f, 20.25f), new Vector3(0.4f, 0.15f, 0.3f), "LampGlow", solid: false);
-            SpotLight(w, "Lumiere_Porte", new Vector3(15f, 3f, 20.4f), Quaternion.Euler(60f, 0f, 0f), Sodium, 4f, 10f, 100f, false);
+            BuiltLamps.Add(SpotLight(w, "Lumiere_Porte", new Vector3(15f, 3f, 20.4f), Quaternion.Euler(60f, 0f, 0f), Sodium, 4f, 10f, 100f, false));
 
             Box("Cour", parent, new Vector3(0f, 0.015f, -49f), new Vector3(40f, 0.03f, 20f), "Gravel");
             Container(parent, "Conteneur", new Vector3(-13f, 0f, -47f), 8f, "CarRed");
@@ -191,8 +191,8 @@ namespace DeadCounty.EditorTools
             Box("Dalle_Essais", parent, new Vector3(0f, 0.05f, 37f), new Vector3(TestPadSize.x, 0.1f, TestPadSize.y), "TestPad");
             FenceLoop(parent, FenceKind.Chain, new Vector3(-4f, 0f, 12.5f), new Vector3(-37.5f, 0f, 12.5f), new Vector3(-37.5f, 0f, 61.5f),
                 new Vector3(37.5f, 0f, 61.5f), new Vector3(37.5f, 0f, 12.5f), new Vector3(4f, 0f, 12.5f));
-            Floodlight(parent, new Vector3(-36f, 0f, 60f), new Vector3(-8f, 0f, 35f));
-            Floodlight(parent, new Vector3(36f, 0f, 60f), new Vector3(8f, 0f, 35f));
+            BuiltLamps.Add(Floodlight(parent, new Vector3(-36f, 0f, 60f), new Vector3(-8f, 0f, 35f)));
+            BuiltLamps.Add(Floodlight(parent, new Vector3(36f, 0f, 60f), new Vector3(8f, 0f, 35f)));
             Reserve(-39f, 11f, 39f, 63f);
 
             var course = Group(parent, "Parcours", new Vector3(0f, 0.1f, 20f));

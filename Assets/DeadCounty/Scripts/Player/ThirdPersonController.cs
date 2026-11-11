@@ -104,6 +104,10 @@ namespace DeadCounty.Player
         // Radius within which zombies hear the player this frame, 0 when silent.
         public float NoiseRadius { get; private set; }
 
+        // Landing contribution to this frame's noise, 0 outside the hard-landing window; lets the emitter
+        // type the footstep event as Landing when the landing peak dominates.
+        public float LandingRadius => landingNoiseTimer > 0f ? landingNoise : 0f;
+
         void Awake()
         {
             controller = GetComponent<CharacterController>();

@@ -18,7 +18,7 @@ namespace DeadCounty.Player
         PlayerStamina stamina;
         PerceptionTarget target;
         int sourceId;
-        float stepTimer, pantingTimer, loudest;
+        float stepTimer, pantingTimer, loudest, landingLoudest;
 
         void Awake()
         {
@@ -33,19 +33,20 @@ namespace DeadCounty.Player
         {
             if (!target.Visible || !target.IsAlive)
             {
-                stepTimer = pantingTimer = loudest = 0f;
+                stepTimer = pantingTimer = loudest = landingLoudest = 0f;
                 return;
             }
 
             var dt = Time.deltaTime;
             loudest = Mathf.Max(loudest, controller.NoiseRadius);
+            landingLoudest = Mathf.Max(landingLoudest, controller.LandingRadius);
             stepTimer += dt;
             if (stepTimer >= stepInterval)
             {
                 // Repeat instead of subtracting so a frame hitch does not fire a burst of catch-up events.
                 stepTimer = Mathf.Repeat(stepTimer, stepInterval);
-                if (loudest > 0f) NoiseSystem.Emit(transform.position, loudest, NoiseKind.Footstep, sourceId);
-                loudest = 0f;
+                if (loudest > 0f) NoiseSystem.Emit(transform.position, loudest, landingLoudest >= loudest ? NoiseKind.Landing : NoiseKind.Footstep, sourceId);
+                loudest = landingLoudest = 0f;
             }
 
             if (!stamina.Model.Exhausted)

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using DeadCounty.AI;
+using DeadCounty.Animation;
 using DeadCounty.Core;
 using NUnit.Framework;
 using Unity.AI.Navigation;
@@ -52,6 +54,9 @@ namespace DeadCounty.Tests
             Profile = ScriptableObject.CreateInstance<ZombieProfile>();
             // Test zombies stand still until something happens, so a wander walk never turns them away.
             Profile.Tuning.IdleChance = 1f;
+            // Readable idle spine (no hunch) for the death-snap test; no PlayMode test asserts hunch.
+            Profile.Tuning.HunchMin = 0f;
+            Profile.Tuning.HunchMax = 0f;
             owned.Add(Profile);
 
             var managerObject = new GameObject("TestZombieManager");
@@ -64,7 +69,7 @@ namespace DeadCounty.Tests
         }
 
         // Built inactive so Configure runs before Awake, like a prefab body would be set up in the editor.
-        public ZombieAgent SpawnZombie(Vector3 position, float yaw = 0f, int seed = 1)
+        public ZombieAgent SpawnZombie(Vector3 position, float yaw = 0f, int seed = 1, bool withAnimator = false)
         {
             var body = new GameObject($"TestZombie_{seed}");
             body.SetActive(false);
@@ -78,8 +83,63 @@ namespace DeadCounty.Tests
             body.AddComponent<Rigidbody>().isKinematic = true;
             var agent = body.AddComponent<ZombieAgent>();
             agent.Configure(Profile, seed, true);
+            if (withAnimator) AttachAnimator(body, agent);
             body.SetActive(true);
             return agent;
+        }
+
+        // A real animator on a test body: joint layout mirrors the EditMode rig, linked by reflection since
+        // the fields are serialized privates.
+        void AttachAnimator(GameObject body, ZombieAgent agent)
+        {
+            var model = Joint(body.transform, "Model", Vector3.zero);
+            var hips = Joint(model, "Hips", new Vector3(0f, 1f, 0f));
+            var spine = Joint(hips, "Spine", new Vector3(0f, 0.06f, 0f));
+            var neck = Joint(spine, "Neck", new Vector3(0f, 0.42f, 0f));
+            var leftShoulder = Joint(spine, "ShoulderL", new Vector3(-0.24f, 0.36f, 0f));
+            var rightShoulder = Joint(spine, "ShoulderR", new Vector3(0.24f, 0.36f, 0f));
+            var leftElbow = Joint(leftShoulder, "ElbowL", new Vector3(0f, -0.28f, 0f));
+            var rightElbow = Joint(rightShoulder, "ElbowR", new Vector3(0f, -0.28f, 0f));
+            var leftHip = Joint(hips, "HipL", new Vector3(-0.095f, -0.05f, 0f));
+            var rightHip = Joint(hips, "HipR", new Vector3(0.095f, -0.05f, 0f));
+            var leftKnee = Joint(leftHip, "KneeL", new Vector3(0f, -0.44f, 0f));
+            var rightKnee = Joint(rightHip, "KneeR", new Vector3(0f, -0.44f, 0f));
+            var leftAnkle = Joint(leftKnee, "AnkleL", new Vector3(0f, -0.43f, 0f));
+            var rightAnkle = Joint(rightKnee, "AnkleR", new Vector3(0f, -0.43f, 0f));
+            var animator = body.AddComponent<ProceduralHumanoidAnimator>();
+            var gait = ScriptableObject.CreateInstance<GaitProfile>();
+            owned.Add(gait);
+            Bind(animator, "controller", agent);
+            Bind(animator, "gait", gait);
+            Bind(animator, "hips", hips);
+            Bind(animator, "spine", spine);
+            Bind(animator, "neck", neck);
+            Bind(animator, "leftShoulder", leftShoulder);
+            Bind(animator, "rightShoulder", rightShoulder);
+            Bind(animator, "leftElbow", leftElbow);
+            Bind(animator, "rightElbow", rightElbow);
+            Bind(animator, "leftHip", leftHip);
+            Bind(animator, "rightHip", rightHip);
+            Bind(animator, "leftKnee", leftKnee);
+            Bind(animator, "rightKnee", rightKnee);
+            Bind(animator, "leftAnkle", leftAnkle);
+            Bind(animator, "rightAnkle", rightAnkle);
+            Bind(agent, "animator", animator);
+        }
+
+        static Transform Joint(Transform parent, string name, Vector3 position)
+        {
+            var joint = new GameObject(name).transform;
+            joint.SetParent(parent, false);
+            joint.localPosition = position;
+            return joint;
+        }
+
+        static void Bind(Component target, string field, Object value)
+        {
+            var info = target.GetType().GetField(field, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (info == null) throw new MissingFieldException(target.GetType().Name, field + " (did you rename?)");
+            info.SetValue(target, value);
         }
 
         // An environment box on the Default layer, tagged Wall or Glass.
