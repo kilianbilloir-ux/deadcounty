@@ -30,6 +30,15 @@
                         <ui:VisualElement name="stamina-fill" picking-mode="Ignore" class="bar-fill stamina-fill" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement name="noise-row" picking-mode="Ignore" class="bar-row noise-row">
+                    <ui:Label text="Bruit" picking-mode="Ignore" class="bar-label" />
+                    <ui:VisualElement name="noise-meter" picking-mode="Ignore" class="noise-meter">
+                        <ui:VisualElement picking-mode="Ignore" class="noise-segment noise-segment--first" />
+                        <ui:VisualElement picking-mode="Ignore" class="noise-segment" />
+                        <ui:VisualElement picking-mode="Ignore" class="noise-segment" />
+                        <ui:VisualElement picking-mode="Ignore" class="noise-segment" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="readouts" picking-mode="Ignore" class="readouts">
                 <ui:Label name="time" text="Jour 1 — 11:00" picking-mode="Ignore" class="readout time-readout" />
