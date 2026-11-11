@@ -195,7 +195,7 @@ namespace DeadCounty.EditorTools
             var s = Group(parent, "Abri_Jardin", pos, yaw);
             Box("Corps", s, new Vector3(0f, 1.15f, 0f), new Vector3(3f, 2.3f, 2.5f), "Wood");
             Box("Porte", s, new Vector3(0f, 0.95f, -1.26f), new Vector3(1.1f, 1.9f, 0.04f), "WoodDark", solid: false);
-            Roof(s, "Toit", new Vector3(0f, 2.3f, 0f), 3.4f, 2.9f, 0.8f, roof);
+            GableRoof(s, new Vector3(0f, 2.3f, 0f), 3.4f, 2.9f, 0.8f, 0f, new Vector2(1.5f, 1.25f), roof, "Wood", null);
         }
 
         static void PicnicTable(Transform parent, Vector3 pos, float yaw)

@@ -183,6 +183,11 @@ namespace DeadCounty.EditorTools
             Post("Poteau", sign, Vector3.zero, 2.8f, 0.035f, "Metal", solid: false);
             Box("Lame", sign, new Vector3(0f, 2.7f, 0f), new Vector3(0.9f, 0.18f, 0.02f), "SignGreen", solid: false);
             Box("Lame", sign, new Vector3(0f, 2.48f, 0f), new Vector3(0.02f, 0.18f, 0.9f), "SignGreen", solid: false);
+            foreach (var side in new[] { -1f, 1f })
+            {
+                Label(sign, "COUNTY RD", new Vector3(0f, 2.7f, side * 0.016f), new Vector3(0f, 0f, side), 0.024f, "SignWhite");
+                Label(sign, "MAIN ST", new Vector3(side * 0.016f, 2.48f, 0f), new Vector3(side, 0f, 0f), 0.024f, "SignWhite");
+            }
         }
 
         static void Hydrant(Transform parent, Vector3 pos)

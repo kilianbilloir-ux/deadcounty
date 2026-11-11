@@ -16,6 +16,27 @@ namespace DeadCounty.EditorTools
         };
 
         static readonly float[] VillageLots = { 24f, 46f, 68f, 90f, 112f };
+        const float HouseRoofSpan = 10.8f;
+        const float HouseRoofHeight = 2.2f;
+
+        // Outer walls of the house body frame, walked so that each wall's local +X faces out; the lap siding follows
+        // the same openings.
+        static readonly (string Name, Vector2 From, Vector2 To, Opening[] Openings)[] HouseShell =
+        {
+            ("Mur_Facade", new Vector2(0f, 0f), new Vector2(12f, 0f), new[] { Window(2f), Door(5f), Window(9.5f) }),
+            ("Mur_Droit", new Vector2(12f, 0f), new Vector2(12f, 10f), new[] { Window(2.5f), Window(7.5f) }),
+            ("Mur_Arriere", new Vector2(12f, 10f), new Vector2(0f, 10f), new[] { Window(3f), Door(9f) }),
+            ("Mur_Gauche", new Vector2(0f, 10f), new Vector2(0f, 0f), new[] { Window(5f) }),
+        };
+
+        static readonly Opening[] ChurchWindows = { Window(4f, 0.8f, 1.3f, 3.4f), Window(8f, 0.8f, 1.3f, 3.4f), Window(12f, 0.8f, 1.3f, 3.4f) };
+        static readonly (string Name, Vector2 From, Vector2 To, Opening[] Openings)[] ChurchShell =
+        {
+            ("Facade", new Vector2(-4.5f, 0f), new Vector2(4.5f, 0f), new[] { Door(4.5f, 1.8f, 2.7f) }),
+            ("Mur_Droit", new Vector2(4.5f, 0f), new Vector2(4.5f, 16f), ChurchWindows),
+            ("Mur_Arriere", new Vector2(4.5f, 16f), new Vector2(-4.5f, 16f), System.Array.Empty<Opening>()),
+            ("Mur_Gauche", new Vector2(-4.5f, 16f), new Vector2(-4.5f, 0f), ChurchWindows),
+        };
         static readonly Vector3 ChurchOrigin = new(MainStreetX + 12f, 0f, -60f);
         const float ChurchYaw = 90f;
 
@@ -82,16 +103,17 @@ namespace DeadCounty.EditorTools
             var inner = new WallStyle("Interior");
 
             Box("Sol", body, new Vector3(6f, 0.05f, 5f), new Vector3(12f, 0.1f, 10f), "Floor");
-            Wall(body, "Mur_Facade", new Vector2(0f, 0f), new Vector2(12f, 0f), ext, Window(2f), Door(5f), Window(9.5f));
-            Wall(body, "Mur_Droit", new Vector2(12f, 0f), new Vector2(12f, 10f), ext, Window(2.5f), Window(7.5f));
-            Wall(body, "Mur_Arriere", new Vector2(12f, 10f), new Vector2(0f, 10f), ext, Window(3f), Door(9f));
-            Wall(body, "Mur_Gauche", new Vector2(0f, 10f), new Vector2(0f, 0f), ext, Window(5f));
+            foreach (var (wallName, start, end, openings) in HouseShell)
+                Wall(body, wallName, start, end, ext, openings);
             Wall(body, "Cloison_Salon", new Vector2(7f, 0f), new Vector2(7f, 10f), inner, Door(3f), Door(7.5f));
             Wall(body, "Cloison_Chambre", new Vector2(7f, 5.5f), new Vector2(12f, 5.5f), inner, Door(1.5f));
             Wall(body, "Cloison_Cuisine", new Vector2(0f, 6f), new Vector2(7f, 6f), inner, Door(5.5f));
 
-            Roof(body, "Toit", new Vector3(6f, WallHeight, 5f), 12.8f, 10.8f, 2.2f, roof);
+            const float face = WallThickness / 2f;
+            GableRoof(body, new Vector3(6f, WallHeight, 5f), 12.8f, HouseRoofSpan, HouseRoofHeight, 0f, new Vector2(6f + face, 5f + face), roof, siding, "Interior", clapboard: true);
+            MeshObject("Bardage", body, ClapboardMesh("SM_Bardage_Maison", HouseShell, 0.24f, WallHeight), Vector3.zero, Quaternion.identity, Vector3.one, new[] { siding }, false);
             Box("Cheminee", body, new Vector3(2f, 4.4f, 7.5f), new Vector3(0.9f, 2.8f, 0.9f), "Brick");
+            ChimneyCap(body, new Vector3(2f, 5.8f, 7.5f), 0.9f);
 
             Box("Porche", body, new Vector3(5f, 0.1f, -1.3f), new Vector3(3.6f, 0.2f, 2.6f), "Wood");
             Box("Marche", body, new Vector3(5f, 0.05f, -2.85f), new Vector3(1.6f, 0.1f, 0.5f), "Wood");
@@ -180,7 +202,7 @@ namespace DeadCounty.EditorTools
             Wall(g, "Mur_Droit", new Vector2(3f, 0f), new Vector2(3f, 6f), style);
             Wall(g, "Mur_Arriere", new Vector2(3f, 6f), new Vector2(-3f, 6f), style, Door(3f));
             Wall(g, "Mur_Gauche", new Vector2(-3f, 6f), new Vector2(-3f, 0f), style);
-            Roof(g, "Toit", new Vector3(0f, 2.8f, 3f), 6.6f, 6.6f, 1.4f, roof);
+            GableRoof(g, new Vector3(0f, 2.8f, 3f), 6.6f, 6.6f, 1.4f, 0f, new Vector2(3f + WallThickness / 2f, 3f + WallThickness / 2f), roof, "Wall", "Wall");
             var rng = new System.Random(Mathf.RoundToInt(frontCenter.x * 53f + frontCenter.z * 17f));
             Workbench(g, new Vector3(-2.6f, 0.1f, 3.5f), -90f, rng);
             Searchable(MetalShelf(g, new Vector3(2.6f, 0.1f, 3.5f), 90f, rng).gameObject, "Étagère", "LT_Atelier");
@@ -192,11 +214,14 @@ namespace DeadCounty.EditorTools
             var root = Group(parent, "Eglise", ChurchOrigin, ChurchYaw);
             var style = new WallStyle("SidingWhite", 4.5f, "ShutterDark");
             Box("Sol", root, new Vector3(0f, 0.05f, 8f), new Vector3(9f, 0.1f, 16f), "Floor");
-            Wall(root, "Facade", new Vector2(-4.5f, 0f), new Vector2(4.5f, 0f), style, Door(4.5f, 1.8f, 2.7f));
-            Wall(root, "Mur_Droit", new Vector2(4.5f, 0f), new Vector2(4.5f, 16f), style, Window(4f, 0.8f, 1.3f, 3.4f), Window(8f, 0.8f, 1.3f, 3.4f), Window(12f, 0.8f, 1.3f, 3.4f));
-            Wall(root, "Mur_Arriere", new Vector2(4.5f, 16f), new Vector2(-4.5f, 16f), style);
-            Wall(root, "Mur_Gauche", new Vector2(-4.5f, 16f), new Vector2(-4.5f, 0f), style, Window(4f, 0.8f, 1.3f, 3.4f), Window(8f, 0.8f, 1.3f, 3.4f), Window(12f, 0.8f, 1.3f, 3.4f));
-            Roof(root, "Toit", new Vector3(0f, 4.5f, 8f), 16.8f, 9.8f, 4f, "RoofDark", 90f);
+            foreach (var (wallName, start, end, openings) in ChurchShell)
+                Wall(root, wallName, start, end, style, openings);
+            const float face = WallThickness / 2f;
+            GableRoof(root, new Vector3(0f, 4.5f, 8f), 16.8f, 9.8f, 4f, 90f, new Vector2(8f + face, 4.5f + face), "RoofDark", "SidingWhite", "Wood", clapboard: true);
+            MeshObject("Bardage", root, ClapboardMesh("SM_Bardage_Eglise", ChurchShell, 0.2f, 4.5f), Vector3.zero, Quaternion.identity, Vector3.one, new[] { "SidingWhite" }, false);
+            foreach (var x in new[] { -4.5f - face - 0.03f, 4.5f + face + 0.03f })
+            foreach (var z in new[] { -face - 0.03f, 16f + face + 0.03f })
+                Box("Planche_Angle", root, new Vector3(x, 2.25f, z), new Vector3(0.12f, 4.5f, 0.12f), "Trim", solid: false);
             Box("Clocher", root, new Vector3(0f, 8.5f, 1.6f), new Vector3(2.4f, 8f, 2.4f), "SidingWhite");
             MeshObject("Fleche", root, ConeMesh(4), new Vector3(0f, 12.5f, 1.6f), Quaternion.Euler(0f, 45f, 0f), new Vector3(1.8f, 4.5f, 1.8f), new[] { "RoofDark" }, false);
             Box("Croix", root, new Vector3(0f, 17.6f, 1.6f), new Vector3(0.1f, 1.2f, 0.1f), "Metal", solid: false);

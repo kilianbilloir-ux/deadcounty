@@ -103,7 +103,7 @@ namespace DeadCounty.EditorTools
             Box("Rail", barn, new Vector3(0f, 4.75f, face), new Vector3(13.6f, 0.08f, 0.06f), "Metal", solid: false);
             foreach (var x in new[] { -4.6f, 4.6f })
                 XPanel(barn, "Porte_Coulissante", new Vector3(x, 2.3f, face - 0.04f), new Vector2(2.3f, 4.5f), "BarnRed");
-            XPanel(barn, "Porte_Fenil", new Vector3(0f, 7.4f, -0.5f), new Vector2(2f, 2f), "BarnRed");
+            XPanel(barn, "Porte_Fenil", new Vector3(0f, 7.4f, face - 0.01f), new Vector2(2f, 2f), "BarnRed");
 
             var cupola = Group(barn, "Lanterneau", new Vector3(0f, 11.2f, 11f));
             Box("Caisson", cupola, new Vector3(0f, 0.5f, 0f), new Vector3(1.4f, 1f, 1.4f), "BarnRed", solid: false);
