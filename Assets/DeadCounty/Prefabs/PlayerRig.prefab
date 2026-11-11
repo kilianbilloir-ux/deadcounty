@@ -2555,6 +2555,7 @@ GameObject:
   - component: {fileID: 6630331365674300}
   - component: {fileID: 5654377057039098411}
   - component: {fileID: 107859788260795814}
+  - component: {fileID: 6781900904932337017}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2860,6 +2861,18 @@ MonoBehaviour:
   wakeHour: 7
   wakeNoiseRadius: 10
   wakeZombieDistance: 6
+--- !u!114 &6781900904932337017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9aed0af5a5b60466fbff686a14e06e88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerPoseDriver
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0

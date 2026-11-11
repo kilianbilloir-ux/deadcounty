@@ -16,6 +16,8 @@ namespace DeadCounty.AI
         const float MinAimDistance = 1e-3f;
         const int FarAnimationInterval = 2;
         const int DormantAnimationInterval = 8;
+        const float TwitchDuration = 0.18f;
+        const float TwitchAngle = 9f;
 
         [Header("Setup")]
         [SerializeField] ZombieProfile profile;
@@ -36,6 +38,7 @@ namespace DeadCounty.AI
         BrainCommands commands = new() { Pose = PoseModifiers.Neutral };
         Vector3 spawnPosition;
         Quaternion spawnRotation;
+        float twitchPeriod, twitchPhase;
         int ownId;
         bool dead;
 
@@ -61,7 +64,24 @@ namespace DeadCounty.AI
         public bool IsCrouching => false;
         public float AimYaw { get; private set; }
         public float AimPitch { get; private set; }
-        public PoseModifiers Pose => commands.Pose;
+        // The brain's pose plus a short convulsive jerk of the torso and head every few seconds, timed and signed by
+        // the seed; test zombies keep still for repeatable measurements.
+        public PoseModifiers Pose
+        {
+            get
+            {
+                var pose = commands.Pose;
+                if (deterministic) return pose;
+                var cycle = Time.time / twitchPeriod + twitchPhase;
+                var into = Mathf.Repeat(cycle, 1f) * twitchPeriod;
+                if (into >= TwitchDuration) return pose;
+                var count = Mathf.FloorToInt(cycle);
+                var strength = TwitchAngle * (1f - into / TwitchDuration);
+                pose.FlinchRoll += ((count & 1) == 0 ? 1f : -1f) * strength;
+                pose.FlinchPitch += ((count + seed) % 3 - 1) * 0.5f * strength;
+                return pose;
+            }
+        }
         public int MotionResetId { get; private set; }
 
         internal int RecordIndex { get; set; } = -1;
@@ -89,6 +109,9 @@ namespace DeadCounty.AI
             // GetInstanceID and the EntityId to int cast are compile errors in Unity 6.6; NoiseEvent keeps an int id.
             ownId = gameObject.GetEntityId().GetHashCode();
             tuning = profile.Tuning;
+            var looks = new System.Random(seed * 7919 + 13);
+            twitchPeriod = 3f + 3f * (float)looks.NextDouble();
+            twitchPhase = (float)looks.NextDouble();
             if (deterministic)
             {
                 tuning.WanderSpeedJitter = 0f;

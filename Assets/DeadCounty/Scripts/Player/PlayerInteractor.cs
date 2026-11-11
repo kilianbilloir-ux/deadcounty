@@ -27,6 +27,8 @@ namespace DeadCounty.Player
 
         public Interactable Current { get; private set; }
         public bool Busy => usedTarget != null;
+        // When Interact last used something, timed or not; the body reaches out (PlayerPoseDriver).
+        public float LastUseTime { get; private set; } = float.NegativeInfinity;
         // 0 to 1 through a timed use, 0 otherwise.
         public float UseProgress => usedTarget != null ? useElapsed / useTime : 0f;
 
@@ -52,6 +54,7 @@ namespace DeadCounty.Player
             if (Current == null || !interact.WasPressedThisFrame()) return;
             var hurried = run.IsPressed() || sprint.IsPressed();
             var time = Current.UseTime(hurried);
+            LastUseTime = Time.time;
             if (time <= 0f)
             {
                 Current.Interact(transform, hurried);

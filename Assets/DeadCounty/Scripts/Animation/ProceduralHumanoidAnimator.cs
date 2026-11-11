@@ -22,6 +22,9 @@ namespace DeadCounty.Animation
     public partial class ProceduralHumanoidAnimator : MonoBehaviour
     {
         static readonly ProfilerMarker EvaluateMarker = new("DC.Anim.Humanoid");
+        // Hands digging through a drawer, in turn (Hz, deg).
+        const float RummageFrequency = 2.2f;
+        const float RummageAngle = 14f;
 
         [Tooltip("Motion source implementing IHumanoidMotion.")]
         [SerializeField] MonoBehaviour controller;
@@ -237,7 +240,9 @@ namespace DeadCounty.Animation
                 + Mathf.Clamp(forwardAccel * g.AccelerationLean, -g.MaxBrakeLean, g.MaxAccelerationLean) * (1f - air)
                 + g.CrouchLean * crouch;
             var still = 1f - moving;
-            var breathe = Mathf.Sin(clock * 2f * Mathf.PI * g.IdleBreathFrequency) * g.IdleBreathAmplitude * still;
+            // Out of breath, the chest heaves deeper and faster, walking or not.
+            var breathe = Mathf.Sin(clock * 2f * Mathf.PI * g.IdleBreathFrequency * (1f + 1.5f * pose.Pant)) * g.IdleBreathAmplitude * (1f + 3f * pose.Pant)
+                * Mathf.Max(still, pose.Pant);
             var idleSway = Mathf.Sin(clock * 2f * Mathf.PI * g.IdleSwayFrequency) * g.IdleSwayAmplitude * still;
             // The head follows the aim within neck limits, less so when sprinting; past the limit it either holds
             // there or, for the player, recenters rather than looking behind.
@@ -249,8 +254,9 @@ namespace DeadCounty.Animation
             var headTilt = Mathf.Clamp(motion.AimPitch * g.HeadPitchFollow, -g.HeadPitchLimit, g.HeadPitchLimit) * follow;
             // The neck makes up for most of the hunch and lunge to keep looking ahead, not for feeding.
             var posePitch = pose.Hunch + g.LungePitch * pose.Lunge;
-            spine.localRotation = Quaternion.Euler(lean + breathe + posePitch + g.FeedPitch * pose.Feed, -pelvisYaw * 0.9f + headYaw * 0.3f, idleSway);
-            neck.localRotation = Quaternion.Euler(headPitch - (lean + posePitch) * 0.7f + headTilt, headYaw * 0.7f, pose.HeadRoll);
+            spine.localRotation = Quaternion.Euler(lean + breathe + posePitch + g.FeedPitch * pose.Feed + pose.FlinchPitch, -pelvisYaw * 0.9f + headYaw * 0.3f, idleSway + pose.FlinchRoll);
+            // The head whips a little further than the torso.
+            neck.localRotation = Quaternion.Euler(headPitch - (lean + posePitch) * 0.7f + headTilt + pose.FlinchPitch * 0.5f, headYaw * 0.7f, pose.HeadRoll + pose.FlinchRoll * 0.5f);
 
             // Each arm swings with the opposite leg.
             var armBlend = 1f - Mathf.Exp(-15f * dt);
@@ -264,8 +270,9 @@ namespace DeadCounty.Animation
             // Arms reach out in front, fully held out at 0.8, then raised further up to 1.
             var reach = Mathf.Clamp01(armsForward / 0.8f);
             var reachPitch = Mathf.Lerp(g.ArmsForwardPitch, g.ArmsRaisedPitch, Mathf.InverseLerp(0.8f, 1f, armsForward));
-            Arm(leftShoulder, leftElbow, -armSwing * leftArmDrive + raise, -g.ArmSpread, bend, reach, reachPitch, g.ReachElbowBend);
-            Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, reach, reachPitch, g.ReachElbowBend);
+            var dig = Mathf.Sin(clock * 2f * Mathf.PI * RummageFrequency) * RummageAngle * pose.Rummage;
+            Arm(leftShoulder, leftElbow, -armSwing * leftArmDrive + raise, -g.ArmSpread, bend, reach, reachPitch + dig, g.ReachElbowBend + dig);
+            Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, reach, reachPitch - dig, g.ReachElbowBend - dig);
         }
 
         float Duty(float walkDuty, float runness, float sprintness) => Mathf.Lerp(Mathf.Lerp(walkDuty, gait.RunDuty, runness), gait.SprintDuty, sprintness);
@@ -280,6 +287,10 @@ namespace DeadCounty.Animation
             pose.LookWeight = Mathf.Lerp(pose.LookWeight, target.LookWeight, k);
             pose.Lunge = Mathf.Lerp(pose.Lunge, target.Lunge, k);
             pose.Feed = Mathf.Lerp(pose.Feed, target.Feed, k);
+            pose.Rummage = Mathf.Lerp(pose.Rummage, target.Rummage, k);
+            pose.Pant = Mathf.Lerp(pose.Pant, target.Pant, k);
+            pose.FlinchPitch = target.FlinchPitch;
+            pose.FlinchRoll = target.FlinchRoll;
         }
 
         void TrackMotion(float dt)
