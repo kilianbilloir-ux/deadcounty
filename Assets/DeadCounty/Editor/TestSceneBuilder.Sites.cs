@@ -159,9 +159,9 @@ namespace DeadCounty.EditorTools
                 var row = Box("Rang_Mais", fields, new Vector3(x, 1.1f, 38f), new Vector3(0.55f, 2.2f, 46f), "Corn");
                 Object.DestroyImmediate(row.GetComponent<MeshRenderer>());
                 Object.DestroyImmediate(row.GetComponent<MeshFilter>());
-                MeshObject("Plants_Mais", fields, CornRowMesh(rowIndex++ % 3, 46f), new Vector3(x, 0f, 38f), Quaternion.identity, Vector3.one, new[] { "Corn", "Hay" }, false);
+                MeshObject("Plants_Mais", fields, CornRowMesh(rowIndex++ % 3, 46f), new Vector3(x, 0f, 38f), Quaternion.identity, Vector3.one, new[] { "Corn", "Wheat" }, false);
             }
-            Box("Champ_Ble", fields, new Vector3(-61f, 0.02f, 47f), new Vector3(38f, 0.04f, 30f), "WheatDark", solid: false);
+            Box("Champ_Ble", fields, new Vector3(-61f, 0.02f, 47f), new Vector3(38f, 0.04f, 30f), "Stubble", solid: false);
             MeshObject("Ble", fields, WheatFieldMesh(new Vector2(38f, 30f)), new Vector3(-61f, 0.04f, 47f), Quaternion.identity, Vector3.one, new[] { "Wheat", "WheatDark" }, false);
             Box("Chaume", fields, new Vector3(-61f, 0.02f, 23f), new Vector3(38f, 0.04f, 18f), "Dirt");
             for (var i = 0; i < 9; i++)

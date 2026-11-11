@@ -51,13 +51,15 @@ namespace DeadCounty.EditorTools
                 Tri(a, c, d, outward);
             }
 
-            // Saves into an existing asset when there is one, so GUIDs stay stable across rebuilds.
-            public Mesh Save(string name, bool worldUv = false)
+            // Saves into an existing asset when there is one, so GUIDs stay stable across rebuilds. `wind` gives
+            // each vertex its lean and flutter for the foliage shader, which reads them from UV3. `groundLit`
+            // points every normal up: blades shaded by their own facing turn black against the light.
+            public Mesh Save(string name, System.Func<Vector3, Vector2> uv = null, System.Func<Vector3, Vector2> wind = null, bool groundLit = false)
             {
                 var verts = submeshes.SelectMany(s => s).ToArray();
                 var normals = new Vector3[verts.Length];
                 for (var i = 0; i < verts.Length; i += 3)
-                    normals[i] = normals[i + 1] = normals[i + 2] = Vector3.Cross(verts[i + 1] - verts[i], verts[i + 2] - verts[i]).normalized;
+                    normals[i] = normals[i + 1] = normals[i + 2] = groundLit ? Vector3.up : Vector3.Cross(verts[i + 1] - verts[i], verts[i + 2] - verts[i]).normalized;
 
                 var path = $"{MeshDir}/{name}.asset";
                 var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
@@ -68,7 +70,8 @@ namespace DeadCounty.EditorTools
                 mesh.indexFormat = verts.Length > 65000 ? IndexFormat.UInt32 : IndexFormat.UInt16;
                 mesh.vertices = verts;
                 mesh.normals = normals;
-                if (worldUv) mesh.uv = verts.Select(v => new Vector2(v.x, v.z) / 10f).ToArray();
+                if (uv != null) mesh.uv = verts.Select(uv).ToArray();
+                if (wind != null) mesh.SetUVs(3, verts.Select(wind).ToArray());
                 mesh.subMeshCount = submeshes.Count;
                 var offset = 0;
                 for (var s = 0; s < submeshes.Count; s++)
@@ -82,6 +85,14 @@ namespace DeadCounty.EditorTools
                 return mesh;
             }
         }
+
+        // Wind weights of a plant: nothing up to `from`, then growing to `lean` metres downwind and `flutter` metres
+        // of leaf shake at `to`. The lean grows with the square of the height, like a stem bending from its foot.
+        static System.Func<Vector3, Vector2> Sway(float from, float to, float lean, float flutter) => v =>
+        {
+            var t = Mathf.Clamp01((v.y - from) / (to - from));
+            return new Vector2(lean * t * t, flutter * t);
+        };
 
         // Unit prism: 1 x 1 footprint centered on the origin, ridge along X at height 1.
         static Mesh RoofMesh() => Cached("SM_Roof_Gable", () =>
@@ -118,7 +129,7 @@ namespace DeadCounty.EditorTools
                 AddCone(m, new Vector3(0f, y, 0f), 2.3f - i * 0.45f, 2.7f - i * 0.25f, 7, i * 0.6f, rng);
                 y += 1.45f;
             }
-            return m.Save($"SM_Pine_{variant}");
+            return m.Save($"SM_Pine_{variant}", wind: Sway(1.5f, 7.5f, 0.35f, 0.03f));
         });
 
         static Mesh TreeMesh(int variant) => Cached($"SM_Tree_{variant}", () =>
@@ -130,14 +141,14 @@ namespace DeadCounty.EditorTools
             AddBlob(m, new Vector3(0f, 4.4f, 0f), new Vector3(2.5f, 2.1f, 2.5f), 1, rng, 0.18f);
             if (variant != 1) AddBlob(m, new Vector3(1f, 3.8f, 0.7f), new Vector3(1.6f, 1.4f, 1.6f), 1, rng, 0.2f);
             if (variant == 2) AddBlob(m, new Vector3(-0.9f, 5.2f, -0.6f), new Vector3(1.5f, 1.3f, 1.5f), 1, rng, 0.2f);
-            return m.Save($"SM_Tree_{variant}");
+            return m.Save($"SM_Tree_{variant}", wind: Sway(2.3f, 6.5f, 0.25f, 0.05f));
         });
 
         static Mesh BushMesh(int variant) => Cached($"SM_Bush_{variant}", () =>
         {
             var m = new MeshBuilder().Sub();
             AddBlob(m, new Vector3(0f, 0.45f, 0f), new Vector3(1f, 0.7f, 1f), variant, new System.Random(300 + variant), 0.22f);
-            return m.Save($"SM_Bush_{variant}");
+            return m.Save($"SM_Bush_{variant}", wind: Sway(0f, 1.2f, 0.07f, 0.03f));
         });
 
         static Mesh TrashBagMesh() => Cached("SM_TrashBag", () =>
@@ -176,7 +187,7 @@ namespace DeadCounty.EditorTools
             for (var i = 0; i < cells; i++)
             for (var j = 0; j < cells; j++)
                 m.Quad(P(i, j), P(i + 1, j), P(i + 1, j + 1), P(i, j + 1), Vector3.up);
-            return m.Save("SM_Terrain", worldUv: true);
+            return m.Save("SM_Terrain", uv: v => new Vector2(v.x, v.z) / 10f);
         });
 
         static void AddCone(MeshBuilder m, Vector3 baseCenter, float radius, float height, int sides, float angleOffset, System.Random jitter)

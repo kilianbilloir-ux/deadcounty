@@ -178,6 +178,7 @@ namespace DeadCounty.EditorTools
                     PlaceBush(bushes, ground + new Vector3(Range(rng, 1.5f, 3f), 0f, Range(rng, -2f, 2f)), rng);
             }
             BuildUndergrowth(parent);
+            BuildMeadows(parent);
         }
 
         static void PlaceTree(Transform parent, Vector3 pos, System.Random rng, bool forest)

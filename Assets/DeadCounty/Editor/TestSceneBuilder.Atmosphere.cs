@@ -34,6 +34,8 @@ namespace DeadCounty.EditorTools
                 nightLights.AddComponent<NightLampController>().Configure(new List<Light>(BuiltLamps));
                 nightLights.SetActive(true);
             }
+            if (Object.FindAnyObjectByType<WindDirector>() == null)
+                new GameObject("Vent").AddComponent<WindDirector>();
             RenderSettings.skybox = SkyMaterial();
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
