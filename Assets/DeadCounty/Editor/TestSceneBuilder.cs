@@ -10,9 +10,8 @@ using UnityEngine.AI;
 
 namespace DeadCounty.EditorTools
 {
-    // Generates Assets/Scenes/TestMap.unity: a 300 m rural county blockout (village, gas station, farm, forest)
-    // wrapped around the movement, AI and lighting test zones. The scene is rebuilt from scratch on every run,
-    // so edit the TestSceneBuilder.*.cs files rather than the scene.
+    // Generates Assets/Scenes/TestMap.unity, a 300 m rural county around the movement, AI and lighting test zones,
+    // from scratch on every run: edit the TestSceneBuilder.*.cs files rather than the scene.
     public static partial class TestSceneBuilder
     {
         const string ScenePath = "Assets/Scenes/TestMap.unity";
@@ -206,7 +205,7 @@ namespace DeadCounty.EditorTools
         }
 
         // Sill, frame, a cross of muntins in the opening and shutters: a hole in the wall reads as a window from
-        // both sides. None of it is solid, so sight and noise go through as before.
+        // both sides. None of it is solid, so sight and noise still go through.
         static void WindowTrim(Transform wall, Opening o, string shutter)
         {
             var x = WallThickness / 2f + 0.04f;

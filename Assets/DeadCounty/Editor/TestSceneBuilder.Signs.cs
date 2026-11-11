@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Road signs and lettering: octagonal stop signs, speed limits, an evacuation route sign, ROAD CLOSED on the
-    // roadblock, shop names and street names. Letters are blocks on a 5-row grid, one quad per run, so they stay
-    // flat-shaded and sharp like the rest of the low poly set. None of it is solid.
+    // Letters are blocks on a 5-row grid, one quad per run, so they stay flat-shaded and sharp like the rest of the
+    // low poly set. None of it is solid.
     public static partial class TestSceneBuilder
     {
         // Rows from top to bottom, '#' lit.

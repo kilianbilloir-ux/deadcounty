@@ -5,8 +5,6 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Zombie sounds (recipes in ZombieVoiceRecipes and ZombieBodyRecipes) and the ZombieAudio that plays them on
-    // the zombie prefab.
     public static partial class TestSceneBuilder
     {
         const string ZombieAudioDir = AudioDir + "/Zombie";

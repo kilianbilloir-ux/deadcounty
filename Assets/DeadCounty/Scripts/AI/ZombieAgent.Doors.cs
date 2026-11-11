@@ -4,14 +4,13 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // Closed doors are left out of the NavMesh, so paths cross them: the zombie stops in front of a shut door on
-    // its way. Hunting, it pushes it until the pushes force it open; calm, it takes the door as the end of its
-    // walk and the brain picks something else to do. The bang of a door it forces is not news to the zombie.
+    // Closed doors are left out of the NavMesh, so paths cross them: a hunting zombie pushes a shut door until it
+    // gives, a calm one takes it as the end of its walk.
     public partial class ZombieAgent
     {
         const float DoorProbe = 0.5f;
         const float MinDoorSteer = 0.01f;
-        // A forced door bangs on the frame of the last push.
+        // A forced door bangs on the frame of the last push; that bang is not news to the zombie that forced it.
         const float OwnDoorNoiseWindow = 0.1f;
 
         int pushedDoorSource;
@@ -20,7 +19,6 @@ namespace DeadCounty.AI
         // Calm and stopped by a door last frame: reported to the brain as arrived.
         bool calmAtDoor;
 
-        // The shut door this zombie pushed on its last Move, or null.
         public Door PushedDoor { get; private set; }
 
         void StopAtShutDoor(float dt)

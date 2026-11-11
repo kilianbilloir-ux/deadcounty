@@ -6,9 +6,7 @@ using UnityEngine;
 
 namespace DeadCounty.Items
 {
-    // Items lying on the ground, picked up with Interact, drawn with their item's WorldModel (a plain box without
-    // one). Items placed in the level come back when the player respawns, like the loot of the furniture; dropped
-    // items are gone once picked up.
+    // Items placed in the level come back when the player respawns, like the furniture's loot; dropped ones do not.
     public class WorldItem : Interactable
     {
         const float PromptHeight = 0.3f;

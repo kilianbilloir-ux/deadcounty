@@ -13,7 +13,6 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Tests
 {
-    // UI Toolkit HUD on the generated player rig.
     public class PlayerHudTests : PlayerRigTests
     {
         VisualElement Root => Rig.GetComponent<UIDocument>().rootVisualElement;

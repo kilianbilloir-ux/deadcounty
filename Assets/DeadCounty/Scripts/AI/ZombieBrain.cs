@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // Pure state machine of one zombie: calm wandering around an anchor, a readable alert before any chase,
-    // investigation of noises, chase with tracking and prediction, search, the attack sub-state and feeding.
-    // The agent fills a PerceptionSnapshot every frame and executes the BrainCommands. All randomness comes
-    // from the seed, so equal seeds and inputs replay identically. At most one transition per Tick.
+    // Pure state machine of one zombie, kept off the scene so it can be tested. All randomness comes from the seed,
+    // so equal seeds and inputs replay identically. At most one transition per Tick.
     public partial class ZombieBrain
     {
         const float Epsilon = 1e-4f;

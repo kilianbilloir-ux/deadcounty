@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // Turns the controller's per-frame NoiseRadius into discrete NoiseSystem events: one footstep per interval
-    // with the loudest radius reached during it (so a landing between two samples is not lost), plus panting
-    // while exhausted. A dead or invisible (ghost) player makes no noise.
+    // One footstep event per interval with the loudest radius reached during it, so a landing between two samples
+    // is not lost.
     [DefaultExecutionOrder(-80)]
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerStamina), typeof(PerceptionTarget))]
     public class PlayerNoiseEmitter : MonoBehaviour
@@ -20,7 +19,6 @@ namespace DeadCounty.Player
         int sourceId;
         float stepTimer, pantingTimer, loudest, landingLoudest;
 
-        // Source id of the player's noises.
         public int SourceId => sourceId;
 
         void Awake()

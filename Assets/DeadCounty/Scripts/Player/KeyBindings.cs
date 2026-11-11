@@ -5,10 +5,8 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Keyboard keys the player can change from the options (GDD 8.11): one binding per row, the first of the
-    // keyboard group, so W A S D move while the arrows stay. A key taken from another row swaps with it, so no
-    // action is left without a key. Overrides are kept in PlayerPrefs and loaded before the first scene; the
-    // prompts read the bindings, so they follow.
+    // GDD 8.11. Only the first keyboard binding of an action is rebindable, so the arrows keep moving whatever
+    // replaces W A S D. A taken key swaps rows, so no action is left without a key.
     public static class KeyBindings
     {
         const string PrefsKey = "dc.bindings";
@@ -106,7 +104,6 @@ namespace DeadCounty.Player
             action.Enable();
         }
 
-        // The row that had the new key takes the old one.
         static void SwapWithTakenKey(InputAction changed, int changedIndex, string previous)
         {
             var path = changed.bindings[changedIndex].effectivePath;

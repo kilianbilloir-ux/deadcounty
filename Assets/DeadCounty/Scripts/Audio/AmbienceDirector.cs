@@ -7,10 +7,8 @@ using Random = UnityEngine.Random;
 
 namespace DeadCounty.Audio
 {
-    // The county's soundscape around the listener: wind day and night, the insects taking over from the birds at
-    // dusk, owls and dogs after dark, and now and then a far-off sign of the outbreak. Under a roof between walls the
-    // outside is muffled and a room tone comes up. Presentation only: nothing here reaches NoiseSystem, the zombies
-    // never hear it. A cue left empty is simply not heard. Paused with the rest of the world audio (Sfx).
+    // Presentation only: nothing here reaches NoiseSystem, the zombies never hear it. A cue left empty is simply not
+    // heard. Paused with the rest of the world audio (Sfx).
     public class AmbienceDirector : MonoBehaviour
     {
         public enum Activity { Birds, Day, Night, MostlyNight, Always }

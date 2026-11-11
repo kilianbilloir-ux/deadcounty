@@ -39,8 +39,7 @@ namespace DeadCounty.Core
         };
     }
 
-    // Hunger, thirst and fatigue from 1 (fine) down to 0, draining over time (GDD 8.4). Empty hunger and thirst
-    // cost health; empty fatigue costs no health but halves the stamina capacity. Sleep fills fatigue back.
+    // GDD 8.4, from 1 (fine) down to 0. Empty fatigue costs no health but halves the stamina capacity.
     public class NeedsModel
     {
         readonly NeedsSettings settings;

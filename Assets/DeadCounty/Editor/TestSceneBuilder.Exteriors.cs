@@ -2,10 +2,7 @@ using UnityEngine;
 
 namespace DeadCounty.EditorTools
 {
-    // Exterior details that make the blocks read as buildings: a concrete foundation band, corner boards, gutters
-    // and downspouts, a porch railing and lamp, an air conditioner or a satellite dish on some houses; the barn's
-    // sliding doors, hayloft and cupola; the silo's hoops and ladder; tall grass in the yards; wheat and corn
-    // fields made of plants instead of slabs. Nothing here is solid except the air conditioners.
+    // Details that make the blocks read as buildings. Nothing here is solid except the air conditioners.
     public static partial class TestSceneBuilder
     {
         // House body frame (see House): walls on x 0..12 and z 0..10, 0.2 m thick, front door at x 5, back door at

@@ -4,8 +4,8 @@ using static DeadCounty.EditorTools.Synth;
 
 namespace DeadCounty.EditorTools
 {
-    // The survivor's own body: breathing, effort, pain, heartbeat. Breath is noise shaped by the formants of an
-    // open mouth; voiced sounds are jittered glottal pulses through the formants of a vowel (source-filter model).
+    // Breath is noise shaped by the formants of an open mouth; voiced sounds are jittered glottal pulses through the
+    // formants of a vowel (source-filter model).
     public static class BodyRecipes
     {
         // Formant centre, Q and gain of the vowels used (adult male, Peterson and Barney).

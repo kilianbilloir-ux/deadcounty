@@ -4,8 +4,7 @@ using static DeadCounty.EditorTools.Synth;
 
 namespace DeadCounty.EditorTools
 {
-    // What the survivor handles: searched furniture, items, the flashlight, beds and doors. Built from the same
-    // impact pieces as the footsteps: a transient, the resonances of the struck object, a tail.
+    // Built from the same impact pieces as the footsteps: a transient, the resonances of the struck object, a tail.
     public static class ActionRecipes
     {
         // Hands digging through a drawer, phase-locked to the animator's 2.2 Hz rummage so the loop stays in rhythm:

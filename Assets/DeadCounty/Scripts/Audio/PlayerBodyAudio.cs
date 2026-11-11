@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // The survivor's body: breathing that follows the effort (spent stamina, sprinting, exhaustion) and keeps heaving
-    // for a while after it, a heartbeat below a quarter of health, pain on hits and the death. Breathing and
-    // heartbeat run on unscaled time so the sleep fast-forward does not race them; they stop while asleep or dead.
-    // Presentation only: the panting zombies hear comes from PlayerNoiseEmitter.
+    // Breathing and heartbeat run on unscaled time so the sleep fast-forward does not race them. Presentation only:
+    // the panting zombies hear comes from PlayerNoiseEmitter.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerStamina), typeof(PlayerHealth))]
     public class PlayerBodyAudio : MonoBehaviour
     {
@@ -39,9 +37,6 @@ namespace DeadCounty.Audio
         PlayerHealth health;
         float effort, nextBreath, nextBeat;
         bool inhaleNext = true;
-
-        // 0 calm to 1 exhausted, smoothed; read by tests.
-        public float Effort => effort;
 
         void Awake()
         {

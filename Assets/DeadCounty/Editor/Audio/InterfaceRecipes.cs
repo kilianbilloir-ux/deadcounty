@@ -3,9 +3,7 @@ using static DeadCounty.EditorTools.AmbienceDsp;
 
 namespace DeadCounty.EditorTools
 {
-    // Interface sounds, one family of muted wooden taps (a damped sine body and a short noise grain) that stays
-    // pleasant at the hundredth repeat: up means forward, down means back. Then the title's dark drone and the
-    // far church bell that tolls over it.
+    // One family of muted wooden taps that stays pleasant at the hundredth repeat: up means forward, down means back.
     static class InterfaceRecipes
     {
         public const float DroneLoop = 15f;
@@ -81,10 +79,8 @@ namespace DeadCounty.EditorTools
             return b;
         }
 
-        // Dark ambient pad over A: a sub, a slowly opening sawtooth fifth and octave detuned to beat once per loop,
-        // a flat sixth swelling once, a cold shimmer and air. Every partial and modulation has a whole number of
-        // cycles in the loop and the reverb settles over a lead-in, so the tones wrap as cut; only the air is
-        // crossfaded.
+        // Dark pad over A. Every partial and modulation has a whole number of cycles in the loop and the reverb
+        // settles over a lead-in, so the tones wrap as cut; only the air is crossfaded.
         public static float[] TitleDrone(Random rng)
         {
             const float leadIn = 8f;

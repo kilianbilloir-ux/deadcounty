@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace DeadCounty.Animation
 {
-    // Feet and limbs of ProceduralHumanoidAnimator: the foot cycle that keeps planted feet on the ground, the cap on
-    // the hip height, the ground probe under each foot and the two-bone IK of the legs and arms.
+    // Foot cycle, hip cap, ground probes and the two-bone IK of the legs and arms.
     public partial class ProceduralHumanoidAnimator
     {
         struct FootPose

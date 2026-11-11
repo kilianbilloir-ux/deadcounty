@@ -6,11 +6,8 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
 {
-    // What the player just took, one line per kind of item with its picture and count, at the bottom right where
-    // nothing else sits (after the collected items list of 7 Days to Die): routine news stays out of the centre,
-    // where the prompt and the world need the eye. Taking more of an item still listed adds to its count instead of
-    // stacking a new line; an empty piece of furniture says so. Lines fade a few seconds later, hidden behind the
-    // menus and the inventory, which lists everything anyway.
+    // Bottom right, where nothing else sits (after the collected items list of 7 Days to Die): routine news stays
+    // out of the centre, where the prompt and the world need the eye.
     [RequireComponent(typeof(UIDocument))]
     public class PlayerPickupFeed : MonoBehaviour
     {

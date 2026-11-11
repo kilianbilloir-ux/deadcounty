@@ -33,8 +33,8 @@ namespace DeadCounty.Core
         };
     }
 
-    // Three-gait stamina: sprinting drains it, running is free (its cost is noise), standing and walking refill
-    // it after a short delay. Emptying it exhausts the player, who can then only walk until it recovers.
+    // Only sprinting drains it: running is free, its cost is noise. Emptying it exhausts the player, who can then
+    // only walk until it recovers.
     public class StaminaModel
     {
         readonly StaminaSettings settings;

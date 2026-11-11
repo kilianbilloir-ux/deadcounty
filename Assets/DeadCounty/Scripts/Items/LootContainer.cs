@@ -7,9 +7,8 @@ using UnityEngine;
 
 namespace DeadCounty.Items
 {
-    // Furniture searched with Interact (GDD 8.6): the player keeps still for a few seconds, or less while hurrying,
-    // which is heard by the zombies, then takes everything found. The contents are drawn from the loot table with
-    // a fixed seed, plus the guaranteed items; a searched piece stays empty until the player respawns.
+    // GDD 8.6. A hurried search is heard by the zombies. The contents are drawn with a fixed seed; a searched piece
+    // stays empty until the player respawns.
     [RequireComponent(typeof(Collider))]
     public class LootContainer : Interactable
     {

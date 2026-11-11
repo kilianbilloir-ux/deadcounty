@@ -51,11 +51,8 @@ namespace DeadCounty.Locomotion
         }
     }
 
-    // Planar movement shared by the player and the zombies: speed builds up and drops with real acceleration,
-    // the body faces its velocity and turns at a rate that shrinks with speed, sharp reversals at speed brake
-    // before pivoting, and airborne momentum can only be nudged.
-    // Callers pass targetSpeed with their own factors applied (slope, landing recovery); with no input they
-    // pass wish = state.Heading and targetSpeed = 0.
+    // Shared by the player and the zombies. Callers apply their own factors (slope, landing recovery) to
+    // targetSpeed; with no input they pass wish = state.Heading and targetSpeed = 0.
     public static class PlanarLocomotion
     {
         public static void Step(ref LocomotionState state, in LocomotionSettings s, Vector3 wish, float targetSpeed, bool hasInput, bool grounded, float dt)

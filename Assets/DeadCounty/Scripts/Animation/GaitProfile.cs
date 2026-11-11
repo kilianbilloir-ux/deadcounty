@@ -2,9 +2,8 @@ using UnityEngine;
 
 namespace DeadCounty.Animation
 {
-    // Every gait and upper body tuning value of ProceduralHumanoidAnimator, shared by all bodies of a kind.
-    // Defaults are the survivor's human gait (GP_Survivor); CreateShambler gives the zombie walk (GP_Shambler).
-    // Angles in degrees, distances in metres, speeds in m/s. Read-only at runtime.
+    // Shared by all bodies of a kind; the defaults are the survivor's human gait. Angles in degrees, distances in
+    // metres, speeds in m/s. Read-only at runtime.
     [CreateAssetMenu(menuName = "DeadCounty/Gait Profile", fileName = "GP_")]
     public class GaitProfile : ScriptableObject
     {
@@ -145,9 +144,7 @@ namespace DeadCounty.Animation
         public float LungeHipShift = 0.1f;
         public float FeedPitch = 60f;
 
-        // Zombie shuffle: slow cadence, long stance, feet skimming the ground, flat heel and toe, no flight
-        // phase or sprint at zombie speeds, little banking and arm swing, a head that sticks at its limit and a
-        // slow sway instead of breathing.
+        // Zombie shuffle: no flight phase or sprint at zombie speeds, a slow sway instead of breathing.
         public static GaitProfile CreateShambler()
         {
             var profile = CreateInstance<GaitProfile>();

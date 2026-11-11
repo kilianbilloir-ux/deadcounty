@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    // Interface sounds of the player's HUD document: the menus' feedback (GameMenu.Feedback) and the inventory
-    // screen opening, closing, stepping through its list and changing its sort. Using, dropping and picking items
-    // up are body sounds, played by the player's own audio. A cue left empty is simply not heard.
+    // Using, dropping and picking items up are body sounds, played by PlayerActionAudio. A cue left empty is simply
+    // not heard.
     [RequireComponent(typeof(GameMenu), typeof(PlayerInventoryScreen))]
     public class UiSounds : MonoBehaviour
     {

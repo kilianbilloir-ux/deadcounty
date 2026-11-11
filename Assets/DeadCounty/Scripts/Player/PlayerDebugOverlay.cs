@@ -4,10 +4,8 @@ using UnityEngine.InputSystem;
 
 namespace DeadCounty.Player
 {
-    // Development overlay toggled with F1 (hidden by default): player state, health, stamina, noise radius and
-    // camera framing values. While it is open, K deals a 25 damage hit from in front of the player to test the hit
-    // reaction and death flow.
-    // The noise radius is also drawn as a gizmo (Scene view, or Game view with Gizmos enabled).
+    // While the F1 overlay is open, K hits the player from the front to test the hit reaction and death flow. The
+    // noise radius gizmo needs Gizmos on in the Game view.
     public class PlayerDebugOverlay : MonoBehaviour
     {
         [SerializeField] bool visible;

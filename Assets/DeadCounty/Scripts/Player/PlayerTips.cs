@@ -9,10 +9,7 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
 {
-    // Tips shown once each, the first time they apply (GDD 8.11): the first furniture to search, the first need
-    // gauge, the first zombie that notices the player and the first nightfall. Seen tips are kept in PlayerPrefs
-    // and the options turn them off. One at a time at the top left, held back while a menu is open, the player
-    // sleeps or is dead.
+    // Shown once each, the first time they apply (GDD 8.11); seen tips are kept in PlayerPrefs.
     [RequireComponent(typeof(UIDocument))]
     public class PlayerTips : MonoBehaviour
     {

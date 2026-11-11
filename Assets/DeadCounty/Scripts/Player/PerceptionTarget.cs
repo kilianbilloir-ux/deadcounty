@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace DeadCounty.Player
 {
-    // The player as the zombies perceive it: sight points that follow the crouch height, motion and visibility
-    // flags, cached once per frame right after the controller has moved.
+    // Cached once per frame right after the controller has moved, for every zombie to read.
     [DefaultExecutionOrder(-90)]
     [RequireComponent(typeof(CharacterController), typeof(ThirdPersonController), typeof(PlayerHealth))]
     public class PerceptionTarget : MonoBehaviour, IPerceivable

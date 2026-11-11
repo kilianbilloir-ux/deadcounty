@@ -4,10 +4,8 @@ using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
 {
-    // How far the player's movement carries, as four segments under the stamina bar, after the sound meters of
-    // Splinter Cell: Chaos Theory and Breath of the Wild. Walking is the baseline and stays hidden like the other
-    // gauges while all is well: the meter shows while crouched, to confirm the player sneaks, and when they are
-    // louder than a walk, then fades a moment later. A short peak such as a hard landing is held long enough to read.
+    // After the sound meters of Splinter Cell: Chaos Theory and Breath of the Wild. Walking is the hidden baseline:
+    // the meter shows while crouched, to confirm the player sneaks, and when louder than a walk.
     [RequireComponent(typeof(UIDocument))]
     public class PlayerNoiseMeter : MonoBehaviour
     {

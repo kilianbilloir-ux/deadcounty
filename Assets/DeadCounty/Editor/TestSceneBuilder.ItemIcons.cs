@@ -12,11 +12,9 @@ using Object = UnityEngine.Object;
 
 namespace DeadCounty.EditorTools
 {
-    // Inventory pictures of the items, rendered from their ground models in a preview scene so nothing of the open
-    // scene gets in the shot. Each model is shot over black then over white: what changes between the two is
-    // background, which gives a clean alpha whatever the pipeline does with it. Shot four times larger and averaged
-    // down for smooth edges. A PNG is only rewritten when its pixels change, so a rebuild leaves git clean. Called
-    // once the new scene is open, so the fog and ambient light of the scene open before cannot tint the pictures.
+    // Rendered in a preview scene once the new scene is open, so neither the objects nor the fog of the scene open
+    // before get in the shot. Each model is shot over black then over white: what changes is background, a clean
+    // alpha whatever the pipeline does. A PNG is only rewritten when its pixels change, so a rebuild leaves git clean.
     public static partial class TestSceneBuilder
     {
         const string ItemIconDir = "Assets/DeadCounty/UI/Icons";

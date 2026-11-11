@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // Sight and hearing queries, run on the manager's time slice. Sight casts from the eyes to the target's head
-    // and chest (glass is see-through); hearing reads the new NoiseSystem events and halves a noise's reach per
-    // Wall or Glass piece between it and the ears. Results are cached in the snapshot until the next Sense.
+    // Runs on the manager's time slice, so results stay cached in the snapshot until the next Sense. Glass lets
+    // sight through but, like a wall, halves the reach of a noise.
     public partial class ZombieAgent
     {
         const int MaxRayHits = 16;
@@ -28,7 +27,6 @@ namespace DeadCounty.AI
 
         public int SenseCount { get; private set; }
         public int RaysLastSense { get; private set; }
-        // Walls between this zombie and the last noise it heard.
         public int LastNoiseWalls { get; private set; }
 
         public void Sense(IPerceivable perceived, float now)
@@ -101,8 +99,7 @@ namespace DeadCounty.AI
             } while (count == Noises.Length);
         }
 
-        // Keeps the noise heard with the widest margin of the current Sense window; reset per Sense
-        // (see SenseNoises) and cleared on consumption (see Think).
+        // Holds the widest-margin noise of the current Sense window until Think consumes it.
         void Listen(in NoiseEvent noise, Vector3 ear, float multiplier)
         {
             var origin = noise.Position + Vector3.up * NoiseHeight;
