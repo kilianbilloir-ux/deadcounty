@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2b7018ed48f0d4b2badcd0f408dfa683
+guid: 9500f817a8f8343808a4eb6283030942
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Inter
+  - Overpass
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
