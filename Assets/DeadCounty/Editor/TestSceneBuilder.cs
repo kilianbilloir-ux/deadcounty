@@ -222,6 +222,7 @@ namespace DeadCounty.EditorTools
 
         static void BakeNavMesh(GameObject env)
         {
+            ConfigureHumanoidAgent();
             var surface = env.AddComponent<NavMeshSurface>();
             surface.collectObjects = CollectObjects.Children;
             surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
@@ -229,6 +230,18 @@ namespace DeadCounty.EditorTools
 
             AssetDatabase.DeleteAsset(NavMeshPath);
             AssetDatabase.CreateAsset(surface.navMeshData, NavMeshPath);
+        }
+
+        // Humanoid agent sized like the player, so baked paths fit through 1 m doors and climb the same steps.
+        static void ConfigureHumanoidAgent()
+        {
+            var settings = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/NavMeshAreas.asset")[0]);
+            var humanoid = settings.FindProperty("m_Settings").GetArrayElementAtIndex(0);
+            humanoid.FindPropertyRelative("agentRadius").floatValue = 0.3f;
+            humanoid.FindPropertyRelative("agentHeight").floatValue = 1.8f;
+            humanoid.FindPropertyRelative("agentClimb").floatValue = 0.3f;
+            humanoid.FindPropertyRelative("agentSlope").floatValue = 45f;
+            settings.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static void AddToBuildSettings()

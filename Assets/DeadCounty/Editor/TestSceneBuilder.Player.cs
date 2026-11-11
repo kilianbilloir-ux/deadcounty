@@ -85,6 +85,7 @@ namespace DeadCounty.EditorTools
             obstacles.DampingFromCollision = 0.4f;
             follow.AvoidObstacles = obstacles;
             camera.AddComponent<PlayerCameraDirector>();
+            rig.AddComponent<PlayerDebugOverlay>();
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(rig, PlayerPrefabPath);
             Object.DestroyImmediate(rig);
