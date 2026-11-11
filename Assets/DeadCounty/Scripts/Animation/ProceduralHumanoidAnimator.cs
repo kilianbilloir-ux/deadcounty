@@ -17,6 +17,9 @@ namespace DeadCounty.Animation
         const float ArmBiasBend = 25f;
         // A reaching right hand turns the chest with it (deg).
         const float ReachTwist = 10f;
+        // Shoulder pitch and elbow bend of the right arm with the hand at the mouth (deg).
+        const float MouthPitch = -38f;
+        const float MouthBend = 128f;
         // Turning faster than PivotStartRate (deg/s) the body starts to pivot instead of following a curve: at
         // PivotFullRate the feet hold back only PivotFoothold of the turn and the body leans only that share. A
         // foothold kept still under a quarter-turn snap ends up crossed and trailing far behind.
@@ -293,8 +296,9 @@ namespace DeadCounty.Animation
             var rightDroop = Mathf.Max(0f, -ArmBias);
             Arm(leftShoulder, leftElbow, -armSwing * leftArmDrive + raise, -g.ArmSpread, bend, reach,
                 reachPitch + dig + ArmBiasPitch * leftDroop, g.ReachElbowBend + dig + ArmBiasBend * leftDroop);
-            Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, Mathf.Max(reach, pose.Reach),
-                reachPitch - dig + ArmBiasPitch * rightDroop, g.ReachElbowBend - dig + ArmBiasBend * rightDroop);
+            Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, Mathf.Max(reach, pose.Reach, pose.HandToMouth),
+                Mathf.Lerp(reachPitch - dig + ArmBiasPitch * rightDroop, MouthPitch, pose.HandToMouth),
+                Mathf.Lerp(g.ReachElbowBend - dig + ArmBiasBend * rightDroop, MouthBend, pose.HandToMouth));
         }
 
         float Duty(float walkDuty, float runness, float sprintness) => Mathf.Lerp(Mathf.Lerp(walkDuty, gait.RunDuty, runness), gait.SprintDuty, sprintness);
@@ -310,7 +314,9 @@ namespace DeadCounty.Animation
             pose.Lunge = Mathf.Lerp(pose.Lunge, target.Lunge, k);
             pose.Feed = Mathf.Lerp(pose.Feed, target.Feed, k);
             // A hand goes out faster than a posture changes.
-            pose.Reach = Mathf.Lerp(pose.Reach, target.Reach, 1f - Mathf.Exp(-dt / (0.4f * gait.PoseSmoothTime)));
+            var handBlend = 1f - Mathf.Exp(-dt / (0.4f * gait.PoseSmoothTime));
+            pose.Reach = Mathf.Lerp(pose.Reach, target.Reach, handBlend);
+            pose.HandToMouth = Mathf.Lerp(pose.HandToMouth, target.HandToMouth, handBlend);
             pose.Rummage = Mathf.Lerp(pose.Rummage, target.Rummage, k);
             pose.Pant = Mathf.Lerp(pose.Pant, target.Pant, k);
             pose.FlinchPitch = target.FlinchPitch;

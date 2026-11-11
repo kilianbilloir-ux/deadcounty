@@ -127,6 +127,7 @@ namespace DeadCounty.EditorTools
             rig.AddComponent<PlayerDebugOverlay>();
             rig.AddComponent<UIDocument>();
             AddMissingPlayerComponents(rig, player);
+            AssignLoadout(player);
             AssignHudAssets(rig);
             EnsureUiSounds(rig);
             EnsurePauseMusic(rig);
@@ -152,6 +153,7 @@ namespace DeadCounty.EditorTools
                 var changed = AddMissingPlayerComponents(root, controller.gameObject);
                 changed |= AssignMissingGait(animator);
                 changed |= SyncBody(controller.transform.Find("Model"), SurvivorLook);
+                AssignLoadout(controller.gameObject);
                 changed |= AddMissing<UIDocument>(root);
                 AssignHudAssets(root);
                 changed |= EnsureUiSounds(root);
@@ -179,6 +181,7 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerInteractor>(player);
             added |= AddMissing<PlayerInventory>(player);
             added |= AddMissing<PlayerSleep>(player);
+            added |= AddMissing<PlayerLoadout>(player);
             added |= AddMissing<PlayerPoseDriver>(player);
             added |= AddMissing<PlayerDeathFlow>(rig);
             added |= AddMissing<PlayerHudController>(rig);
@@ -332,6 +335,25 @@ namespace DeadCounty.EditorTools
             gait.objectReferenceValue = SurvivorGait();
             so.ApplyModifiedPropertiesWithoutUndo();
             return true;
+        }
+
+        static readonly string[] BackpackParts = { "Sac_A_Dos", "Rabat", "Poche_Sac", "Couverture", "Sangle_G", "Sangle_D", "Bretelle_G", "Bretelle_D" };
+
+        // Points the loadout at the parts of the body it shows and hides. Runs after the body is brought up to date,
+        // and rewrites the references every time: parts are looked up by name and may have been recreated.
+        static void AssignLoadout(GameObject player)
+        {
+            var spine = player.transform.Find("Model/" + SpinePath) ?? throw new System.InvalidOperationException($"{player.name} has no spine joint");
+            var so = new SerializedObject(player.GetComponent<PlayerLoadout>());
+            var parts = so.FindProperty("backpack");
+            parts.arraySize = BackpackParts.Length;
+            for (var i = 0; i < BackpackParts.Length; i++)
+                parts.GetArrayElementAtIndex(i).objectReferenceValue = (spine.Find(BackpackParts[i]) ?? throw new System.InvalidOperationException($"{player.name} has no {BackpackParts[i]}")).gameObject;
+            so.FindProperty("hand").objectReferenceValue = spine.Find("Epaule_D/Coude_D");
+            so.FindProperty("lampLens").objectReferenceValue = spine.Find("Lampe_Verre").GetComponent<Renderer>();
+            so.FindProperty("lensLit").objectReferenceValue = Mat("LampGlow");
+            so.FindProperty("lensDark").objectReferenceValue = Mat("Glass");
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static bool AddMissing<T>(GameObject target) where T : Component
