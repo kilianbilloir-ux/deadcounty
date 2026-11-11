@@ -34,7 +34,7 @@ namespace DeadCounty.EditorTools
             ["BirchBark"] = Rgb(0xD2CFC4), ["BirchMark"] = Rgb(0x2E2B28), ["FoliageBirch"] = Rgb(0x8A9448),
             ["Flower"] = Rgb(0xD8C24A), ["FlowerWhite"] = Rgb(0xE2DED2), ["FlowerPurple"] = Rgb(0x7E5A8E), ["RoadCrack"] = Rgb(0x26272A),
             ["RoadPatch"] = Rgb(0x313236),
-            ["Wheat"] = Rgb(0xBFA25A), ["WheatDark"] = Rgb(0x9A7E45), ["Corn"] = Rgb(0x7E8A3E), ["Hay"] = Rgb(0xC7A860), ["GrassTall"] = Rgb(0x5E6A3A),
+            ["Wheat"] = Rgb(0xBFA25A), ["WheatDark"] = Rgb(0x9A7E45), ["Stubble"] = Rgb(0x9A7E45), ["Corn"] = Rgb(0x7E8A3E), ["Hay"] = Rgb(0xC7A860), ["GrassTall"] = Rgb(0x5E6A3A), ["GrassDry"] = Rgb(0x8B8752),
             ["CarRed"] = Rgb(0x7A2420), ["CarBlue"] = Rgb(0x2E4766), ["CarGreen"] = Rgb(0x3E5444), ["CarBeige"] = Rgb(0xB8A88A),
             ["CarWhite"] = Rgb(0xD6D6D2), ["CarBlack"] = Rgb(0x1C1D20), ["CarBurnt"] = Rgb(0x252220), ["Tire"] = Rgb(0x151515),
             ["BusYellow"] = Rgb(0xD6A21E), ["TractorGreen"] = Rgb(0x3F6B3A),
@@ -59,6 +59,14 @@ namespace DeadCounty.EditorTools
             ["LampGlow"] = 2.5f, ["PanelGlow"] = 1.6f, ["PoliceRed"] = 3f, ["PoliceBlue"] = 3f, ["ZombieEye"] = 1.8f,
         };
 
+        // Drawn with the foliage shader, which moves vertices by the wind weights of the mesh. Only for meshes
+        // saved with weights: a primitive has none and the shader then reads garbage, so it must not share these.
+        static readonly HashSet<string> Plants = new()
+        {
+            "Pine", "Foliage", "FoliageOlive", "FoliageAutumn", "FoliageRust", "FoliageBirch", "Bush", "GrassTall",
+            "GrassDry", "Flower", "FlowerWhite", "FlowerPurple", "Wheat", "WheatDark", "Corn",
+        };
+
         static float SmoothnessOf(string key) => key switch
         {
             "Glass" => 0.92f,
@@ -74,12 +82,16 @@ namespace DeadCounty.EditorTools
             if (Materials.TryGetValue(key, out var cached)) return cached;
 
             var path = $"{ArtDir}/M_Proto_{key}.mat";
+            var shaderName = Plants.Contains(key) ? "DeadCounty/Foliage" : "Universal Render Pipeline/Lit";
+            var shader = Shader.Find(shaderName) ?? throw new System.InvalidOperationException($"Shader {shaderName} not found");
             var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (mat == null)
             {
-                mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                mat = new Material(shader);
                 AssetDatabase.CreateAsset(mat, path);
             }
+            // Materials saved before a key changed shader follow it.
+            if (mat.shader != shader) mat.shader = shader;
             mat.SetColor("_BaseColor", Palette[key]);
             mat.SetFloat("_Smoothness", SmoothnessOf(key));
             mat.SetFloat("_Metallic", key.StartsWith("Metal") ? 0.4f : 0f);

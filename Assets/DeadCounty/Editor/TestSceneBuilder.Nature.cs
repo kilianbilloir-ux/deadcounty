@@ -39,6 +39,50 @@ namespace DeadCounty.EditorTools
             }
         }
 
+        // Wild grass over the open ground, its own seed so nothing else moves. One mesh per patch rather than one
+        // object per tuft, and only on the flat: a patch spans 6 m and would float over a slope.
+        static void BuildMeadows(Transform parent)
+        {
+            var rng = new System.Random(9);
+            var meadows = Group(parent, "Prairies");
+            const float cell = 6f;
+            const float reach = 3f;
+            for (var cx = -HalfMap + cell / 2f; cx < HalfMap; cx += cell)
+            for (var cz = -HalfMap + cell / 2f; cz < HalfMap; cz += cell)
+            {
+                var x = cx + Range(rng, -0.3f, 0.3f) * cell;
+                var z = cz + Range(rng, -0.3f, 0.3f) * cell;
+                var roll = rng.NextDouble();
+                var variant = rng.Next(3);
+                var yaw = Range(rng, 0f, 360f);
+                if (roll > (ForestDensity(x, z) > 0.4f ? 0.35 : 0.85) || IsReserved(x, z, 2f)) continue;
+                if (TerrainHeight(x - reach, z) + TerrainHeight(x + reach, z) + TerrainHeight(x, z - reach) + TerrainHeight(x, z + reach) > 0.01f) continue;
+                MeshObject("Herbes_Folles", meadows, MeadowPatchMesh(variant), new Vector3(x, 0f, z), Quaternion.Euler(0f, yaw, 0f), Vector3.one, new[] { "GrassTall", "GrassDry" }, false);
+            }
+        }
+
+        // Twenty tufts within 3 m of the origin; submesh 0 green blades, 1 dry ones.
+        static Mesh MeadowPatchMesh(int variant) => Cached($"SM_MeadowPatch_{variant}", () =>
+        {
+            var rng = new System.Random(1100 + variant);
+            var m = new MeshBuilder();
+            m.Sub();
+            m.Sub();
+            for (var tuft = 0; tuft < 20; tuft++)
+            {
+                var angle = Range(rng, 0f, Mathf.PI * 2f);
+                var centre = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * (3f * Mathf.Sqrt((float)rng.NextDouble()));
+                m.Use(rng.NextDouble() < 0.3 ? 1 : 0);
+                for (var i = rng.Next(8, 13); i > 0; i--)
+                {
+                    var spread = Range(rng, 0f, Mathf.PI * 2f);
+                    var root = centre + new Vector3(Mathf.Cos(spread), 0f, Mathf.Sin(spread)) * Range(rng, 0f, 0.28f);
+                    Blade(m, root, Range(rng, 0f, 360f), Range(rng, 0.18f, 0.5f), 0.13f, Range(rng, -0.35f, 0.35f));
+                }
+            }
+            return m.Save($"SM_MeadowPatch_{variant}", wind: Sway(0f, 0.55f, 0.1f, 0.02f), groundLit: true);
+        });
+
         static void Stump(Transform parent, Vector3 ground, System.Random rng)
         {
             var radius = Range(rng, 0.2f, 0.35f);
@@ -76,7 +120,7 @@ namespace DeadCounty.EditorTools
                 m.Use(1);
                 AddBlob(m, root + Vector3.up * height, Vector3.one * 0.045f, 0, rng, 0.1f);
             }
-            return m.Save($"SM_FlowerClump_{variant}");
+            return m.Save($"SM_FlowerClump_{variant}", wind: Sway(0f, 0.5f, 0.08f, 0.015f), groundLit: true);
         });
 
         // Slender white trunk with dark marks and a light crown; submeshes: bark, marks, foliage.
@@ -95,7 +139,7 @@ namespace DeadCounty.EditorTools
             m.Sub();
             AddBlob(m, new Vector3(0f, 5f, 0f), new Vector3(1.5f, 1.8f, 1.5f), 1, rng, 0.2f);
             AddBlob(m, new Vector3(0.6f, 4.1f, 0.3f), new Vector3(1f, 1f, 1f), 1, rng, 0.2f);
-            return m.Save($"SM_Birch_{variant}");
+            return m.Save($"SM_Birch_{variant}", wind: Sway(3f, 6.8f, 0.35f, 0.05f));
         });
 
         // Road wear along Main Street and the main road: cracks, potholes, patched squares, manholes.

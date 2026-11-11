@@ -150,7 +150,7 @@ namespace DeadCounty.EditorTools
                 var root = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * Range(rng, 0f, 0.25f);
                 Blade(m, root, Range(rng, 0f, 360f), Range(rng, 0.3f, 0.7f), 0.1f, Range(rng, -0.3f, 0.3f));
             }
-            return m.Save($"SM_GrassTuft_{variant}");
+            return m.Save($"SM_GrassTuft_{variant}", wind: Sway(0f, 0.7f, 0.12f, 0.02f), groundLit: true);
         });
 
         // A thin leaf from `root`, leaning by `lean` along its own facing; both faces, as low poly blades are seen
@@ -183,7 +183,7 @@ namespace DeadCounty.EditorTools
                 for (var k = 0; k < 4; k++)
                     Blade(m, root, yaw + k * 45f, height * Range(rng, 0.85f, 1f), 0.15f, Range(rng, -0.12f, 0.12f));
             }
-            return m.Save("SM_WheatField");
+            return m.Save("SM_WheatField", wind: Sway(0f, 0.95f, 0.18f, 0.02f), groundLit: true);
         });
 
         // One row of corn plants along Z, centred on the origin: a stalk, three leaves and a tassel each.
@@ -207,7 +207,7 @@ namespace DeadCounty.EditorTools
                 m.Use(1);
                 Blade(m, root + Vector3.up * height, Range(rng, 0f, 360f), 0.25f, 0.08f, 0.2f);
             }
-            return m.Save($"SM_CornRow_{variant}");
+            return m.Save($"SM_CornRow_{variant}", wind: Sway(0f, 2.6f, 0.3f, 0.04f), groundLit: true);
         });
     }
 }
