@@ -14,14 +14,24 @@ namespace DeadCounty.EditorTools
             ("SidingRed", "ShutterDark", "RoofGrey"),
         };
 
+        static readonly float[] VillageLots = { 24f, 46f, 68f, 90f, 112f };
+        static readonly Vector3 ChurchOrigin = new(MainStreetX + 12f, 0f, -60f);
+        const float ChurchYaw = 90f;
+
+        static Vector3 LotFront(int lot, bool east) => new(MainStreetX + (east ? 12f : -12f), 0f, VillageLots[lot]);
+
+        static float LotYaw(bool east) => east ? 90f : -90f;
+
+        // World point of a lot given in its root-local frame (see Lot).
+        static Vector3 LotPoint(int lot, bool east, float x, float z) => LotFront(lot, east) + Quaternion.Euler(0f, LotYaw(east), 0f) * new Vector3(x, 0f, z);
+
         static void BuildVillage(Transform parent)
         {
             var rng = new System.Random(11);
-            float[] lots = { 24f, 46f, 68f, 90f, 112f };
-            for (var i = 0; i < lots.Length; i++)
+            for (var i = 0; i < VillageLots.Length; i++)
             {
-                Lot(parent, $"Maison_O{i + 1}", new Vector3(MainStreetX - 12f, 0f, lots[i]), -90f, i, rng, boarded: i == 2);
-                Lot(parent, $"Maison_E{i + 1}", new Vector3(MainStreetX + 12f, 0f, lots[i]), 90f, i + 3, rng, boarded: i == 4);
+                Lot(parent, $"Maison_O{i + 1}", LotFront(i, false), LotYaw(false), i, rng, boarded: i == 2);
+                Lot(parent, $"Maison_E{i + 1}", LotFront(i, true), LotYaw(true), i + 3, rng, boarded: i == 4);
             }
             var lamps = Group(parent, "Lampadaires");
             for (var z = 14f; z <= 114f; z += 25f)
@@ -146,7 +156,7 @@ namespace DeadCounty.EditorTools
         // White wooden church facing Main Street, with steeple and a small graveyard on its south side.
         static void BuildChurch(Transform parent)
         {
-            var root = Group(parent, "Eglise", new Vector3(MainStreetX + 12f, 0f, -60f), 90f);
+            var root = Group(parent, "Eglise", ChurchOrigin, ChurchYaw);
             var style = new WallStyle("SidingWhite", 4.5f, "ShutterDark");
             Box("Sol", root, new Vector3(0f, 0.05f, 8f), new Vector3(9f, 0.1f, 16f), "Floor");
             Wall(root, "Facade", new Vector2(-4.5f, 0f), new Vector2(4.5f, 0f), style, Door(4.5f, 1.8f, 2.7f));

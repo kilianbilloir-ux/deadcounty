@@ -24,7 +24,8 @@ namespace DeadCounty.Perception
         // Oldest first, so a caller whose destination fills up can resume from the last copied Id.
         public int CopySince(int lastId, NoiseEvent[] destination)
         {
-            var first = Mathf.Max(lastId + 1, LatestId - events.Length + 1, firstValidId);
+            // Nested two-argument Max: the three-argument overload takes a params array and allocates per call.
+            var first = Mathf.Max(Mathf.Max(lastId + 1, LatestId - events.Length + 1), firstValidId);
             var count = Mathf.Clamp(LatestId - first + 1, 0, destination.Length);
             for (var i = 0; i < count; i++) destination[i] = events[(first + i) % events.Length];
             return count;

@@ -6,6 +6,8 @@ namespace DeadCounty.EditorTools
     {
         static readonly Color Sodium = new(1f, 0.78f, 0.45f);
         static readonly Color ColdWhite = new(0.92f, 0.95f, 1f);
+        static readonly Vector3 ClearingCenter = new(-80f, 0f, -72f);
+        static readonly Vector3 WarehouseOrigin = new(-15f, 0f, -80f);
 
         // South-east corner of the crossroads: canopy with two pump islands, shop facing the pumps.
         static void BuildGasStation(Transform parent)
@@ -155,7 +157,7 @@ namespace DeadCounty.EditorTools
         // Closed 30 x 20 m warehouse with a single door (flashlight tests) and a container yard in front.
         static void BuildWarehouse(Transform parent)
         {
-            var w = Group(parent, "Hangar", new Vector3(-15f, 0f, -80f));
+            var w = Group(parent, "Hangar", WarehouseOrigin);
             var style = new WallStyle("MetalSiding", 5f);
             Box("Sol", w, new Vector3(15f, 0.05f, 10f), new Vector3(30f, 0.1f, 20f), "Concrete");
             Wall(w, "Mur_Nord", new Vector2(30f, 20f), new Vector2(0f, 20f), style, new Opening(15f, 2f, 0f, 2.4f));
@@ -245,7 +247,7 @@ namespace DeadCounty.EditorTools
         // and mixed cover for line-of-sight tests.
         static void BuildAIClearing(Transform parent)
         {
-            var center = new Vector3(-80f, 0f, -72f);
+            var center = ClearingCenter;
             var c = Group(parent, "Clairiere", center);
             ReservedCircles.Add(new Vector3(center.x, center.z, 53f));
             Post("NoiseOrigin", c, Vector3.zero, 3f, 0.25f, "Accent");

@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d99113faf71b24df7af2befb323ceba1, type: 3}
+  m_Name: ZP_Standard
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.AI.ZombieProfile
+  Tuning:
+    WanderSpeed: 0.55
+    InvestigateSpeed: 0.9
+    SearchSpeed: 0.8
+    ChaseSpeed: 1.2
+    WanderSpeedJitter: 0.12
+    SpeedJitter: 0.1
+    IdleChance: 0.6
+    IdleMin: 4
+    IdleMax: 12
+    WanderRadius: 8
+    LeashRadius: 12
+    FieldOfView: 120
+    DayRange: 20
+    NightRange: 8
+    FlashlightRange: 25
+    CrouchRangeFactor: 0.6
+    EyeHeight: 1.6
+    ProximityRadius: 1.1
+    ProximitySnarl: 0.4
+    HearingMultiplier: 1
+    HearingUnaware: 1
+    HearingAlert: 1.25
+    HearingHunting: 1.5
+    AlertThreshold: 0.3
+    ChaseThreshold: 1
+    MinAlertTime: 1.5
+    CalledAlertTime: 0.6
+    SuspicionHold: 0.5
+    SuspicionDecay: 0.4
+    NoiseSuspicion: 0.5
+    AlertedFillMultiplier: 1.5
+    OneRayFactor: 0.6
+    TrackTime: 1
+    GiveUpTime: 4
+    PredictionHorizon: 1.5
+    SearchDuration: 15
+    SearchPoints: 4
+    SearchRadiusStart: 4
+    SearchRadiusEnd: 8
+    SearchPauseMin: 1.5
+    SearchPauseMax: 2.5
+    WrongSideChance: 0.25
+    InvestigateLookTime: 3
+    InvestigateSearchDuration: 6
+    InvestigateSearchPoints: 2
+    InvestigateSearchRadius: 3
+    CallRadius: 10
+    CallCooldown: 5
+    FeedRadius: 3
+    HunchMin: 8
+    HunchMax: 18
+    HeadRollMax: 10
+    Attack:
+      TriggerBase: 1.6
+      TriggerPerAwaySpeed: 0.3
+      TriggerMin: 1
+      TriggerHalfAngle: 45
+      Windup: 1
+      ArmsUpAt: 0.6
+      WindupTurnRate: 90
+      LungeDistance: 0.6
+      LungeDuration: 0.2
+      ContactDistance: 0.65
+      HitReach: 1.3
+      HitHalfWidth: 0.5
+      Damage: 25
+      RecoverAfterHit: 0.6
+      RecoverAfterMiss: 0.9
+      Cooldown: 0.4
+  Locomotion:
+    Acceleration: 2.5
+    Deceleration: 4
+    AirAcceleration: 1
+    StandingTurnRate: 160
+    MovingTurnRate: 90
+    TurnRateReferenceSpeed: 1.2
+    PivotAngle: 181
+    PivotMinSpeed: 100
+    PivotTurnScale: 1
+    TightTurnSpeedFactor: 0.4
+  Gait: {fileID: 11400000, guid: 138dd32a5bc264159a50dd6f0d8b5ee2, type: 2}
+  LimpChance: 0.3

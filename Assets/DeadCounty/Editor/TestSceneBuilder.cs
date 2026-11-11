@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DeadCounty.Core;
 using System.IO;
 using System.Linq;
 using Unity.AI.Navigation;
@@ -38,6 +39,7 @@ namespace DeadCounty.EditorTools
             MeshCache.Clear();
             Reserved.Clear();
             ReservedCircles.Clear();
+            ConfigureProject();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             var env = new GameObject("Environment").transform;
@@ -59,8 +61,10 @@ namespace DeadCounty.EditorTools
                 GameObjectUtility.SetStaticEditorFlags(t.gameObject, StaticEditorFlags.BatchingStatic);
 
             SetupAtmosphere();
+            EnsureGaitProfiles();
             BuildPlayer();
             BakeNavMesh(env.gameObject);
+            BuildZombies();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings();
@@ -169,7 +173,7 @@ namespace DeadCounty.EditorTools
             void Piece(float from, float to, float bottom, float top)
             {
                 if (to - from < 0.01f || top - bottom < 0.01f) return;
-                Box("Piece", wall, new Vector3(0f, (bottom + top) / 2f, (from + to) / 2f), new Vector3(WallThickness, top - bottom, to - from), style.Mat);
+                Box("Piece", wall, new Vector3(0f, (bottom + top) / 2f, (from + to) / 2f), new Vector3(WallThickness, top - bottom, to - from), style.Mat).tag = GameLayers.WallTag;
             }
 
             var cursor = 0f;
@@ -198,7 +202,7 @@ namespace DeadCounty.EditorTools
         }
 
         static void Glaze(Transform wall, Opening o)
-            => Box("Vitre", wall, new Vector3(0f, (o.Bottom + o.Top) / 2f, o.Offset), new Vector3(0.04f, o.Top - o.Bottom, o.Width), "Glass");
+            => Box("Vitre", wall, new Vector3(0f, (o.Bottom + o.Top) / 2f, o.Offset), new Vector3(0.04f, o.Top - o.Bottom, o.Width), "Glass").tag = GameLayers.GlassTag;
 
         static void Reserve(float xMin, float zMin, float xMax, float zMax) => Reserved.Add(Rect.MinMaxRect(xMin, zMin, xMax, zMax));
 
@@ -230,6 +234,41 @@ namespace DeadCounty.EditorTools
 
             AssetDatabase.DeleteAsset(NavMeshPath);
             AssetDatabase.CreateAsset(surface.navMeshData, NavMeshPath);
+        }
+
+        // Tags and layers used by gameplay queries; zombies never collide with each other (NavMesh avoidance
+        // keeps them apart, physics contacts between them would only jitter).
+        static void ConfigureProject()
+        {
+            EnsureTag(GameLayers.WallTag);
+            EnsureTag(GameLayers.GlassTag);
+            EnsureLayer(GameLayers.Player, "Player");
+            EnsureLayer(GameLayers.Zombie, "Zombie");
+            Physics.IgnoreLayerCollision(GameLayers.Zombie, GameLayers.Zombie, true);
+        }
+
+        static SerializedObject TagManager() => new(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+
+        static void EnsureTag(string tag)
+        {
+            var tagManager = TagManager();
+            var tags = tagManager.FindProperty("tags");
+            for (var i = 0; i < tags.arraySize; i++)
+                if (tags.GetArrayElementAtIndex(i).stringValue == tag) return;
+            tags.InsertArrayElementAtIndex(tags.arraySize);
+            tags.GetArrayElementAtIndex(tags.arraySize - 1).stringValue = tag;
+            tagManager.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void EnsureLayer(int index, string name)
+        {
+            var tagManager = TagManager();
+            var slot = tagManager.FindProperty("layers").GetArrayElementAtIndex(index);
+            if (slot.stringValue == name) return;
+            if (!string.IsNullOrEmpty(slot.stringValue))
+                throw new System.InvalidOperationException($"Layer {index} is already used by '{slot.stringValue}'");
+            slot.stringValue = name;
+            tagManager.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // Humanoid agent sized like the player, so baked paths fit through 1 m doors and climb the same steps.
