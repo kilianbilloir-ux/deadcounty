@@ -94,6 +94,9 @@ namespace DeadCounty.EditorTools
             foreach (var x in new[] { 3f, 6f, 12f, 15f })
                 Searchable(GroceryShelf(b, new Vector3(x, 0f, 5f), 90f, stock).gameObject, "Rayon", "LT_Magasin_Rayon");
             Searchable(Checkout(b, new Vector3(4.5f, 0f, 9.6f), 180f).gameObject, "Comptoir", "LT_Magasin_Comptoir");
+            // Cans knocked off the shelves into the aisles.
+            foreach (var (x, z) in new[] { (4.2f, 3f), (7.1f, 6.8f), (11.2f, 2.4f), (13.6f, 7.5f) })
+                PlaceItem(b, FoodItems[stock.Next(FoodItems.Length)], new Vector3(x, 0.02f, z), stock.Next(0, 360));
             Box("Congelateurs", b, new Vector3(9f, 0.6f, 0.6f), new Vector3(8f, 1.2f, 0.9f), "SignWhite");
 
             Car(lot, "Voiture_Parking", new Vector3(-5.8f, 0.06f, 2.5f), 90f, "CarGreen");

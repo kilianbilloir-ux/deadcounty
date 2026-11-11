@@ -24,6 +24,9 @@ namespace DeadCounty.Items
         [Tooltip("Carrying capacity added while the item is carried (backpack), in kg; only the largest counts.")]
         [Min(0f)] public float CapacityBonus;
 
+        [Tooltip("Model shown when the item lies on the ground, pivot on the ground with a collider on its root. Without one the item drops as a plain box.")]
+        public GameObject WorldModel;
+
         public bool Usable => !string.IsNullOrEmpty(UseVerb);
 
         public static string CategoryName(ItemCategory category) => category switch

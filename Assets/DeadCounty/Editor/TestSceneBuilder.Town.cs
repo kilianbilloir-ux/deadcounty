@@ -162,6 +162,12 @@ namespace DeadCounty.EditorTools
             Toilet(f, At(11.57f, 4.4f), 90f);
             Searchable(BathroomCabinet(f, At(7.35f, 4.6f), -90f).gameObject, "Armoire à pharmacie", "LT_SalleDeBain");
             CeilingLamp(f, new Vector3(9.5f, 0f, 2.75f));
+
+            // A few items left in sight, picked up without searching: food on the kitchen table, a soda on the
+            // coffee table, a bandage by the basin.
+            if (rng.NextDouble() < 0.55) PlaceItem(f, FoodItems[rng.Next(FoodItems.Length)], At(3.3f + Range(rng, -0.4f, 0.5f), 8f + Range(rng, -0.2f, 0.2f)) + Vector3.up * 0.75f, Range(rng, 0f, 360f));
+            if (rng.NextDouble() < 0.3) PlaceItem(f, "IT_Soda", At(2f + Range(rng, -0.4f, 0.4f), 2.7f) + Vector3.up * 0.42f, Range(rng, 0f, 360f));
+            if (rng.NextDouble() < 0.25) PlaceItem(f, "IT_Bandage", At(7.35f, 4.3f) + Vector3.up * 0.9f, 90f);
         }
 
         // 6 x 6 m garage, front wall on z = 0 facing -Z.
