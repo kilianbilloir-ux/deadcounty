@@ -38,7 +38,11 @@ namespace DeadCounty.Tests
 
         static float[][] Run(Case c)
         {
-            using var rig = new HumanoidTestRig(ScriptableObject.CreateInstance<GaitProfile>());
+            // The recorded poses predate the idle weight shift, which HumanoidAnimatorLifeTests covers.
+            var gait = ScriptableObject.CreateInstance<GaitProfile>();
+            gait.IdleShift = 0f;
+            gait.IdleShiftRoll = 0f;
+            using var rig = new HumanoidTestRig(gait);
             rig.Initialize();
             rig.Motion.IsCrouching = c.Crouch;
             rig.Motion.AimPitch = c.AimPitch;

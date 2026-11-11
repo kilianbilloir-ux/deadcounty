@@ -62,7 +62,7 @@ namespace DeadCounty.Player
             }
             else if (Time.time - interactor.LastUseTime < ReachTime)
             {
-                pose.ArmsForward = 0.5f;
+                pose.Reach = 1f;
             }
             if (stamina.Model.Exhausted)
             {
