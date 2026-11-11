@@ -7,7 +7,9 @@ namespace DeadCounty.EditorTools
     {
         // House body frame (see House): walls on x 0..12 and z 0..10, 0.2 m thick, front door at x 5, back door at
         // x 3, roof eaves at z -0.4 and 10.4.
-        static void HouseExterior(Transform body, System.Random rng)
+        // `top` is the height of the wall tops, one or two storeys up; `veranda` moves the porch rails to a deck
+        // running the whole front.
+        static void HouseExterior(Transform body, System.Random rng, float top, bool veranda)
         {
             var ext = Group(body, "Exterieur");
             const float face = WallThickness / 2f + 0.03f;
@@ -22,16 +24,16 @@ namespace DeadCounty.EditorTools
             Band("Soubassement", new Vector3(12f + face, 0.12f, 5f), new Vector3(0.06f, 0.24f, 10.26f));
 
             foreach (var (x, z) in new[] { (-face, -face), (12f + face, -face), (-face, 10f + face), (12f + face, 10f + face) })
-                Box("Planche_Angle", ext, new Vector3(x, WallHeight / 2f, z), new Vector3(0.12f, WallHeight, 0.12f), "Trim", solid: false);
+                Box("Planche_Angle", ext, new Vector3(x, top / 2f, z), new Vector3(0.12f, top, 0.12f), "Trim", solid: false);
 
             // Fascia and gutter under both eaves, a downspout at each end.
             foreach (var z in new[] { -0.42f, 10.42f })
             {
                 var outward = Mathf.Sign(z - 5f);
-                Box("Bandeau", ext, new Vector3(6f, WallHeight - 0.06f, z), new Vector3(12.8f, 0.16f, 0.04f), "Trim", solid: false);
-                Box("Gouttiere", ext, new Vector3(6f, WallHeight - 0.12f, z + outward * 0.07f), new Vector3(12.8f, 0.1f, 0.1f), "Metal", solid: false);
+                Box("Bandeau", ext, new Vector3(6f, top - 0.06f, z), new Vector3(12.8f, 0.16f, 0.04f), "Trim", solid: false);
+                Box("Gouttiere", ext, new Vector3(6f, top - 0.12f, z + outward * 0.07f), new Vector3(12.8f, 0.1f, 0.1f), "Metal", solid: false);
                 foreach (var x in new[] { -0.3f, 12.3f })
-                    Box("Descente", ext, new Vector3(x, (WallHeight - 0.12f) / 2f, z + outward * 0.07f), new Vector3(0.07f, WallHeight - 0.12f, 0.07f), "Metal", solid: false);
+                    Box("Descente", ext, new Vector3(x, (top - 0.12f) / 2f, z + outward * 0.07f), new Vector3(0.07f, top - 0.12f, 0.07f), "Metal", solid: false);
             }
 
             // Front door frame, porch lamp and a railing on both sides of the step.
@@ -39,10 +41,12 @@ namespace DeadCounty.EditorTools
             foreach (var x in new[] { 4.44f, 5.56f })
                 Box("Chambranle_Porte", ext, new Vector3(x, 1.05f, -face), new Vector3(0.1f, 2.1f, 0.05f), "Trim", solid: false);
             Box("Applique", ext, new Vector3(5.85f, 1.9f, -face - 0.06f), new Vector3(0.14f, 0.22f, 0.12f), "Lampshade", solid: false);
-            foreach (var (from, to) in new[] { (3.3f, 4.2f), (5.8f, 6.7f) })
+            // Front rails, open on the step in front of the door, then the two ends of the porch.
+            var (left, right) = veranda ? (0.2f, 11.8f) : (3.3f, 6.7f);
+            foreach (var (from, to) in new[] { (left, 4.2f), (5.8f, right) })
                 Railing(ext, new Vector3(from, 0.2f, -2.5f), new Vector3(to, 0.2f, -2.5f));
-            Railing(ext, new Vector3(3.3f, 0.2f, -2.5f), new Vector3(3.3f, 0.2f, -0.15f));
-            Railing(ext, new Vector3(6.7f, 0.2f, -2.5f), new Vector3(6.7f, 0.2f, -0.15f));
+            Railing(ext, new Vector3(left, 0.2f, -2.5f), new Vector3(left, 0.2f, -0.15f));
+            Railing(ext, new Vector3(right, 0.2f, -2.5f), new Vector3(right, 0.2f, -0.15f));
 
             if (rng.NextDouble() < 0.5)
             {
@@ -53,8 +57,10 @@ namespace DeadCounty.EditorTools
             }
             if (rng.NextDouble() < 0.35)
             {
-                // Dish on the front slope of the roof, aimed south.
-                var dish = Group(ext, "Parabole", new Vector3(Range(rng, 8.5f, 10.5f), 3.75f, 1.5f), 180f);
+                // Dish on the front slope of the roof, aimed south; between the dormers when there are any. The draw
+                // is taken either way so the furniture that follows does not change with the shape of the house.
+                var along = Range(rng, 8.5f, 10.5f);
+                var dish = Group(ext, "Parabole", new Vector3(veranda ? 6f : along, top + 0.75f, 1.5f), 180f);
                 Box("Pied", dish, new Vector3(0f, 0.15f, 0f), new Vector3(0.05f, 0.3f, 0.05f), "Metal", solid: false);
                 Cylinder("Disque", dish, new Vector3(0f, 0.38f, 0.04f), 0.32f, 0.04f, "Porcelain", Quaternion.Euler(-60f, 0f, 0f), solid: false);
                 Box("Bras", dish, new Vector3(0f, 0.42f, 0.22f), new Vector3(0.03f, 0.03f, 0.35f), "Metal", Quaternion.Euler(-30f, 0f, 0f), solid: false);
