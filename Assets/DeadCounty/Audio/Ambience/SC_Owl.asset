@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_Owl
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 3c0821151dd8d4258ab18577d462fdff, type: 3}
-  - {fileID: 8300000, guid: ab5f2c6e8ac244af1921c3d7cf6ce1c0, type: 3}
+  - {fileID: 8300000, guid: 2c83bb0d4213e4273b50e19a39c702be, type: 3}
+  - {fileID: 8300000, guid: 8c549b28cd7ac4e2d8363f06d3f5359f, type: 3}
   volume: 0.35
   pitch: {x: 0.97, y: 1.03}
   channel: 1

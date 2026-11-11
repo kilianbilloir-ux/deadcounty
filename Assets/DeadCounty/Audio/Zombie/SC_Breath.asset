@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: SC_Breath
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 18debfbdd6e8f462db03a3e706f628ce, type: 3}
-  - {fileID: 8300000, guid: 549e806890fe2449882857fd58d8c938, type: 3}
-  - {fileID: 8300000, guid: be8d0c5a24bce4d1081b195be28f12ca, type: 3}
+  - {fileID: 8300000, guid: 6675d07df60534f5087ff1d910a3bff8, type: 3}
+  - {fileID: 8300000, guid: bf352c1e162864700b055e4bcc651c3f, type: 3}
+  - {fileID: 8300000, guid: 7c6bf6773e6b04ba6a5934a9e78825fe, type: 3}
   volume: 0.45
   pitch: {x: 0.95, y: 1.05}
   channel: 0

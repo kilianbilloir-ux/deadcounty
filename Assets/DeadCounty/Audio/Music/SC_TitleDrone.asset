@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SC_TitleDrone
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: 0f2ed7839e6034fbeb5cb58b69291d83, type: 3}
+  - {fileID: 8300000, guid: 09700705525be4db799fcc6bd5d1e509, type: 3}
   volume: 0.5
   pitch: {x: 1, y: 1}
   channel: 2

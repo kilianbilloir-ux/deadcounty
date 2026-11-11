@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_DistantScream
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: a27c2bcff1da84ccba08eccee7db8fea, type: 3}
-  - {fileID: 8300000, guid: 3dee1b36b871842688ea103fd126e9c2, type: 3}
+  - {fileID: 8300000, guid: 707d8922aab20404d81f9e5c3a812a6e, type: 3}
+  - {fileID: 8300000, guid: 604e76e75592b4b5ea99e401a2aa1211, type: 3}
   volume: 0.3
   pitch: {x: 0.96, y: 1.04}
   channel: 1

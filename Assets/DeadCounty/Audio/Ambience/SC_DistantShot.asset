@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SC_DistantShot
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
   clips:
-  - {fileID: 8300000, guid: d4270fb84407b43509169c3d7a222d86, type: 3}
-  - {fileID: 8300000, guid: 4808301e17a464cda94e598951733854, type: 3}
+  - {fileID: 8300000, guid: f125a1b15c5fb41ebbad51a942405669, type: 3}
+  - {fileID: 8300000, guid: 4b9610a15ca0f4ff499b5c7ed67eb208, type: 3}
   volume: 0.4
   pitch: {x: 0.96, y: 1.04}
   channel: 1
