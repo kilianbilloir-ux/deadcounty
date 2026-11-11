@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Run_Wood
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 87118ab92dfe84a5696db7f42f44bd01, type: 3}
+  - {fileID: 8300000, guid: d55ba72cdfed247d39a9ba0e034ce4e3, type: 3}
+  - {fileID: 8300000, guid: e76d03eda0c3b409da20550ea06f8194, type: 3}
+  - {fileID: 8300000, guid: 94a06c805f6f248698e6ed542b3b5f2b, type: 3}
+  - {fileID: 8300000, guid: 64e83a2b16e8049349f7ea85a6c5fa92, type: 3}
+  volume: 0.9
+  pitch: {x: 0.94, y: 1.06}
+  channel: 0
+  minDistance: 1
+  maxDistance: 25

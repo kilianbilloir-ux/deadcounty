@@ -2556,6 +2556,9 @@ GameObject:
   - component: {fileID: 5654377057039098411}
   - component: {fileID: 107859788260795814}
   - component: {fileID: 6781900904932337017}
+  - component: {fileID: 931376391292756448}
+  - component: {fileID: 4761732171727397079}
+  - component: {fileID: 1735016780315068882}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2873,6 +2876,83 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9aed0af5a5b60466fbff686a14e06e88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerPoseDriver
+--- !u!114 &931376391292756448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe74a62f5e744cb0bb17d1acbfd26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.PlayerFootstepAudio
+  steps:
+  - {fileID: 11400000, guid: d121283c1a04d4da5aacde7314555696, type: 2}
+  - {fileID: 11400000, guid: de7233e443cc147ea951b87206660045, type: 2}
+  - {fileID: 11400000, guid: 0d64f461dd54f41a39dc0eb9c34395b2, type: 2}
+  - {fileID: 11400000, guid: 460375059d4e744e2bcb8d4a220cb171, type: 2}
+  - {fileID: 11400000, guid: 5c973b31415f64af8a7ee7afe835bb12, type: 2}
+  - {fileID: 11400000, guid: f6906222a65fc4f439bbbc563c3059bc, type: 2}
+  - {fileID: 11400000, guid: 8adc4e00644e0470c8882f057f6fe7d3, type: 2}
+  runSteps:
+  - {fileID: 11400000, guid: 6d5c6c142ca8f4d76b0d45b444d651ad, type: 2}
+  - {fileID: 11400000, guid: dd440fd1fafe44bdfa949c14a58b8554, type: 2}
+  - {fileID: 11400000, guid: 2ae5ddb8d319a42609ee66652bc0e0cf, type: 2}
+  - {fileID: 11400000, guid: 06c1a544981374a1eba7ed0fb51b136b, type: 2}
+  - {fileID: 11400000, guid: 95a0b77d6551f416fa2bf5b612055c52, type: 2}
+  - {fileID: 11400000, guid: f052dd5f4a64d427d99c21cc96ea34af, type: 2}
+  - {fileID: 11400000, guid: b69cc600c77644c31a1a2c84cafa7ee3, type: 2}
+  jump: {fileID: 11400000, guid: 28e3e089e74724e83a57544810d6f076, type: 2}
+  land: {fileID: 11400000, guid: d76d12229969e4c30affd76ec412d7f8, type: 2}
+  crouchVolume: 0.3
+  walkVolume: 0.55
+  runVolume: 0.8
+  sprintVolume: 1
+--- !u!114 &4761732171727397079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01ccbb754a57c44d496ce2f9611ec239, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.PlayerBodyAudio
+  breathIn: {fileID: 11400000, guid: 9d6061c4dabb94bfabf9a728409bf356, type: 2}
+  breathOut: {fileID: 11400000, guid: ffbdf288f52a4445b8c9e2198a47a526, type: 2}
+  pantOut: {fileID: 11400000, guid: 2a3eb8d32aa72467e9ba841b5996532a, type: 2}
+  hurt: {fileID: 11400000, guid: 83757a9182a6c4442ac7ffd6cd30aac2, type: 2}
+  death: {fileID: 11400000, guid: f7dbdd4b1d84b44dcbef75b25b103caa, type: 2}
+  heartbeat: {fileID: 11400000, guid: 42f9ec35bc1dd467c85b6367cdd9477b, type: 2}
+  calmCycle: 3
+  pantCycle: 0.75
+  heartbeatBelow: 0.25
+  slowBpm: 75
+  fastBpm: 130
+--- !u!114 &1735016780315068882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25995fc988972463c819cde22cb220e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.PlayerActionAudio
+  rummage: {fileID: 11400000, guid: a0856f9d7508e4077a011743364a6e51, type: 2}
+  pickup: {fileID: 11400000, guid: 748e5b54204a24f16afbc2bc0ddf865c, type: 2}
+  eat: {fileID: 11400000, guid: 07560c52a9422483aa3fbf9497d99e8f, type: 2}
+  drink: {fileID: 11400000, guid: be290a19f4bbe4bfc985ae9cab369903, type: 2}
+  bandage: {fileID: 11400000, guid: c6c282e7ffff643e386291b2f6598ece, type: 2}
+  drop: {fileID: 11400000, guid: a43322dbedc054373bb88f324cb1b4d5, type: 2}
+  flashlightClick: {fileID: 11400000, guid: f52f87aa427c744698ee60e44d412160, type: 2}
+  bed: {fileID: 11400000, guid: 37b8504341d5b4ad19370c6899d63695, type: 2}
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0
@@ -3417,6 +3497,7 @@ GameObject:
   - component: {fileID: 2536389201600511191}
   - component: {fileID: 8259299151959908222}
   - component: {fileID: 1303728362577461157}
+  - component: {fileID: 2206476033113840169}
   m_Layer: 0
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -3603,6 +3684,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 560c5103690114dc79345429f6a260b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerPickupFeed
+--- !u!114 &2206476033113840169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789988712029122297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 229e73dff6871414caf8da13769eae79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.UiSounds
+  move: {fileID: 11400000, guid: d0086f76742aa455ba1379d5f88908fc, type: 2}
+  confirm: {fileID: 11400000, guid: 4fefb935a8fc8473ba99d37d54403294, type: 2}
+  back: {fileID: 11400000, guid: 5cf4102b89c8547f68aff898a1ccb57b, type: 2}
+  step: {fileID: 11400000, guid: 43e0c8b31c62d44efacbd922cd972e56, type: 2}
+  toggle: {fileID: 11400000, guid: fc4aa37bbca8841cdab573ea333fee50, type: 2}
+  menuOpen: {fileID: 11400000, guid: ad7f0ebfbc4ee47c7b03992fc126141d, type: 2}
+  menuClose: {fileID: 11400000, guid: 73ec02bc9ce1946d8ad69207efc4c984, type: 2}
+  bagOpen: {fileID: 11400000, guid: 066282f4c2b464afcb52356dd832cb21, type: 2}
+  bagClose: {fileID: 11400000, guid: d48b618da9f6c474aabcc6a8ca8559ce, type: 2}
 --- !u!1 &6092803171642249547
 GameObject:
   m_ObjectHideFlags: 0

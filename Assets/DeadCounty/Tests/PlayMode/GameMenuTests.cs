@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections;
+using System.Collections.Generic;
 using DeadCounty.Player;
 using DeadCounty.UI;
 using NUnit.Framework;
@@ -217,6 +218,83 @@ namespace DeadCounty.Tests
                 InputSystem.actions.LoadBindingOverridesFromJson(savedOverrides);
                 if (savedPrefs == null) PlayerPrefs.DeleteKey("dc.bindings");
                 else PlayerPrefs.SetString("dc.bindings", savedPrefs);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator AudioOptionsStepTheVolumesThenGoBack()
+        {
+            var savedMaster = GameSettings.MasterVolume;
+            var savedEffects = GameSettings.EffectsVolume;
+            try
+            {
+                GameSettings.MasterVolume = 0.5f;
+                GameSettings.EffectsVolume = 0.5f;
+                yield return Press(Key.Escape);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                for (var i = 0; i < 7; i++) yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                Assert.That(pause.InAudio, "Enter on Audio did not open the volumes");
+                Assert.That(Root.Q("pause-audio").style.display.value, Is.EqualTo(DisplayStyle.Flex));
+                Assert.That(Root.Q("pause-settings").style.display.value, Is.EqualTo(DisplayStyle.None));
+
+                yield return Press(Key.RightArrow);
+                Assert.That(GameSettings.MasterVolume, Is.EqualTo(0.6f).Within(1e-4f));
+                Assert.That(Root.Q("option-volume-master-fill").style.width.value.value, Is.EqualTo(60f).Within(0.01f));
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.LeftArrow);
+                Assert.That(GameSettings.EffectsVolume, Is.EqualTo(0.4f).Within(1e-4f));
+                Assert.That(Root.Q("option-volume-effects-fill").style.width.value.value, Is.EqualTo(40f).Within(0.01f));
+
+                yield return Press(Key.Escape);
+                Assert.That(pause.InSettings, "Escape on the volumes must go back to the options");
+                yield return Press(Key.Escape);
+                Assert.That(pause.Paused, "and from the options back to the pause");
+            }
+            finally
+            {
+                GameSettings.MasterVolume = savedMaster;
+                GameSettings.EffectsVolume = savedEffects;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator MenusReportWhatThePlayerDidForTheInterfaceSounds()
+        {
+            var heard = new List<GameMenu.MenuFeedback>();
+            var savedInvert = controller.InvertLook;
+            pause.Feedback += heard.Add;
+            try
+            {
+                yield return Press(Key.Escape);
+                yield return Press(Key.UpArrow);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.RightArrow);
+                yield return Press(Key.UpArrow);
+                yield return Press(Key.RightArrow);
+                yield return Press(Key.Escape);
+                yield return Press(Key.Escape);
+                Assert.That(heard, Is.EqualTo(new[]
+                {
+                    GameMenu.MenuFeedback.Open,
+                    GameMenu.MenuFeedback.Move,
+                    GameMenu.MenuFeedback.Confirm,
+                    GameMenu.MenuFeedback.Move,
+                    GameMenu.MenuFeedback.Toggle,
+                    GameMenu.MenuFeedback.Move,
+                    GameMenu.MenuFeedback.Step,
+                    GameMenu.MenuFeedback.Back,
+                    GameMenu.MenuFeedback.Close,
+                }), "Up on the first entry stays put and must stay silent");
+            }
+            finally
+            {
+                pause.Feedback -= heard.Add;
+                controller.InvertLook = savedInvert;
+                PlayerPrefs.DeleteKey("dc.invertLook");
             }
         }
 

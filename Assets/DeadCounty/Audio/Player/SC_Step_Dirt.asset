@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Step_Dirt
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: ac75ba494f610471faf0f558dcdea19b, type: 3}
+  - {fileID: 8300000, guid: c14e6fa5347394b50b9d0174cddfb0a6, type: 3}
+  - {fileID: 8300000, guid: b6cbb49d0376c4f459cb158bbd5004d8, type: 3}
+  - {fileID: 8300000, guid: 9e7a463a0013c4e7eb4bb586029fefdb, type: 3}
+  - {fileID: 8300000, guid: 43172a150e9eb4bbe9a52fc69f7668b0, type: 3}
+  volume: 0.8
+  pitch: {x: 0.94, y: 1.06}
+  channel: 0
+  minDistance: 1
+  maxDistance: 20

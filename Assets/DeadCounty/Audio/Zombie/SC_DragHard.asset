@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_DragHard
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 9b62214b35a3c4ca7a884d2450416f9d, type: 3}
+  - {fileID: 8300000, guid: 11d8656c9184c4f008d1ff3c070fb611, type: 3}
+  - {fileID: 8300000, guid: d253b9a65dbb24cf18fbc531c66b0390, type: 3}
+  volume: 0.3
+  pitch: {x: 0.92, y: 1.08}
+  channel: 0
+  minDistance: 1
+  maxDistance: 10

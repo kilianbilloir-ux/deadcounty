@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Door_Creak
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: f7f2f4395b1ad4877b7fddaec6f92dc1, type: 3}
+  - {fileID: 8300000, guid: f231d0d485f22405f8fe1f232468fdec, type: 3}
+  - {fileID: 8300000, guid: 437754d2c11644d4188bac36ed339561, type: 3}
+  - {fileID: 8300000, guid: 1b15b8e5547694921af429180bb0c6a3, type: 3}
+  - {fileID: 8300000, guid: a839a5b496eec40e0b4294698c94aa29, type: 3}
+  volume: 0.3
+  pitch: {x: 0.92, y: 1.08}
+  channel: 0
+  minDistance: 1
+  maxDistance: 20

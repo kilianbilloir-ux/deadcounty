@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Windup
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 7ffa4f081da5a41ef9f16fbab34bbbb0, type: 3}
+  - {fileID: 8300000, guid: 76e33723f05ad44bf98e8f50b9cff9e5, type: 3}
+  - {fileID: 8300000, guid: 40e0bb617bcee49a28c4647ae3ee7c87, type: 3}
+  volume: 1
+  pitch: {x: 0.98, y: 1.02}
+  channel: 0
+  minDistance: 2
+  maxDistance: 30

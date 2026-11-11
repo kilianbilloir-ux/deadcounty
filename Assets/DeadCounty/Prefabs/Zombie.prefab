@@ -2056,6 +2056,8 @@ GameObject:
   - component: {fileID: 8861234518597276054}
   - component: {fileID: 9165582693441013670}
   - component: {fileID: 5414209194453691712}
+  - component: {fileID: 7392426528476961714}
+  - component: {fileID: 5067236964312300131}
   m_Layer: 7
   m_Name: Zombie
   m_TagString: Untagged
@@ -2225,6 +2227,132 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 1
+--- !u!82 &7392426528476961714
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695996889099690771}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &5067236964312300131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695996889099690771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30dcd5e24779643b2a757a98cfcbc35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.ZombieAudio
+  moan: {fileID: 11400000, guid: 45ffd9bdba2e74bfc9473c5a45c72b2e, type: 2}
+  breath: {fileID: 11400000, guid: 4ec7ad318ddce4553842429db77ea9fe, type: 2}
+  alert: {fileID: 11400000, guid: 374adbd0d696c404b95982372840df67, type: 2}
+  sniff: {fileID: 11400000, guid: 38d9077b007034bc29188409043be206, type: 2}
+  growl: {fileID: 11400000, guid: 48c45f968e5f744bfaf914d7a113276b, type: 2}
+  call: {fileID: 11400000, guid: ac657ac167f434acb9797494df846af3, type: 2}
+  windup: {fileID: 11400000, guid: a2e3d42a649364d90b80df6d8a094c54, type: 2}
+  frustrated: {fileID: 11400000, guid: 09ac0ae41e76243d4b84267a5132ae23, type: 2}
+  whoosh: {fileID: 11400000, guid: aef6b3c9e269c4445a6688f15fc734cc, type: 2}
+  hit: {fileID: 11400000, guid: 9134f0d772a5d4db7b2fcfce459f37d6, type: 2}
+  miss: {fileID: 11400000, guid: 784f385f88cca4030973dc074e4fda87, type: 2}
+  stepSoft: {fileID: 11400000, guid: 82a423a19e8344bb7a0d63d084fbe36d, type: 2}
+  stepHard: {fileID: 11400000, guid: 9fd9c602ce7664431b7b9c0995f8fcf6, type: 2}
+  stepGravel: {fileID: 11400000, guid: ef8754f6b67784880ad00890795c2670, type: 2}
+  dragSoft: {fileID: 11400000, guid: 5e80490349a8e4964a7c3562978e27f4, type: 2}
+  dragHard: {fileID: 11400000, guid: 9fa9d6dbd728a4e5a9a1e222350fc6bc, type: 2}
+  doorBang: {fileID: 11400000, guid: c6aa072461a6f4fce9c32dc40f3a3a8a, type: 2}
 --- !u!1 &5995926655462892823
 GameObject:
   m_ObjectHideFlags: 0

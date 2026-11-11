@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Run_Concrete
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: c87136ead51f54c98b0f0468390f8f0a, type: 3}
+  - {fileID: 8300000, guid: 20beca18cdaf34f65b5759865ecd87d0, type: 3}
+  - {fileID: 8300000, guid: 2e415dff3ce1f41dbacf521338924927, type: 3}
+  - {fileID: 8300000, guid: 7247c73181d3d4befbf7b3b8e82820de, type: 3}
+  - {fileID: 8300000, guid: 3bf65b3736dd64b53bec090be8659f84, type: 3}
+  volume: 0.9
+  pitch: {x: 0.94, y: 1.06}
+  channel: 0
+  minDistance: 1
+  maxDistance: 25

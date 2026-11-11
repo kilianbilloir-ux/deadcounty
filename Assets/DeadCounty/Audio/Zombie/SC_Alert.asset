@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Alert
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: e04ede755636b4879accb3ed0d2cfc6f, type: 3}
+  - {fileID: 8300000, guid: fc40842b10bf54879a06dc6a57386a15, type: 3}
+  - {fileID: 8300000, guid: a134eb65d7d1d495eb25506b55dce795, type: 3}
+  - {fileID: 8300000, guid: 38eddca7b313641b9866dd6ecd0da048, type: 3}
+  volume: 0.85
+  pitch: {x: 0.96, y: 1.04}
+  channel: 0
+  minDistance: 2
+  maxDistance: 30

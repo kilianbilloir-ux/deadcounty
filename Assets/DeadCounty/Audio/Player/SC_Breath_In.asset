@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Breath_In
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 346529ca7f98b4c778f9ad0caf863232, type: 3}
+  - {fileID: 8300000, guid: d1e41e4d6ccdc41ae9eb91dd568cbdcc, type: 3}
+  - {fileID: 8300000, guid: 45e2900e20c9145f18c5908aa344dcc5, type: 3}
+  - {fileID: 8300000, guid: 43bb2d5f6e5b147008e7b7da0f6afb36, type: 3}
+  - {fileID: 8300000, guid: 3f1e3d9f1870e49c5b3e665bc4df9329, type: 3}
+  volume: 0.4
+  pitch: {x: 0.96, y: 1.04}
+  channel: 0
+  minDistance: 1
+  maxDistance: 25

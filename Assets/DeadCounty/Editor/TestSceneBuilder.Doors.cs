@@ -51,6 +51,7 @@ namespace DeadCounty.EditorTools
                 door.FindProperty("startAngle").floatValue = startAngle;
                 door.ApplyModifiedPropertiesWithoutUndo();
                 leaf.localRotation = Quaternion.Euler(0f, startAngle, 0f);
+                AddDoorAudio(hinge.gameObject);
             }
         }
     }

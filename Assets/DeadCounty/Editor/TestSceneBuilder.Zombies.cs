@@ -35,7 +35,7 @@ namespace DeadCounty.EditorTools
         // Runs after the NavMesh bake: every zombie is snapped onto it, and a spot without NavMesh fails the build.
         static void BuildZombies()
         {
-            var prefab = ZombiePrefab();
+            var prefab = EnsureZombieAudio(ZombiePrefab());
             var ai = new GameObject("AI");
             ai.AddComponent<ZombieManager>();
             var tools = new SerializedObject(ai.AddComponent<ZombieDebugTools>());

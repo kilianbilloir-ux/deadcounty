@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Moan
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: db02661a91b4344f486575bf192ba1e0, type: 3}
+  - {fileID: 8300000, guid: b133ebd41d7a148a8b25842e6a08a060, type: 3}
+  - {fileID: 8300000, guid: 29b3ff980afa043d78c94bbe4c4f6683, type: 3}
+  - {fileID: 8300000, guid: 006a327d250f9492d9c6ac147ecf91ef, type: 3}
+  - {fileID: 8300000, guid: efef8c49abed5439eb1ecdda6eca4520, type: 3}
+  volume: 0.7
+  pitch: {x: 0.96, y: 1.04}
+  channel: 0
+  minDistance: 2
+  maxDistance: 28

@@ -20,9 +20,13 @@ namespace DeadCounty.AI
         // Calm and stopped by a door last frame: reported to the brain as arrived.
         bool calmAtDoor;
 
+        // The shut door this zombie pushed on its last Move, or null.
+        public Door PushedDoor { get; private set; }
+
         void StopAtShutDoor(float dt)
         {
             calmAtDoor = false;
+            PushedDoor = null;
             if (!commands.HasDestination || commands.Stop || commands.AttackPhase != AttackPhase.None) return;
             var desired = navAgent.desiredVelocity;
             desired.y = 0f;
@@ -41,6 +45,7 @@ namespace DeadCounty.AI
             commands.Pose.ArmsForward = 1f;
             pushedDoorSource = door.SourceId;
             lastDoorPushTime = Time.time;
+            PushedDoor = door;
             door.Push(from, dt);
         }
 

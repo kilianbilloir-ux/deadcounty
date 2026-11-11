@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Pant_Out
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 8eb42ab02238548228d34394309e8f1e, type: 3}
+  - {fileID: 8300000, guid: 4b36207a8a76f47ce96227c727095ddb, type: 3}
+  - {fileID: 8300000, guid: 5156e067f19e74002920dffa75ff51c6, type: 3}
+  - {fileID: 8300000, guid: a3a0cdf738539414cb1101cee8f0eb71, type: 3}
+  volume: 0.5
+  pitch: {x: 0.96, y: 1.04}
+  channel: 0
+  minDistance: 1
+  maxDistance: 25
