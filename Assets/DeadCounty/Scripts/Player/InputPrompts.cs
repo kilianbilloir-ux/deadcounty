@@ -20,6 +20,10 @@ namespace DeadCounty.Player
         // Raised when the player switches between keyboard and gamepad, so prompts can be redrawn.
         public static event Action DeviceChanged;
 
+        // UI Submit and Cancel are generic bindings with no readable key name.
+        public static string SubmitKey => GamepadActive ? "A" : "Entrée";
+        public static string CancelKey => GamepadActive ? "B" : "Échap";
+
         // "E" on keyboard, "Y" on gamepad; null without project-wide actions.
         public static string Key(string actionPath)
         {

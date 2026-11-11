@@ -372,8 +372,13 @@
     color: rgb(180, 188, 201);
 }
 
-.game-over-prompt-row {
+.game-over-prompts {
+    flex-direction: row;
     margin-top: 36px;
+}
+
+.game-over-prompts .prompt-row {
+    margin: 0 16px;
 }
 
 /* Inventory (GDD 8.5): the character's state on the left, the list on the right. */
@@ -600,7 +605,58 @@
 .hints .prompt-action {
     font-size: 15px;
     color: rgb(180, 188, 201);
-    text-shadow: none;
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+/* Title (GDD 8.11, after Risk of Rain 2): a list of text entries on the left over the game world, the help line
+   under it. A shade fading to the right keeps the text readable on any part of the town. */
+.title-screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    display: none;
+}
+
+.title-column {
+    width: 1000px;
+    padding-left: 96px;
+    justify-content: center;
+    background-image: url("Textures/TitleShade.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.title-name {
+    font-size: 60px;
+    -unity-font-style: bold;
+    letter-spacing: 6px;
+    color: rgb(217, 217, 217);
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.title-tagline {
+    font-size: 15px;
+    -unity-font-style: bold;
+    letter-spacing: 6px;
+    color: rgb(212, 185, 118);
+    margin-bottom: 56px;
+}
+
+.title-list {
+    align-items: flex-start;
+}
+
+/* Two classes, to win over the centred .menu-item declared further down. */
+.title-list .title-item {
+    -unity-text-align: middle-left;
+    padding-left: 18px;
+    min-width: 280px;
+}
+
+.title-hints {
+    margin-top: 40px;
 }
 
 /* Pause (GDD 8.11, after Risk of Rain 2): a few centred text entries over the blurred, darkened game. */

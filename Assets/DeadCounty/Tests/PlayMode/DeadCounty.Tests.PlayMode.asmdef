@@ -4,6 +4,7 @@
     "references": [
         "DeadCounty.Runtime",
         "Unity.AI.Navigation",
+        "Unity.Cinemachine",
         "Unity.InputSystem",
         "Unity.RenderPipelines.Core.Runtime",
         "UnityEngine.TestRunner",

@@ -3,27 +3,30 @@ using System.Collections;
 using DeadCounty.Player;
 using DeadCounty.UI;
 using NUnit.Framework;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
 namespace DeadCounty.Tests
 {
-    // Escape, arrows and Enter driving the pause menu of the generated rig.
-    public class PauseMenuTests : PlayerRigTests
+    // Escape, arrows and Enter driving the title, pause and options menus of the generated rig.
+    public class GameMenuTests : PlayerRigTests
     {
-        PauseMenu pause;
+        GameMenu pause;
         ThirdPersonController controller;
         float sensitivity;
+        GameObject titleCamera;
 
         VisualElement Root => Rig.GetComponent<UIDocument>().rootVisualElement;
 
         [UnitySetUp]
         public IEnumerator SetUpPause()
         {
-            pause = Rig.GetComponent<PauseMenu>();
+            pause = Rig.GetComponent<GameMenu>();
             controller = Rig.GetComponentInChildren<ThirdPersonController>();
             sensitivity = controller.MouseSensitivity;
             yield return null;
@@ -33,12 +36,71 @@ namespace DeadCounty.Tests
         public IEnumerator TearDownPause()
         {
             Time.timeScale = 1f;
+            if (titleCamera != null) Object.Destroy(titleCamera);
             controller.MouseSensitivity = sensitivity;
             PlayerPrefs.DeleteKey("dc.mouseSensitivity");
             yield return null;
         }
 
         IEnumerator Press(Key key) => Tap(Keyboard, new KeyboardState(key), new KeyboardState());
+
+        // A title camera and its TitleScreen, as the builder puts them in the scene.
+        IEnumerator ShowTitle()
+        {
+            titleCamera = new GameObject("TestTitleCamera");
+            titleCamera.SetActive(false);
+            var vcam = titleCamera.AddComponent<CinemachineCamera>();
+            var title = titleCamera.AddComponent<TitleScreen>();
+            typeof(TitleScreen).GetField("titleCamera", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(title, vcam);
+            titleCamera.SetActive(true);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TitleHoldsTheGameUntilPlay()
+        {
+            yield return ShowTitle();
+            Assert.That(pause.OnTitle);
+            Assert.That(Time.timeScale, Is.Zero);
+            Assert.That(controller.MenuOpen);
+            Assert.That(Root.Q("title").style.display.value, Is.EqualTo(DisplayStyle.Flex));
+            Assert.That(Root.Q("hud").style.display.value, Is.EqualTo(DisplayStyle.None));
+
+            yield return Press(Key.Escape);
+            Assert.That(pause.OnTitle, "Escape left the title");
+            Assert.That(pause.Paused, Is.False);
+
+            yield return Press(Key.Enter);
+            Assert.That(pause.OnTitle, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(1f));
+            Assert.That(controller.MenuOpen, Is.False);
+            Assert.That(Root.Q("title").style.display.value, Is.EqualTo(DisplayStyle.None));
+            Assert.That(titleCamera.GetComponent<CinemachineCamera>().enabled, Is.False, "the view must go back to the player camera");
+        }
+
+        [UnityTest]
+        public IEnumerator OptionsOpenedFromTheTitleGoBackToIt()
+        {
+            yield return ShowTitle();
+            yield return Press(Key.DownArrow);
+            yield return Press(Key.Enter);
+            Assert.That(pause.InSettings);
+            Assert.That(Root.Q("pause").style.display.value, Is.EqualTo(DisplayStyle.Flex));
+            Assert.That(Root.Q("title").style.display.value, Is.EqualTo(DisplayStyle.None));
+
+            yield return Press(Key.Escape);
+            Assert.That(pause.InSettings, Is.False);
+            Assert.That(pause.OnTitle);
+            Assert.That(Root.Q("title").style.display.value, Is.EqualTo(DisplayStyle.Flex));
+        }
+
+        [UnityTest]
+        public IEnumerator TheTitleKeepsTheWorldSharp()
+        {
+            yield return ShowTitle();
+            yield return new WaitForSecondsRealtime(0.4f);
+            Assert.That(Rig.transform.Find("MenuBlurVolume").GetComponent<Volume>().weight, Is.Zero, "the world behind the title must not be blurred");
+        }
 
         [UnityTest]
         public IEnumerator EscapeFreezesTheGameAndEscapeAgainResumes()
