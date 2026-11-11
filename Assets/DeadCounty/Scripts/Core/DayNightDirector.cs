@@ -63,6 +63,14 @@ namespace DeadCounty.Core
             Apply();
         }
 
+        // Jumps the clock without counting a day (debug, saves later).
+        public void SetHour(float value)
+        {
+            if (!float.IsFinite(value)) throw new ArgumentException("Hour must be a number", nameof(value));
+            hour = DayNightModel.WrapHour(value);
+            Apply();
+        }
+
         void Update()
         {
             // Scaled time: pause freezes the sky, like the zombie manager freezes the horde.

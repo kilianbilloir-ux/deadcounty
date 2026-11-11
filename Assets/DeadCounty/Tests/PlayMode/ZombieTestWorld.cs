@@ -19,7 +19,6 @@ namespace DeadCounty.Tests
     sealed class ZombieTestWorld
     {
         public const float FrameTime = 1f / 60f;
-        const float GroundScale = 4f;
 
         readonly List<Object> owned = new();
         readonly float savedTimeScale;
@@ -32,7 +31,8 @@ namespace DeadCounty.Tests
         public readonly ZombieProfile Profile;
         public readonly ZombieManager Manager;
 
-        public ZombieTestWorld(float timeScale)
+        // groundScale: Unity plane scale, 10 m per unit (the default floor is 40 x 40 m).
+        public ZombieTestWorld(float timeScale, float groundScale = 4f)
         {
             savedTimeScale = Time.timeScale;
             savedCaptureDeltaTime = Time.captureDeltaTime;
@@ -43,7 +43,7 @@ namespace DeadCounty.Tests
 
             var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             ground.name = "TestGround";
-            ground.transform.localScale = new Vector3(GroundScale, 1f, GroundScale);
+            ground.transform.localScale = new Vector3(groundScale, 1f, groundScale);
             owned.Add(ground);
             Physics.SyncTransforms();
             var surface = ground.AddComponent<NavMeshSurface>();
@@ -69,7 +69,8 @@ namespace DeadCounty.Tests
         }
 
         // Built inactive so Configure runs before Awake, like a prefab body would be set up in the editor.
-        public ZombieAgent SpawnZombie(Vector3 position, float yaw = 0f, int seed = 1, bool withAnimator = false)
+        // deterministic: no speed jitter (and no other per-seed variation), like the scene's test zombies.
+        public ZombieAgent SpawnZombie(Vector3 position, float yaw = 0f, int seed = 1, bool withAnimator = false, bool deterministic = true)
         {
             var body = new GameObject($"TestZombie_{seed}");
             body.SetActive(false);
@@ -82,7 +83,7 @@ namespace DeadCounty.Tests
             capsule.center = new Vector3(0f, 0.9f, 0f);
             body.AddComponent<Rigidbody>().isKinematic = true;
             var agent = body.AddComponent<ZombieAgent>();
-            agent.Configure(Profile, seed, true);
+            agent.Configure(Profile, seed, deterministic);
             if (withAnimator) AttachAnimator(body, agent);
             body.SetActive(true);
             return agent;

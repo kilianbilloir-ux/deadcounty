@@ -56,11 +56,24 @@ namespace DeadCounty.AI
         bool lodDirty;
         int senseCursor;
         int registrations;
+        bool frozen;
+        float lastAttackTurn = float.NegativeInfinity;
 
         public static ZombieManager Instance { get; private set; }
 
         // Set by tests to perceive a stand-in instead of the player.
         public IPerceivable TargetOverride { get; set; }
+
+        // Debug freeze: every zombie goes dormant where it stands until unfrozen.
+        public bool Frozen
+        {
+            get => frozen;
+            set
+            {
+                frozen = value;
+                lodDirty = true;
+            }
+        }
 
         public IPerceivable Target
         {
@@ -86,6 +99,14 @@ namespace DeadCounty.AI
         public int CountIn(ZombieState state) => stateCounts[(int)state];
 
         public ZombieRecord GetRecord(int index) => records[index];
+
+        // Every zombie hunts the same target, so one turn clock is enough.
+        internal bool TryTakeAttackTurn(float now, float turnInterval)
+        {
+            if (now - lastAttackTurn < turnInterval) return false;
+            lastAttackTurn = now;
+            return true;
+        }
 
         void Awake()
         {
@@ -170,7 +191,7 @@ namespace DeadCounty.AI
         }
 
         // Prototype rule: when the player respawns, every zombie, dead or alive, starts over at its spawn.
-        void ResetAll()
+        public void ResetAll()
         {
             for (var i = 0; i < records.Count; i++)
             {
@@ -264,7 +285,7 @@ namespace DeadCounty.AI
                 // Without a target nothing is near or far: everyone competes for the budget equally.
                 var distance = hasTarget ? offset.magnitude : 0f;
                 lodDistances[i] = distance;
-                lodTiers[i] = DistanceTier(distance, agent.Lod);
+                lodTiers[i] = frozen ? ZombieLod.Dormant : DistanceTier(distance, agent.Lod);
                 if (lodTiers[i] != ZombieLod.Dormant) lodOrder[candidates++] = i;
             }
             if (candidates > activeBudget)

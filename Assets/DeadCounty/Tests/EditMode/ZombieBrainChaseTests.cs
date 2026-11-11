@@ -90,6 +90,22 @@ namespace DeadCounty.Tests
             Assert.That(sim.State, Is.EqualTo(ZombieState.Chase));
         }
 
+        [Test]
+        public void WaitsForItsTurnWhileAnotherZombieWindsUp()
+        {
+            var sim = BrainSim.Chasing();
+            sim.TargetVisible = true;
+            sim.World.AttackTurnTaken = true;
+            sim.PlaceTarget(1.2f);
+            sim.Run(0.5f);
+            Assert.That(sim.State, Is.EqualTo(ZombieState.Chase));
+
+            sim.World.AttackTurnTaken = false;
+            sim.Step();
+            Assert.That(sim.State, Is.EqualTo(ZombieState.Attack));
+            Assert.That(sim.World.LastTurnInterval, Is.EqualTo(Attack.TurnInterval));
+        }
+
         [TestCase(true, 0.6f)]
         [TestCase(false, 0.9f)]
         public void AttackTimelineStrikesOnceThenRecoversThenCoolsDown(bool reported, float recoverTime)

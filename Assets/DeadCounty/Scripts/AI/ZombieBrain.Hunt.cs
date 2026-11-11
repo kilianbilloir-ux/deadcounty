@@ -43,7 +43,7 @@ namespace DeadCounty.AI
 
         void UpdateChase(float dt, in PerceptionSnapshot p, IZombieWorld world)
         {
-            if (CanStartAttack(p))
+            if (CanStartAttack(p) && world.TryTakeAttackTurn(tuning.Attack.TurnInterval))
             {
                 EnterAttack(dt, p, world);
                 return;
