@@ -247,7 +247,7 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
 }
 
-/* Short messages: found items, why the player woke up. */
+/* Short messages: why the player woke up. */
 .toast-row {
     position: absolute;
     left: 0;
@@ -264,6 +264,56 @@
     border-left-width: 3px;
     border-color: rgb(212, 185, 118);
     opacity: 0;
+}
+
+/* Items just taken, at the bottom right where nothing else sits, the newest at the bottom; an empty search in grey. */
+.pickup-feed {
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+    align-items: flex-end;
+}
+
+.pickup {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+    padding: 3px 16px 3px 8px;
+    background-color: rgba(26, 29, 34, 0.85);
+    border-left-width: 3px;
+    border-color: rgb(212, 185, 118);
+}
+
+.pickup-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.pickup-name {
+    font-size: 17px;
+    color: rgb(217, 217, 217);
+}
+
+.pickup-count {
+    margin-left: 8px;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: rgb(212, 185, 118);
+}
+
+.pickup--empty {
+    padding: 10px 16px;
+    border-color: rgb(138, 143, 150);
+}
+
+.pickup--empty .pickup-icon {
+    display: none;
+}
+
+.pickup--empty .pickup-name {
+    color: rgb(138, 143, 150);
 }
 
 /* One-time tips at the top left, where the eye goes first and nothing else sits. */
@@ -365,6 +415,12 @@
 
 .game-over-title {
     color: rgb(167, 95, 59);
+}
+
+.game-over-cause {
+    font-size: 24px;
+    color: rgb(217, 217, 217);
+    margin-bottom: 10px;
 }
 
 .game-over-line {
@@ -518,6 +574,11 @@
     border-color: rgba(180, 188, 201, 0.15);
 }
 
+/* The name header starts above the names, past the pictures. */
+.item-columns .item-name {
+    margin-left: 44px;
+}
+
 .item-column {
     font-size: 14px;
     color: rgb(138, 143, 150);
@@ -548,11 +609,20 @@
 
 .item-row {
     flex-direction: row;
-    padding: 9px 12px;
+    align-items: center;
+    padding: 5px 12px;
     border-left-width: 3px;
     border-color: rgba(0, 0, 0, 0);
     transition-property: background-color, border-color;
     transition-duration: 0.12s;
+}
+
+.item-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .item-row:hover {
@@ -581,15 +651,61 @@
     margin: 14px 15px;
 }
 
+/* The selected item: its picture on a dark tile, then what using it would do to the gauges as they are now,
+   in amber, or in grey when it would be wasted. */
 .item-detail {
-    min-height: 46px;
+    flex-direction: row;
+    min-height: 102px;
     margin-top: 12px;
-    padding-top: 12px;
-    font-size: 16px;
-    color: rgb(180, 188, 201);
+    padding-top: 14px;
     border-top-width: 1px;
     border-color: rgba(180, 188, 201, 0.15);
-    white-space: normal;
+}
+
+.item-detail-icon {
+    width: 88px;
+    height: 88px;
+    margin-right: 18px;
+    flex-shrink: 0;
+    background-color: rgba(10, 11, 13, 0.6);
+    border-radius: 4px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.item-detail-body {
+    flex-grow: 1;
+}
+
+.item-detail-name {
+    font-size: 19px;
+    -unity-font-style: bold;
+    color: rgb(217, 217, 217);
+}
+
+.item-detail-meta {
+    font-size: 14px;
+    color: rgb(138, 143, 150);
+    margin-bottom: 8px;
+}
+
+.item-effect {
+    flex-direction: row;
+    margin-bottom: 3px;
+}
+
+.item-effect-name {
+    width: 110px;
+    font-size: 16px;
+    color: rgb(180, 188, 201);
+}
+
+.item-effect-value {
+    font-size: 16px;
+    color: rgb(212, 185, 118);
+}
+
+.item-effect--wasted .item-effect-value {
+    color: rgb(138, 143, 150);
 }
 
 .hints {

@@ -134,6 +134,28 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
+        public IEnumerator TheDeathScreenNamesTheZombieThatKilled()
+        {
+            var cause = Element<Label>("game-over-cause");
+            Health.ApplyHit(10000f, Health.transform.position + Vector3.forward);
+            yield return null;
+            Assert.That(cause.text, Is.EqualTo("Tué par un zombie"));
+            Assert.That(cause.style.display.value, Is.EqualTo(DisplayStyle.Flex));
+        }
+
+        [UnityTest]
+        public IEnumerator TheDeathScreenNamesAnEmptyNeed()
+        {
+            var needs = Rig.GetComponentInChildren<PlayerNeeds>();
+            Health.Pool.Apply(99.9f);
+            // Thirst empty, hunger at 0.4: dehydration drains the last tenth of a point within a frame or two.
+            needs.Model.Tick(12f * 60f + 1f, false);
+            yield return new WaitForSeconds(0.5f);
+            Assert.That(Health.IsAlive, Is.False);
+            Assert.That(Element<Label>("game-over-cause").text, Is.EqualTo("Mort de soif"));
+        }
+
+        [UnityTest]
         public IEnumerator HitMarkerPointsWhereTheHitCameFromAndFollowsTheCamera()
         {
             var view = new GameObject("TestCamera", typeof(Camera)) { tag = "MainCamera" };

@@ -48,6 +48,7 @@ namespace DeadCounty.EditorTools
             EnsureLootTables(items);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            EnsureItemIcons(items);
             var env = new GameObject("Environment").transform;
 
             BuildTerrain(Group(env, "Terrain"));

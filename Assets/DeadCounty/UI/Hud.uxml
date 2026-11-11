@@ -58,6 +58,7 @@
         <ui:VisualElement picking-mode="Ignore" class="toast-row">
             <ui:Label name="loot-toast" picking-mode="Ignore" class="toast" />
         </ui:VisualElement>
+        <ui:VisualElement name="pickup-feed" picking-mode="Ignore" class="pickup-feed" />
         <ui:VisualElement name="tip" picking-mode="Ignore" class="tip">
             <ui:Label text="ASTUCE" picking-mode="Ignore" class="tip-title" />
             <ui:Label name="tip-text" picking-mode="Ignore" class="tip-text" />
@@ -139,7 +140,14 @@
                     </ui:VisualElement>
                     <ui:ScrollView name="item-list" class="item-list" />
                     <ui:Label name="inventory-empty" text="Vous ne portez rien." picking-mode="Ignore" class="inventory-empty" />
-                    <ui:Label name="item-detail" picking-mode="Ignore" class="item-detail" />
+                    <ui:VisualElement name="item-detail" picking-mode="Ignore" class="item-detail">
+                        <ui:VisualElement name="item-detail-icon" picking-mode="Ignore" class="item-detail-icon" />
+                        <ui:VisualElement picking-mode="Ignore" class="item-detail-body">
+                            <ui:Label name="item-detail-name" picking-mode="Ignore" class="item-detail-name" />
+                            <ui:Label name="item-detail-meta" picking-mode="Ignore" class="item-detail-meta" />
+                            <ui:VisualElement name="item-effects" picking-mode="Ignore" class="item-effects" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
                     <ui:VisualElement name="inventory-hints" picking-mode="Ignore" class="hints" />
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -205,6 +213,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="game-over" picking-mode="Ignore" class="game-over">
             <ui:Label name="game-over-title" text="VOUS ÊTES MORT" picking-mode="Ignore" class="screen-title game-over-title" />
+            <ui:Label name="game-over-cause" picking-mode="Ignore" class="game-over-cause" />
             <ui:Label name="game-over-time" text="Temps survécu : 00:00" picking-mode="Ignore" class="game-over-line" />
             <ui:VisualElement picking-mode="Ignore" class="game-over-prompts">
                 <ui:VisualElement picking-mode="Ignore" class="prompt-row">

@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using DeadCounty.Core;
-using DeadCounty.Items;
 using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
@@ -15,11 +14,11 @@ namespace DeadCounty.Player
     // takes the danger colour when low, the stamina bar shows while not full and blinks when exhausted, the
     // flashlight and clock readouts show for a few seconds when they change, with the need gauges. The
     // interaction prompt sits next to what the player can use, its name above the key and the action (GDD 8.11,
-    // after Valheim), with a ring filling through a search; what was found, or why the player woke up, shows for a
-    // moment below the middle of the screen. A hit flashes the screen and leaves an arc around the centre that
-    // points at where it came from and follows the camera. Also draws the game over screen from PlayerDeathFlow.
-    // The only allocations are texts rebuilt when they change. Afflictions and the sleep screen are
-    // PlayerConditionHud's.
+    // after Valheim), with a ring filling through a search and the same key offered to stop it; why the player woke
+    // up shows for a moment below the middle of the screen. A hit flashes the screen and leaves an arc around the
+    // centre that points at where it came from and follows the camera. Also draws the game over screen from
+    // PlayerDeathFlow, with what killed the player. The only allocations are texts rebuilt when they change.
+    // Afflictions and the sleep screen are PlayerConditionHud's, items taken PlayerPickupFeed's.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
@@ -54,7 +53,6 @@ namespace DeadCounty.Player
         PlayerFlashlight flashlight;
         PlayerDeathFlow deathFlow;
         PlayerInteractor interactor;
-        PlayerInventory inventory;
         PlayerSleep sleep;
         ThirdPersonController controller;
         GameMenu menu;
@@ -68,7 +66,7 @@ namespace DeadCounty.Player
         RadialGauge interactionProgress;
         Interactable shownInteractable;
         string shownAction;
-        Label flashlightLabel, time, gameOverTitle, gameOverTime, gameOverPrompt;
+        Label flashlightLabel, time, gameOverTitle, gameOverCause, gameOverTime, gameOverPrompt;
         StringBuilder text;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
         float healthOpacity, staminaOpacity, readoutOpacity, readoutsUntil;
@@ -93,13 +91,12 @@ namespace DeadCounty.Player
             flashlight = GetComponentInChildren<PlayerFlashlight>(true);
             deathFlow = GetComponent<PlayerDeathFlow>();
             interactor = GetComponentInChildren<PlayerInteractor>(true);
-            inventory = GetComponentInChildren<PlayerInventory>(true);
             sleep = GetComponentInChildren<PlayerSleep>(true);
             controller = GetComponentInChildren<ThirdPersonController>(true);
             menu = GetComponent<GameMenu>();
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null || needs == null || interactor == null || inventory == null || sleep == null || controller == null || menu == null)
-                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerInventory, a PlayerSleep and a ThirdPersonController in its children and a GameMenu next to it");
+            if (health == null || stamina == null || needs == null || interactor == null || sleep == null || controller == null || menu == null)
+                throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina, a PlayerNeeds, a PlayerInteractor, a PlayerSleep and a ThirdPersonController in its children and a GameMenu next to it");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -134,6 +131,7 @@ namespace DeadCounty.Player
             flashlightLabel = Find<Label>(root, "flashlight");
             time = Find<Label>(root, "time");
             gameOverTitle = Find<Label>(root, "game-over-title");
+            gameOverCause = Find<Label>(root, "game-over-cause");
             gameOverTime = Find<Label>(root, "game-over-time");
             gameOverPrompt = Find<Label>(root, "game-over-prompt");
             gameOverKey = Find<Label>(root, "game-over-key");
@@ -174,7 +172,7 @@ namespace DeadCounty.Player
         void OnEnable()
         {
             health.Damaged += OnDamaged;
-            inventory.Received += OnReceived;
+            health.Died += OnDied;
             sleep.WokeUp += ShowToast;
             InputPrompts.KeysChanged += ShowKeys;
             GameSettings.Changed += ApplyUiScale;
@@ -183,7 +181,7 @@ namespace DeadCounty.Player
         void OnDisable()
         {
             health.Damaged -= OnDamaged;
-            inventory.Received -= OnReceived;
+            health.Died -= OnDied;
             sleep.WokeUp -= ShowToast;
             InputPrompts.KeysChanged -= ShowKeys;
             GameSettings.Changed -= ApplyUiScale;
@@ -192,18 +190,6 @@ namespace DeadCounty.Player
         void OnDestroy() => Destroy(panel);
 
         void ApplyUiScale() => panel.scale = GameSettings.UiScale;
-
-        void OnReceived(IReadOnlyList<ItemStack> items)
-        {
-            text.Clear();
-            if (items.Count == 0) text.Append("Rien trouvé");
-            for (var i = 0; i < items.Count; i++)
-            {
-                text.Append(i == 0 ? "Trouvé : " : ", ").Append(items[i].Item.DisplayName);
-                if (items[i].Count > 1) text.Append(" ×").Append(items[i].Count);
-            }
-            ShowToast(text.ToString());
-        }
 
         void ShowToast(string message)
         {
@@ -217,6 +203,29 @@ namespace DeadCounty.Player
             hitSources[nextHitMarker] = health.LastHitSource;
             hitTimes[nextHitMarker] = Time.time;
             nextHitMarker = (nextHitMarker + 1) % HitMarkerCount;
+        }
+
+        // A death the player cannot explain feels unfair: a hit taken this very frame is the zombie's, otherwise
+        // the drains running at the time (GDD 8.4) are named.
+        void OnDied(PlayerHealth _)
+        {
+            var model = needs.Model;
+            gameOverCause.text = CauseOfDeath(health.LastHitTime == Time.time, health.Bleeding, model.Hunger <= 0f, model.Thirst <= 0f);
+        }
+
+        public static string CauseOfDeath(bool struck, bool bleeding, bool starving, bool dehydrated)
+        {
+            if (struck) return "Tué par un zombie";
+            var causes = new List<string>(3);
+            if (bleeding) causes.Add("d'une hémorragie");
+            if (starving) causes.Add("de faim");
+            if (dehydrated) causes.Add("de soif");
+            return causes.Count switch
+            {
+                0 => "",
+                1 => $"Mort {causes[0]}",
+                _ => $"Mort {string.Join(", ", causes.GetRange(0, causes.Count - 1))} et {causes[^1]}",
+            };
         }
 
         void ShowReadouts() => readoutsUntil = Time.time + ReadoutShowTime;
@@ -317,7 +326,8 @@ namespace DeadCounty.Player
                 shownInteractable = null;
                 return;
             }
-            var action = current.Action;
+            // Interact again stops a search: say so rather than repeat the action.
+            var action = interactor.Busy ? "Arrêter" : current.Action;
             if (current != shownInteractable || action != shownAction)
             {
                 shownInteractable = current;
@@ -383,6 +393,7 @@ namespace DeadCounty.Player
             deathShown = dead;
             // Only the black screen fades back out after the respawn.
             gameOverTitle.style.display = dead ? DisplayStyle.Flex : DisplayStyle.None;
+            gameOverCause.style.display = dead && gameOverCause.text.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             gameOverTime.style.display = dead ? DisplayStyle.Flex : DisplayStyle.None;
             var prompt = dead && deathFlow.CanRespawn ? DisplayStyle.Flex : DisplayStyle.None;
             gameOverPrompt.style.display = prompt;

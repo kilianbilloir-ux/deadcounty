@@ -27,6 +27,9 @@ namespace DeadCounty.Items
         [Tooltip("Model shown when the item lies on the ground, pivot on the ground with a collider on its root. Without one the item drops as a plain box.")]
         public GameObject WorldModel;
 
+        [Tooltip("Picture of the item in the inventory and the pickup feed, rendered from the WorldModel by the scene builder.")]
+        public Texture2D Icon;
+
         public bool Usable => !string.IsNullOrEmpty(UseVerb);
 
         public static string CategoryName(ItemCategory category) => category switch
