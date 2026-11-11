@@ -1,6 +1,8 @@
-/* HUD and screens (GDD 8.11): one font, a desaturated palette, dried blood as the single danger accent.
-   Bone rgb(217, 217, 217) · steel rgb(180, 188, 201) · ash rgb(138, 143, 150) · amber rgb(212, 185, 118)
-   · danger rgb(167, 95, 59) · panel rgb(26, 29, 34). Sizes are for 1080p; the panel scales with the screen. */
+/* HUD and screens (GDD 8.11), drawn like the county's road signs: Overpass, the open descendant of the US highway
+   alphabet, in two weights; flat plates with thick borders; the colours of the world's own signs and roads.
+   Sign white rgb(230, 230, 224), steel rgb(180, 188, 201), fog rgb(138, 143, 150), line yellow rgb(218, 178, 70) for
+   what is selected, sign green rgb(47, 90, 58), danger rgb(167, 95, 59), asphalt rgb(38, 39, 42) for panels. Sizes
+   are for 1080p; the panel scales with the screen. */
 .root {
     position: absolute;
     left: 0;
@@ -8,8 +10,8 @@
     right: 0;
     bottom: 0;
     flex-grow: 1;
-    -unity-font: url("Fonts/Inter-Regular.otf");
-    color: rgb(217, 217, 217);
+    -unity-font: url("Fonts/Overpass-Regular.ttf");
+    color: rgb(230, 230, 224);
 }
 
 .hit-flash {
@@ -126,7 +128,7 @@
 }
 
 .stamina-fill {
-    background-color: rgb(212, 185, 118);
+    background-color: rgb(218, 178, 70);
 }
 
 .stamina-fill--spent {
@@ -165,7 +167,7 @@
 }
 
 .noise-meter--loud .noise-segment--lit {
-    background-color: rgb(212, 185, 118);
+    background-color: rgb(218, 178, 70);
 }
 
 .noise-meter--very-loud .noise-segment--lit {
@@ -190,7 +192,7 @@
 }
 
 .flashlight-readout--on {
-    color: rgb(212, 185, 118);
+    color: rgb(218, 178, 70);
 }
 
 /* Key prompts: the key in a frame, then the action. */
@@ -201,21 +203,19 @@
 
 .keycap {
     min-width: 26px;
-    padding: 2px 7px;
+    padding: 3px 8px 1px 8px;
     margin-right: 8px;
     font-size: 15px;
-    -unity-font-style: bold;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
     -unity-text-align: middle-center;
-    color: rgb(217, 217, 217);
-    background-color: rgba(10, 11, 13, 0.7);
-    border-width: 1px;
-    border-radius: 4px;
-    border-color: rgba(212, 185, 118, 0.7);
+    color: rgb(38, 39, 42);
+    background-color: rgb(230, 230, 224);
+    border-radius: 5px;
 }
 
 .prompt-action {
     font-size: 17px;
-    color: rgb(212, 185, 118);
+    color: rgb(218, 178, 70);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -234,16 +234,16 @@
     height: 34px;
     margin-right: 10px;
     --gauge-track: rgba(10, 11, 13, 0.6);
-    --gauge-fill: rgb(212, 185, 118);
+    --gauge-fill: rgb(218, 178, 70);
     --gauge-thickness: 4;
     display: none;
 }
 
 .interaction-name {
     font-size: 20px;
-    -unity-font-style: bold;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
     margin-bottom: 4px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
 }
 
@@ -259,10 +259,10 @@
 .toast {
     font-size: 18px;
     padding: 8px 18px;
-    color: rgb(217, 217, 217);
-    background-color: rgba(26, 29, 34, 0.85);
-    border-left-width: 3px;
-    border-color: rgb(212, 185, 118);
+    color: rgb(230, 230, 224);
+    background-color: rgba(38, 39, 42, 0.85);
+    border-left-width: 5px;
+    border-color: rgb(218, 178, 70);
     opacity: 0;
 }
 
@@ -279,9 +279,9 @@
     align-items: center;
     margin-top: 6px;
     padding: 3px 16px 3px 8px;
-    background-color: rgba(26, 29, 34, 0.85);
-    border-left-width: 3px;
-    border-color: rgb(212, 185, 118);
+    background-color: rgba(38, 39, 42, 0.85);
+    border-left-width: 5px;
+    border-color: rgb(218, 178, 70);
 }
 
 .pickup-icon {
@@ -293,14 +293,14 @@
 
 .pickup-name {
     font-size: 17px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
 }
 
 .pickup-count {
     margin-left: 8px;
     font-size: 17px;
-    -unity-font-style: bold;
-    color: rgb(212, 185, 118);
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    color: rgb(218, 178, 70);
 }
 
 .pickup--empty {
@@ -323,23 +323,23 @@
     left: 32px;
     max-width: 460px;
     padding: 12px 16px;
-    background-color: rgba(26, 29, 34, 0.88);
-    border-left-width: 3px;
-    border-color: rgb(212, 185, 118);
+    background-color: rgba(38, 39, 42, 0.88);
+    border-left-width: 5px;
+    border-color: rgb(218, 178, 70);
     display: none;
 }
 
 .tip-title {
     font-size: 13px;
-    -unity-font-style: bold;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
     letter-spacing: 3px;
-    color: rgb(212, 185, 118);
+    color: rgb(218, 178, 70);
     margin-bottom: 6px;
 }
 
 .tip-text {
     font-size: 17px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
     white-space: normal;
 }
 
@@ -353,14 +353,14 @@
 
 .status {
     font-size: 15px;
-    -unity-font-style: bold;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
     letter-spacing: 1px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
     padding: 6px 12px;
     margin-bottom: 8px;
-    background-color: rgba(26, 29, 34, 0.8);
-    border-left-width: 3px;
-    border-color: rgb(212, 185, 118);
+    background-color: rgba(38, 39, 42, 0.8);
+    border-left-width: 5px;
+    border-color: rgb(218, 178, 70);
     display: none;
 }
 
@@ -372,8 +372,8 @@
 /* Full-screen screens: sleep and game over, over a darkened scene (Crow Country). */
 .screen-title {
     font-size: 54px;
-    -unity-font-style: bold;
-    letter-spacing: 6px;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    letter-spacing: 2px;
     margin-bottom: 16px;
 }
 
@@ -419,7 +419,7 @@
 
 .game-over-cause {
     font-size: 24px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
     margin-bottom: 10px;
 }
 
@@ -456,14 +456,15 @@
     width: 960px;
     height: 640px;
     padding: 32px;
-    background-color: rgb(26, 29, 34);
-    border-width: 1px;
-    border-color: rgba(212, 185, 118, 0.3);
+    background-color: rgb(38, 39, 42);
+    border-top-width: 5px;
+    border-color: rgb(218, 178, 70);
+    border-radius: 6px;
 }
 
 .panel-title {
     font-size: 15px;
-    -unity-font-style: bold;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
     letter-spacing: 3px;
     color: rgb(138, 143, 150);
     margin-bottom: 18px;
@@ -493,7 +494,7 @@
 
 .stat-label {
     font-size: 16px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
 }
 
 .stat-word {
@@ -517,7 +518,7 @@
 }
 
 .stat-fill--stamina {
-    background-color: rgb(212, 185, 118);
+    background-color: rgb(218, 178, 70);
 }
 
 .stat-fill--low {
@@ -543,8 +544,8 @@
 
 .inventory-weight {
     font-size: 20px;
-    -unity-font-style: bold;
-    color: rgb(217, 217, 217);
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    color: rgb(230, 230, 224);
 }
 
 .inventory-weight--over {
@@ -585,8 +586,8 @@
 }
 
 .item-column--active {
-    color: rgb(212, 185, 118);
-    -unity-font-style: bold;
+    color: rgb(218, 178, 70);
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
 }
 
 .item-name {
@@ -630,13 +631,13 @@
 }
 
 .item-row--selected {
-    background-color: rgba(212, 185, 118, 0.1);
-    border-color: rgb(212, 185, 118);
+    background-color: rgba(230, 230, 224, 0.08);
+    border-color: rgb(218, 178, 70);
 }
 
 .item-row > Label {
     font-size: 17px;
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
 }
 
 .item-row .item-category,
@@ -677,8 +678,8 @@
 
 .item-detail-name {
     font-size: 19px;
-    -unity-font-style: bold;
-    color: rgb(217, 217, 217);
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    color: rgb(230, 230, 224);
 }
 
 .item-detail-meta {
@@ -700,7 +701,7 @@
 
 .item-effect-value {
     font-size: 16px;
-    color: rgb(212, 185, 118);
+    color: rgb(218, 178, 70);
 }
 
 .item-effect--wasted .item-effect-value {
@@ -743,20 +744,66 @@
     -unity-background-scale-mode: stretch-to-fill;
 }
 
+/* The county line sign: a green plate, its white border set in from the edge, the population painted out. */
+.county-sign {
+    align-self: flex-start;
+    padding: 7px;
+    margin-bottom: 16px;
+    background-color: rgb(47, 90, 58);
+    border-radius: 22px;
+}
+
+.county-sign-face {
+    padding: 20px 36px 14px 36px;
+    border-width: 4px;
+    border-color: rgb(230, 230, 224);
+    border-radius: 15px;
+}
+
 .title-name {
-    font-size: 60px;
-    -unity-font-style: bold;
-    letter-spacing: 6px;
-    color: rgb(217, 217, 217);
-    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.6);
+    font-size: 68px;
+    -unity-font: url("Fonts/Overpass-ExtraBold.ttf");
+    letter-spacing: 3px;
+    color: rgb(230, 230, 224);
+}
+
+.county-sign-rule {
+    height: 3px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    background-color: rgb(230, 230, 224);
+}
+
+.county-sign-line {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.county-sign-small {
+    font-size: 26px;
+    color: rgb(230, 230, 224);
+}
+
+.county-sign-struck {
+    justify-content: center;
+}
+
+.county-sign-strike {
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    top: 42%;
+    height: 5px;
+    background-color: rgb(168, 50, 42);
+    rotate: -7deg;
 }
 
 .title-tagline {
-    font-size: 15px;
-    -unity-font-style: bold;
-    letter-spacing: 6px;
-    color: rgb(212, 185, 118);
-    margin-bottom: 56px;
+    font-size: 18px;
+    color: rgb(218, 178, 70);
+    margin-left: 12px;
+    margin-bottom: 44px;
 }
 
 .title-list {
@@ -768,6 +815,12 @@
     -unity-text-align: middle-left;
     padding-left: 18px;
     min-width: 280px;
+    color: rgb(230, 230, 224);
+    background-color: rgba(38, 39, 42, 0.55);
+}
+
+.title-list .menu-item--selected {
+    background-color: rgba(38, 39, 42, 0.95);
 }
 
 .title-hints {
@@ -792,9 +845,13 @@
     min-width: 520px;
 }
 
+/* Underlined in line yellow, like the centre of the road. */
 .menu-title {
-    color: rgb(180, 188, 201);
+    color: rgb(230, 230, 224);
+    padding-bottom: 4px;
     margin-bottom: 30px;
+    border-bottom-width: 4px;
+    border-color: rgb(218, 178, 70);
 }
 
 .menu-item {
@@ -803,16 +860,16 @@
     margin-bottom: 4px;
     color: rgb(180, 188, 201);
     -unity-text-align: middle-center;
-    border-left-width: 3px;
+    border-left-width: 6px;
     border-color: rgba(0, 0, 0, 0);
     transition-property: background-color, border-color, color;
     transition-duration: 0.12s;
 }
 
 .menu-item--selected {
-    color: rgb(217, 217, 217);
-    background-color: rgba(212, 185, 118, 0.1);
-    border-color: rgb(212, 185, 118);
+    color: rgb(230, 230, 224);
+    background-color: rgba(38, 39, 42, 0.85);
+    border-color: rgb(218, 178, 70);
 }
 
 .option-row {
@@ -828,14 +885,14 @@
 }
 
 .menu-item--selected .option-label {
-    color: rgb(217, 217, 217);
+    color: rgb(230, 230, 224);
 }
 
 /* Same width as the bar, so values and bars start on one line. */
 .option-value {
     width: 160px;
     font-size: 20px;
-    color: rgb(212, 185, 118);
+    color: rgb(218, 178, 70);
 }
 
 .option-bar {
@@ -847,7 +904,7 @@
 .option-fill {
     height: 100%;
     width: 50%;
-    background-color: rgb(212, 185, 118);
+    background-color: rgb(218, 178, 70);
 }
 
 /* Keyboard keys: compact rows so the thirteen keys fit with the page title. */
@@ -871,8 +928,7 @@
 }
 
 .controls-key--waiting {
-    color: rgb(212, 185, 118);
-    border-color: rgb(212, 185, 118);
+    background-color: rgb(218, 178, 70);
 }
 
 .menu-hints {

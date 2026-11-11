@@ -154,8 +154,20 @@
         </ui:VisualElement>
         <ui:VisualElement name="title" class="title-screen">
             <ui:VisualElement picking-mode="Ignore" class="title-column">
-                <ui:Label text="DEAD COUNTY" picking-mode="Ignore" class="title-name" />
-                <ui:Label text="DÉMO" picking-mode="Ignore" class="title-tagline" />
+                <ui:VisualElement picking-mode="Ignore" class="county-sign">
+                    <ui:VisualElement picking-mode="Ignore" class="county-sign-face">
+                        <ui:Label text="DEAD COUNTY" picking-mode="Ignore" class="title-name" />
+                        <ui:VisualElement picking-mode="Ignore" class="county-sign-rule" />
+                        <ui:VisualElement picking-mode="Ignore" class="county-sign-line">
+                            <ui:Label text="Population" picking-mode="Ignore" class="county-sign-small" />
+                            <ui:VisualElement picking-mode="Ignore" class="county-sign-struck">
+                                <ui:Label text="3 812" picking-mode="Ignore" class="county-sign-small" />
+                                <ui:VisualElement picking-mode="Ignore" class="county-sign-strike" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label text="Démo" picking-mode="Ignore" class="title-tagline" />
                 <ui:VisualElement picking-mode="Ignore" class="title-list">
                     <ui:Label name="title-play" text="Jouer" class="menu-item title-item" />
                     <ui:Label name="title-options" text="Options" class="menu-item title-item" />
