@@ -31,6 +31,9 @@ namespace DeadCounty.EditorTools
             ["LampGlow"] = Rgb(0xD4B976), ["PanelGlow"] = Rgb(0xE8EEF2), ["PoliceRed"] = Rgb(0xC8261E), ["PoliceBlue"] = Rgb(0x1E4FC8),
             ["Trunk"] = Rgb(0x4E3B2C), ["Pine"] = Rgb(0x2E4433), ["Foliage"] = Rgb(0x4E6234), ["FoliageOlive"] = Rgb(0x6D6A3A),
             ["FoliageAutumn"] = Rgb(0xA0602A), ["FoliageRust"] = Rgb(0x8A3F24), ["Bush"] = Rgb(0x445A30), ["Rock"] = Rgb(0x77777A),
+            ["BirchBark"] = Rgb(0xD2CFC4), ["BirchMark"] = Rgb(0x2E2B28), ["FoliageBirch"] = Rgb(0x8A9448),
+            ["Flower"] = Rgb(0xD8C24A), ["FlowerWhite"] = Rgb(0xE2DED2), ["FlowerPurple"] = Rgb(0x7E5A8E), ["RoadCrack"] = Rgb(0x26272A),
+            ["RoadPatch"] = Rgb(0x313236),
             ["Wheat"] = Rgb(0xBFA25A), ["WheatDark"] = Rgb(0x9A7E45), ["Corn"] = Rgb(0x7E8A3E), ["Hay"] = Rgb(0xC7A860), ["GrassTall"] = Rgb(0x5E6A3A),
             ["CarRed"] = Rgb(0x7A2420), ["CarBlue"] = Rgb(0x2E4766), ["CarGreen"] = Rgb(0x3E5444), ["CarBeige"] = Rgb(0xB8A88A),
             ["CarWhite"] = Rgb(0xD6D6D2), ["CarBlack"] = Rgb(0x1C1D20), ["CarBurnt"] = Rgb(0x252220), ["Tire"] = Rgb(0x151515),
@@ -89,8 +92,13 @@ namespace DeadCounty.EditorTools
             }
             if (key == "Grass")
             {
-                // Terrain UVs are world XZ / 10: one tile = 10 m, one cell = 1 m. Lines stay faint on grass.
-                mat.SetTexture("_BaseMap", GridTexture("T_Proto_GrassGrid", 226, 216, 202));
+                // Terrain UVs are world XZ / 10; a quarter scale stretches one tile over 40 m so patches do not repeat
+                // at a glance.
+                var ground = GroundTexture("T_Proto_Grass", 31);
+                mat.SetTexture("_BaseMap", ground);
+                // URP Lit also keeps the legacy slot; left alone it would still point to the former texture.
+                mat.SetTexture("_MainTex", ground);
+                mat.SetTextureScale("_BaseMap", Vector2.one * 0.25f);
             }
             if (key == "TestPad")
             {
@@ -101,6 +109,58 @@ namespace DeadCounty.EditorTools
             Materials[key] = mat;
             UsedMaterials.Add(path);
             return mat;
+        }
+
+        // Tileable mottled ground tinted by the material colour: wide darker and lighter patches, dry yellowish areas
+        // and a fine speckle. Sums of whole-period waves, so the tile repeats without a seam.
+        static Texture2D GroundTexture(string name, int seed)
+        {
+            var path = $"{ArtDir}/{name}.png";
+            const int size = 512;
+            var rng = new System.Random(seed);
+            (int kx, int ky, float amplitude, float phase)[] Waves(int count, int maxFrequency)
+            {
+                var waves = new (int, int, float, float)[count];
+                for (var i = 0; i < count; i++)
+                    waves[i] = (rng.Next(-maxFrequency, maxFrequency + 1), rng.Next(1, maxFrequency + 1), Range(rng, 0.5f, 1f) / (1f + i * 0.5f), Range(rng, 0f, Mathf.PI * 2f));
+                return waves;
+            }
+            float Field((int kx, int ky, float amplitude, float phase)[] waves, float u, float v)
+            {
+                float sum = 0f, total = 0f;
+                foreach (var w in waves)
+                {
+                    sum += w.amplitude * Mathf.Sin(2f * Mathf.PI * (w.kx * u + w.ky * v) + w.phase);
+                    total += w.amplitude;
+                }
+                return sum / total;
+            }
+            var shade = Waves(8, 6);
+            var dryness = Waves(5, 3);
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            var px = new Color32[size * size];
+            for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
+            {
+                var u = x / (float)size;
+                var v = y / (float)size;
+                var value = 0.86f + 0.1f * Field(shade, u, v) + 0.05f * Range(rng, -1f, 1f);
+                var dry = Mathf.Clamp01((Field(dryness, u, v) - 0.25f) / 0.5f);
+                px[y * size + x] = new Color32(
+                    (byte)Mathf.Clamp(value * (1f + 0.14f * dry) * 255f, 0f, 255f),
+                    (byte)Mathf.Clamp(value * (1f + 0.05f * dry) * 255f, 0f, 255f),
+                    (byte)Mathf.Clamp(value * (1f - 0.18f * dry) * 255f, 0f, 255f), 255);
+            }
+            tex.SetPixels32(px);
+            File.WriteAllBytes(path, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+
+            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+            importer.wrapMode = TextureWrapMode.Repeat;
+            importer.anisoLevel = 8;
+            importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
 
         static Texture2D GridTexture(string name, byte cell, byte minor, byte major)
