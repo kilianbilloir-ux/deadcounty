@@ -6,7 +6,9 @@ namespace DeadCounty.EditorTools
 {
     public static partial class TestSceneBuilder
     {
-        // Material keys of a body; zombies drop the backpack and get a blood stain.
+        const string BodyMeshPrefix = "SM_Char_";
+
+        // Material keys of a body; zombies drop the backpack and get blood stains.
         readonly struct BodyLook
         {
             public readonly string Skin, Hair, Eye, Top, TopDark, Pants, Boots;
@@ -25,8 +27,25 @@ namespace DeadCounty.EditorTools
             }
         }
 
+        // One cross-section of a limb: X width and Z depth at height Y, centred on (X, Z).
+        readonly struct Ring
+        {
+            public readonly float Y, Width, Depth, Z, X;
+
+            public Ring(float y, float width, float depth, float z, float x)
+            {
+                Y = y;
+                Width = width;
+                Depth = depth;
+                Z = z;
+                X = x;
+            }
+        }
+
         static readonly BodyLook SurvivorLook = new("Skin", "Hair", "Eye", "Jacket", "JacketDark", "Jeans", "Boots", true);
         static readonly BodyLook ZombieLook = new("ZombieSkin", "ZombieHair", "ZombieEye", "ZombieShirt", "ZombieShirt", "ZombiePants", "Boots", false);
+
+        static Ring R(float y, float width, float depth, float z = 0f, float x = 0f) => new(y, width, depth, z, x);
 
         static Dictionary<string, Transform> BuildSurvivor(Transform player) => BuildHumanoid(player, SurvivorLook);
 
@@ -37,134 +56,105 @@ namespace DeadCounty.EditorTools
         {
             var joints = new Dictionary<string, Transform>();
             var model = Group(body, "Model");
-
             var hips = joints["hips"] = Group(model, "Hanches", new Vector3(0f, 1f, 0f));
-            Part(hips, "Bassin", Frustum("Pelvis", -0.1f, 0.1f, new(0.33f, 0.2f), new(0.35f, 0.21f)), look.Pants);
-            Part(hips, "Ceinture", Frustum("Belt", 0.06f, 0.11f, new(0.358f, 0.218f), new(0.358f, 0.218f)), "Strap");
-
             var spine = joints["spine"] = Group(hips, "Colonne", new Vector3(0f, 0.06f, 0f));
-            Part(spine, "Torse", Frustum("Torso", 0f, 0.42f, new(0.35f, 0.21f), new(0.44f, 0.25f)), look.Top);
-            Part(spine, "Col", Frustum("Collar", 0.38f, 0.46f, new(0.26f, 0.2f), new(0.2f, 0.16f)), look.TopDark);
-            if (look.Survivor)
-            {
-                Part(spine, "Sac_A_Dos", Frustum("Backpack", 0.06f, 0.4f, new(0.32f, 0.16f), new(0.3f, 0.14f), new(0f, -0.2f)), "Backpack");
-                Part(spine, "Rabat", Frustum("BackpackFlap", 0.3f, 0.42f, new(0.31f, 0.17f), new(0.28f, 0.15f), new(0f, -0.2f)), "BackpackDark");
-                foreach (var x in new[] { -0.1f, 0.1f })
-                    Part(spine, "Bretelle", Frustum("Strap", 0.05f, 0.43f, new(0.05f, 0.02f), new(0.05f, 0.02f), new(0f, 0.12f)), "Strap", new Vector3(x, 0f, 0f));
-            }
-            else
-            {
-                Part(spine, "Sang", Frustum("BloodStain", 0.15f, 0.26f, new(0.12f, 0.01f), new(0.08f, 0.01f), new(0.05f, 0.12f)), "Blood");
-            }
-
             var neck = joints["neck"] = Group(spine, "Cou", new Vector3(0f, 0.42f, 0f));
-            Part(neck, "Cou", Frustum("Neck", 0f, 0.09f, new(0.11f, 0.11f), new(0.1f, 0.1f)), look.Skin);
-            var head = Group(neck, "Tete", new Vector3(0f, 0.07f, 0f));
-            Part(head, "Visage", Blob("Head", new Vector3(0f, 0.11f, 0.01f), new Vector3(0.105f, 0.125f, 0.115f)), look.Skin);
-            Part(head, "Cheveux", Blob("Hair", new Vector3(0f, 0.165f, -0.03f), new Vector3(0.116f, 0.095f, 0.12f)), look.Hair);
-            Part(head, "Nez", Frustum("Nose", 0.04f, 0.09f, new(0.035f, 0.03f), new(0.025f, 0.02f), new(0f, 0.12f)), look.Skin);
-            foreach (var x in new[] { -0.04f, 0.04f })
-                Part(head, "Oeil", Frustum("Eye", 0.1f, 0.12f, new(0.03f, 0.01f), new(0.03f, 0.01f), new(0f, 0.122f)), look.Eye, new Vector3(x, 0f, 0f));
-
+            Group(neck, "Tete", new Vector3(0f, 0.07f, 0f));
             foreach (var side in new[] { -1f, 1f })
             {
                 var left = side < 0f;
                 var shoulder = joints[left ? "leftShoulder" : "rightShoulder"] = Group(spine, left ? "Epaule_G" : "Epaule_D", new Vector3(side * 0.24f, 0.36f, 0f));
-                Part(shoulder, "Bras", Frustum("UpperArm", -0.28f, 0.03f, new(0.09f, 0.1f), new(0.12f, 0.13f)), look.Top);
-                var elbow = joints[left ? "leftElbow" : "rightElbow"] = Group(shoulder, left ? "Coude_G" : "Coude_D", new Vector3(0f, -0.28f, 0f));
-                Part(elbow, "Avant_Bras", Frustum("Forearm", -0.25f, 0f, new(0.075f, 0.08f), new(0.09f, 0.1f)), look.Top);
-                Part(elbow, "Main", Frustum("Hand", -0.34f, -0.24f, new(0.05f, 0.08f), new(0.065f, 0.075f)), look.Skin);
-
+                joints[left ? "leftElbow" : "rightElbow"] = Group(shoulder, left ? "Coude_G" : "Coude_D", new Vector3(0f, -0.28f, 0f));
                 var hip = joints[left ? "leftHip" : "rightHip"] = Group(hips, left ? "Hanche_G" : "Hanche_D", new Vector3(side * 0.095f, -0.05f, 0f));
-                Part(hip, "Cuisse", Frustum("Thigh", -0.44f, 0.04f, new(0.12f, 0.13f), new(0.16f, 0.17f)), look.Pants);
                 var knee = joints[left ? "leftKnee" : "rightKnee"] = Group(hip, left ? "Genou_G" : "Genou_D", new Vector3(0f, -0.44f, 0f));
-                Part(knee, "Tibia", Frustum("Shin", -0.41f, 0.02f, new(0.1f, 0.11f), new(0.12f, 0.13f)), look.Pants);
-                var ankle = joints[left ? "leftAnkle" : "rightAnkle"] = Group(knee, left ? "Cheville_G" : "Cheville_D", new Vector3(0f, -0.43f, 0f));
-                Part(ankle, "Botte", Frustum("Boot", -0.08f, 0.05f, new(0.12f, 0.27f), new(0.11f, 0.15f), new(0f, 0.04f)), look.Boots);
+                joints[left ? "leftAnkle" : "rightAnkle"] = Group(knee, left ? "Cheville_G" : "Cheville_D", new Vector3(0f, -0.43f, 0f));
             }
-            AddBodyDetails(model, look);
+            SyncBody(model, look);
             return joints;
         }
 
-        // Adds only what is missing, so older prefabs get the details too; true when anything was added.
-        static bool AddBodyDetails(Transform model, BodyLook look)
+        // Brings the parts of a body in line with BodyParts: prefabs are never regenerated, so older ones get the
+        // current shapes in place and lose the parts that no longer exist. True when the hierarchy changed.
+        static bool SyncBody(Transform model, BodyLook look)
         {
-            var added = false;
-            void Detail(string jointPath, string name, Mesh mesh, string mat, Vector3 offset = default)
+            var changed = false;
+            var current = new HashSet<Transform>();
+            foreach (var (jointPath, name, mesh, mat) in BodyParts(look))
             {
                 var joint = model.Find(jointPath) ?? throw new System.InvalidOperationException($"{model.name} has no joint {jointPath}");
-                if (joint.Find(name) != null) return;
-                var part = MeshObject(name, joint, mesh, offset, Quaternion.identity, Vector3.one, new[] { mat }, false);
-                part.layer = joint.gameObject.layer;
-                added = true;
+                var part = joint.Find(name);
+                if (part == null)
+                {
+                    part = MeshObject(name, joint, mesh, Vector3.zero, Quaternion.identity, Vector3.one, new[] { mat }, false).transform;
+                    part.gameObject.layer = joint.gameObject.layer;
+                    changed = true;
+                }
+                else
+                {
+                    var filter = part.GetComponent<MeshFilter>();
+                    var renderer = part.GetComponent<MeshRenderer>();
+                    if (filter.sharedMesh != mesh || renderer.sharedMaterial != Mat(mat) || part.localPosition != Vector3.zero)
+                    {
+                        filter.sharedMesh = mesh;
+                        renderer.sharedMaterial = Mat(mat);
+                        part.localPosition = Vector3.zero;
+                        changed = true;
+                    }
+                }
+                current.Add(part);
             }
-
-            const string spine = "Hanches/Colonne";
-            const string head = spine + "/Cou/Tete";
-            foreach (var side in new[] { -1f, 1f })
+            foreach (var filter in model.GetComponentsInChildren<MeshFilter>(true))
             {
-                var left = side < 0f;
-                var elbow = $"{spine}/{(left ? "Epaule_G/Coude_G" : "Epaule_D/Coude_D")}";
-                // On the inner front edge of the hand, toward the body.
-                Detail(elbow, "Pouce", Frustum(left ? "ThumbL" : "ThumbR", -0.31f, -0.25f, new(0.025f, 0.03f), new(0.03f, 0.035f), new(-side * 0.025f, 0.035f)), look.Skin);
-                Detail(head, left ? "Oreille_G" : "Oreille_D", Blob(left ? "EarL" : "EarR", new Vector3(side * 0.103f, 0.115f, 0f), new Vector3(0.02f, 0.038f, 0.03f)), look.Skin);
-                if (!look.Survivor) continue;
-                Detail(head, left ? "Sourcil_G" : "Sourcil_D", Frustum("Brow", 0.138f, 0.15f, new(0.045f, 0.012f), new(0.04f, 0.01f), new(0f, 0.122f)), look.Hair, new Vector3(side * 0.042f, 0f, 0f));
-                Detail($"Hanches/{(left ? "Hanche_G" : "Hanche_D")}", "Poche", Frustum(left ? "PocketL" : "PocketR", -0.22f, -0.08f, new(0.02f, 0.11f), new(0.02f, 0.1f), new(side * 0.074f, 0f)), "JeansDark");
+                if (current.Contains(filter.transform)) continue;
+                if (filter.sharedMesh != null && !filter.sharedMesh.name.StartsWith(BodyMeshPrefix)) continue;
+                Object.DestroyImmediate(filter.gameObject);
+                changed = true;
             }
-            if (look.Survivor)
-            {
-                Detail(spine, "Fermeture", Frustum("Zip", 0.02f, 0.4f, new(0.014f, 0.012f), new(0.014f, 0.012f), new(0f, 0.118f)), look.TopDark);
-                Detail(spine, "Ourlet", Frustum("JacketHem", -0.01f, 0.05f, new(0.37f, 0.225f), new(0.37f, 0.225f)), look.TopDark);
-            }
-            else
-            {
-                Detail(head, "Sang_Bouche", Frustum("MouthBlood", 0.025f, 0.065f, new(0.06f, 0.012f), new(0.05f, 0.012f), new(0f, 0.118f)), "Blood");
-            }
-            return added;
+            return changed;
         }
 
-        static void Part(Transform joint, string name, Mesh mesh, string mat, Vector3 offset = default)
-            => MeshObject(name, joint, mesh, offset, Quaternion.identity, Vector3.one, new[] { mat }, false);
+        static Mesh Loft(string name, params Ring[] rings) => Loft(name, 0.3f, Quaternion.identity, Vector3.zero, rings);
 
-        // Octagonal prism tapering from `bottom` (X width, Z depth) at y0 to `top` at y1, centred on `offset` in XZ:
-        // a box with its vertical edges cut, which reads as a rounded limb while staying flat-shaded low poly.
-        static Mesh Frustum(string name, float y0, float y1, Vector2 bottom, Vector2 top, Vector2 offset = default) => Cached($"SM_Char_{name}", () =>
+        // Octagonal sections joined from the first ring to the last and capped at both ends: a limb that swells
+        // and tapers while staying flat-shaded. `chamfer` is the share of the narrow side cut off each corner.
+        static Mesh Loft(string name, float chamfer, Quaternion rotation, Vector3 offset, Ring[] rings) => Cached(BodyMeshPrefix + name, () =>
         {
-            const float chamfer = 0.3f;
             var m = new MeshBuilder().Sub();
-            Vector3[] Ring(float y, Vector2 size)
+            var pose = Matrix4x4.TRS(offset, rotation, Vector3.one);
+            Vector3[] Section(Ring r)
             {
-                var hx = size.x / 2f;
-                var hz = size.y / 2f;
-                var c = chamfer * Mathf.Min(size.x, size.y);
+                var hx = r.Width / 2f;
+                var hz = r.Depth / 2f;
+                var c = chamfer * Mathf.Min(r.Width, r.Depth);
                 return new[]
                 {
-                    new Vector3(-hx + c, y, -hz), new Vector3(hx - c, y, -hz), new Vector3(hx, y, -hz + c), new Vector3(hx, y, hz - c),
-                    new Vector3(hx - c, y, hz), new Vector3(-hx + c, y, hz), new Vector3(-hx, y, hz - c), new Vector3(-hx, y, -hz + c),
-                }.Select(v => v + new Vector3(offset.x, 0f, offset.y)).ToArray();
+                    new Vector3(-hx + c, 0f, -hz), new Vector3(hx - c, 0f, -hz), new Vector3(hx, 0f, -hz + c), new Vector3(hx, 0f, hz - c),
+                    new Vector3(hx - c, 0f, hz), new Vector3(-hx + c, 0f, hz), new Vector3(-hx, 0f, hz - c), new Vector3(-hx, 0f, -hz + c),
+                }.Select(v => pose.MultiplyPoint3x4(v + new Vector3(r.X, r.Y, r.Z))).ToArray();
             }
-            var b = Ring(y0, bottom);
-            var t = Ring(y1, top);
-            var center = new Vector3(offset.x, (y0 + y1) / 2f, offset.y);
-            for (var i = 0; i < 8; i++)
+            static Vector3 Centre(Vector3[] section) => section.Aggregate(Vector3.zero, (sum, v) => sum + v) / section.Length;
+
+            var sections = rings.Select(Section).ToArray();
+            for (var s = 0; s < sections.Length - 1; s++)
             {
-                var j = (i + 1) % 8;
-                m.Quad(b[i], b[j], t[j], t[i], (b[i] + b[j] + t[i] + t[j]) / 4f - center);
+                var b = sections[s];
+                var t = sections[s + 1];
+                var centre = (Centre(b) + Centre(t)) / 2f;
+                for (var i = 0; i < 8; i++)
+                {
+                    var j = (i + 1) % 8;
+                    m.Quad(b[i], b[j], t[j], t[i], (b[i] + b[j] + t[i] + t[j]) / 4f - centre);
+                }
             }
+            var first = sections[0];
+            var last = sections[^1];
+            var axis = Centre(last) - Centre(first);
             for (var i = 1; i < 7; i++)
             {
-                m.Tri(t[0], t[i], t[i + 1], Vector3.up);
-                m.Tri(b[0], b[i], b[i + 1], Vector3.down);
+                m.Tri(first[0], first[i], first[i + 1], -axis);
+                m.Tri(last[0], last[i], last[i + 1], axis);
             }
-            return m.Save($"SM_Char_{name}");
-        });
-
-        static Mesh Blob(string name, Vector3 center, Vector3 radii) => Cached($"SM_Char_{name}", () =>
-        {
-            var m = new MeshBuilder().Sub();
-            AddBlob(m, center, radii, 1, new System.Random(0), 0f);
-            return m.Save($"SM_Char_{name}");
+            return m.Save(BodyMeshPrefix + name);
         });
     }
 }

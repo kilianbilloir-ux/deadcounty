@@ -45,7 +45,7 @@ namespace DeadCounty.EditorTools
             ["Headstone"] = Rgb(0x8E8E8A), ["Crate"] = Rgb(0x8C734C), ["Spray"] = Rgb(0xD0612A), ["SignBlue"] = Rgb(0x24508A),
             ["Marker"] = Rgb(0xEDEDED), ["MarkerMajor"] = Rgb(0xC03A2E), ["Accent"] = Rgb(0xF2CC1A),
             ["Skin"] = Rgb(0xC69C7A), ["Hair"] = Rgb(0x2A211B), ["Eye"] = Rgb(0x151515), ["Jacket"] = Rgb(0x5C6340),
-            ["JacketDark"] = Rgb(0x434A30), ["Jeans"] = Rgb(0x34404F), ["Boots"] = Rgb(0x3B2F25), ["Backpack"] = Rgb(0x6E5B3D),
+            ["JacketDark"] = Rgb(0x434A30), ["Jeans"] = Rgb(0x3F4E63), ["Boots"] = Rgb(0x3B2F25), ["Backpack"] = Rgb(0x6E5B3D),
             ["BackpackDark"] = Rgb(0x55462F), ["Strap"] = Rgb(0x2A2A2A),
             ["ZombieSkin"] = Rgb(0x8E9681), ["ZombieSkinPale"] = Rgb(0xA6A898), ["ZombieSkinGrey"] = Rgb(0x7B7F78), ["ZombieHairGrey"] = Rgb(0x7A766E),
             ["JeansDark"] = Rgb(0x29323F), ["ZombieHair"] = Rgb(0x3A342D), ["ZombieEye"] = Rgb(0xD9CF8C), ["Blood"] = Rgb(0x3A1714),

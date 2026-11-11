@@ -24,12 +24,12 @@ namespace DeadCounty.EditorTools
         // Wound spots: joint path from the model, position on the limb surface, size of the patch.
         static readonly (string joint, Vector3 position, Vector3 size)[] WoundSpots =
         {
-            ("Hanches/Colonne/Epaule_G/Coude_G", new Vector3(0f, -0.12f, 0.046f), new Vector3(0.06f, 0.09f, 0.01f)),
-            ("Hanches/Colonne/Epaule_D/Coude_D", new Vector3(0f, -0.1f, 0.046f), new Vector3(0.07f, 0.08f, 0.01f)),
-            ("Hanches/Colonne/Epaule_D", new Vector3(0.062f, -0.12f, 0f), new Vector3(0.01f, 0.1f, 0.08f)),
-            ("Hanches/Hanche_G", new Vector3(0f, -0.2f, 0.072f), new Vector3(0.09f, 0.12f, 0.01f)),
-            ("Hanches/Hanche_D/Genou_D", new Vector3(0f, -0.15f, 0.062f), new Vector3(0.07f, 0.1f, 0.01f)),
-            ("Hanches/Colonne", new Vector3(-0.17f, 0.2f, 0.06f), new Vector3(0.01f, 0.14f, 0.1f)),
+            ("Hanches/Colonne/Epaule_G/Coude_G", new Vector3(0f, -0.12f, 0.056f), new Vector3(0.06f, 0.09f, 0.01f)),
+            ("Hanches/Colonne/Epaule_D/Coude_D", new Vector3(0f, -0.1f, 0.058f), new Vector3(0.07f, 0.08f, 0.01f)),
+            ("Hanches/Colonne/Epaule_D", new Vector3(0.062f, -0.12f, 0f), new Vector3(0.01f, 0.1f, 0.06f)),
+            ("Hanches/Hanche_G", new Vector3(0f, -0.2f, 0.09f), new Vector3(0.09f, 0.12f, 0.01f)),
+            ("Hanches/Hanche_D/Genou_D", new Vector3(0f, -0.15f, 0.066f), new Vector3(0.07f, 0.1f, 0.01f)),
+            ("Hanches/Colonne", new Vector3(-0.07f, 0.08f, 0.116f), new Vector3(0.1f, 0.11f, 0.01f)),
         };
 
         // Runs after the NavMesh bake: every zombie is snapped onto it, and a spot without NavMesh fails the build.
@@ -141,14 +141,14 @@ namespace DeadCounty.EditorTools
             return prefab;
         }
 
-        // The prefab is never regenerated: body details added since it was created are added in place.
+        // The prefab is never regenerated: its body is brought up to date in place.
         static GameObject EnsureZombieDetails(GameObject prefab)
         {
             var root = PrefabUtility.LoadPrefabContents(ZombiePrefabPath);
             try
             {
                 var model = root.transform.Find("Model") ?? throw new InvalidOperationException($"{ZombiePrefabPath} has no Model");
-                return AddBodyDetails(model, ZombieLook) ? PrefabUtility.SaveAsPrefabAsset(root, ZombiePrefabPath) : prefab;
+                return SyncBody(model, ZombieLook) ? PrefabUtility.SaveAsPrefabAsset(root, ZombiePrefabPath) : prefab;
             }
             finally
             {
@@ -182,8 +182,8 @@ namespace DeadCounty.EditorTools
             foreach (var r in zombie.GetComponentsInChildren<MeshRenderer>())
             {
                 if (r.name == "Avant_Bras" && tornSleeves) r.sharedMaterial = skin;
-                else if (r.name == "Cheveux") r.sharedMaterial = hair;
-                else if (r.name == "Botte" && lostShoe && r.transform.parent.name == "Cheville_G") r.sharedMaterial = skin;
+                else if (r.name.StartsWith("Cheveux")) r.sharedMaterial = hair;
+                else if (r.name is "Botte" or "Semelle" && lostShoe && r.transform.parent.name == "Cheville_G") r.sharedMaterial = skin;
                 else if (r.sharedMaterial == baseShirt) r.sharedMaterial = shirt;
                 else if (r.sharedMaterial == basePants) r.sharedMaterial = pants;
                 else if (r.sharedMaterial == baseSkin) r.sharedMaterial = skin;
