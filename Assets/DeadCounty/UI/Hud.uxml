@@ -2,6 +2,20 @@
     <ui:VisualElement name="root" picking-mode="Ignore" class="root">
         <ui:VisualElement name="hit-flash" picking-mode="Ignore" class="hit-flash" />
         <ui:VisualElement name="hud" picking-mode="Ignore" class="hud">
+            <ui:VisualElement name="needs" picking-mode="Ignore" class="needs">
+                <ui:VisualElement name="hunger" picking-mode="Ignore" class="need">
+                    <DeadCounty.UI.RadialGauge name="hunger-gauge" picking-mode="Ignore" class="need-gauge" />
+                    <ui:Label text="Faim" picking-mode="Ignore" class="need-label" />
+                </ui:VisualElement>
+                <ui:VisualElement name="thirst" picking-mode="Ignore" class="need">
+                    <DeadCounty.UI.RadialGauge name="thirst-gauge" picking-mode="Ignore" class="need-gauge" />
+                    <ui:Label text="Soif" picking-mode="Ignore" class="need-label" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fatigue" picking-mode="Ignore" class="need">
+                    <DeadCounty.UI.RadialGauge name="fatigue-gauge" picking-mode="Ignore" class="need-gauge" />
+                    <ui:Label text="Fatigue" picking-mode="Ignore" class="need-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="bars" picking-mode="Ignore" class="bars">
                 <ui:VisualElement name="health-row" picking-mode="Ignore" class="bar-row">
                     <ui:Label name="health-label" text="Vie" picking-mode="Ignore" class="bar-label" />

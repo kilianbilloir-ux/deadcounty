@@ -62,6 +62,13 @@ namespace DeadCounty.Player
             return true;
         }
 
+        // Damage from an empty need: no hit reaction and no invulnerability window; god mode ignores it too.
+        public void ApplyDrain(float damage)
+        {
+            if (!(damage > 0f) || !IsAlive || Invulnerable) return;
+            if (Pool.Apply(damage)) Died?.Invoke(this);
+        }
+
         public void Restore()
         {
             Pool.Reset();

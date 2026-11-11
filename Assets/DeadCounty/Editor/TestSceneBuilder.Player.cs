@@ -5,6 +5,8 @@ using DeadCounty.Player;
 using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
 namespace DeadCounty.EditorTools
@@ -15,6 +17,7 @@ namespace DeadCounty.EditorTools
         const string HudPanelSettingsPath = "Assets/DeadCounty/UI/HudPanelSettings.asset";
         const string HudUxmlPath = "Assets/DeadCounty/UI/Hud.uxml";
         const string HudUssPath = "Assets/DeadCounty/UI/Hud.uss";
+        const string ExhaustionProfilePath = ArtDir + "/VP_Exhausted.asset";
         static readonly Vector3 SpawnPosition = new(65.2f, 0.15f, -10f);
 
         // The prefab is only generated when missing, so Inspector tweaks survive scene rebuilds.
@@ -144,10 +147,42 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PerceptionTarget>(player);
             added |= AddMissing<PlayerNoiseEmitter>(player);
             added |= AddMissing<PlayerFlashlight>(player);
+            added |= AddMissing<PlayerNeeds>(player);
             added |= AddMissing<PlayerDeathFlow>(rig);
             added |= AddMissing<PlayerHudController>(rig);
             added |= EnsureFlashlight(player);
+            added |= EnsureExhaustionVolume(rig, player);
             return added;
+        }
+
+        // Global volume that PlayerNeeds blends in while fatigue is empty (GDD 8.4: dark vignette).
+        static bool EnsureExhaustionVolume(GameObject rig, GameObject player)
+        {
+            var so = new SerializedObject(player.GetComponent<PlayerNeeds>());
+            var property = so.FindProperty("exhaustionVolume");
+            if (property.objectReferenceValue != null) return false;
+            var holder = new GameObject("ExhaustionVolume");
+            holder.transform.SetParent(rig.transform, false);
+            var volume = holder.AddComponent<Volume>();
+            volume.isGlobal = true;
+            volume.priority = 10f;
+            volume.weight = 0f;
+            volume.sharedProfile = ExhaustionProfile();
+            property.objectReferenceValue = volume;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return true;
+        }
+
+        static VolumeProfile ExhaustionProfile()
+        {
+            var profile = EmptiedProfile(ExhaustionProfilePath);
+            var vignette = AddOverride<Vignette>(profile);
+            vignette.intensity.Override(0.55f);
+            vignette.smoothness.Override(0.5f);
+            vignette.color.Override(Color.black);
+            AddOverride<ColorAdjustments>(profile).saturation.Override(-45f);
+            EditorUtility.SetDirty(profile);
+            return profile;
         }
 
         // Old rigs predate the flashlight: add the spot under the camera target and wire it.

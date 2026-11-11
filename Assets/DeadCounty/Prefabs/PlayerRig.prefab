@@ -1865,6 +1865,7 @@ GameObject:
   - component: {fileID: 5878281340476389133}
   - component: {fileID: 6087673885327060316}
   - component: {fileID: 5457722342757846616}
+  - component: {fileID: 9131007080392847135}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2092,6 +2093,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerFlashlight
   spot: {fileID: 2554684620794533850}
   startOn: 0
+--- !u!114 &9131007080392847135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4143adc71979841f881e1388afc59e53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerNeeds
+  settings:
+    HungerMinutes: 20
+    ThirstMinutes: 12
+    FatigueMinutes: 25
+    SprintFatigueFactor: 2
+    StarvingDamagePerMinute: 33.333332
+    DehydratedDamagePerMinute: 50
+    ExhaustedStaminaCapacity: 0.5
+  exhaustionVolume: {fileID: 8573854563993322308}
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0
@@ -2560,6 +2582,7 @@ Transform:
   m_Children:
   - {fileID: 1968052532910183328}
   - {fileID: 359943300387110147}
+  - {fileID: 4482664761186980759}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2922239359997387129
@@ -3348,6 +3371,55 @@ Transform:
   - {fileID: 1861700865735653729}
   m_Father: {fileID: 4374764708901550846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8779144069761093942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4482664761186980759}
+  - component: {fileID: 8573854563993322308}
+  m_Layer: 0
+  m_Name: ExhaustionVolume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4482664761186980759
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8779144069761093942}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3012412907313332803}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8573854563993322308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8779144069761093942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 10
+  blendDistance: 0
+  weight: 0
+  sharedProfile: {fileID: 11400000, guid: 43befa5e4f59342c4912551d1eead13f, type: 2}
 --- !u!1 &8861102554256516926
 GameObject:
   m_ObjectHideFlags: 0

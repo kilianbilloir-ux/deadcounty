@@ -7,7 +7,7 @@ namespace DeadCounty.Player
 {
     // Death and respawn loop: on death the body collapses and the screen fades to black (the HUD draws the fade,
     // the survival time and the prompt from the state exposed here), then Jump respawns the player at the pose
-    // recorded in Start with full health and stamina. Lives on the rig root so it keeps running if the Player
+    // recorded in Start with full health, stamina and needs. Lives on the rig root so it keeps running if the Player
     // object gets disabled.
     public class PlayerDeathFlow : MonoBehaviour
     {
@@ -27,6 +27,7 @@ namespace DeadCounty.Player
         ThirdPersonController controller;
         PlayerHealth health;
         PlayerStamina stamina;
+        PlayerNeeds needs;
         ProceduralHumanoidAnimator animator;
         InputAction jump;
         Transform model;
@@ -48,6 +49,7 @@ namespace DeadCounty.Player
             controller = Require<ThirdPersonController>();
             health = Require<PlayerHealth>();
             stamina = Require<PlayerStamina>();
+            needs = Require<PlayerNeeds>();
             animator = Require<ProceduralHumanoidAnimator>();
             jump = InputSystem.actions.FindAction("Player/Jump", true);
             model = controller.transform.Find("Model");
@@ -107,6 +109,7 @@ namespace DeadCounty.Player
             controller.Teleport(spawnPosition, spawnRotation);
             health.Restore();
             stamina.ResetFull();
+            needs.ResetFull();
             model.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             animator.enabled = true;
             controller.InputEnabled = true;

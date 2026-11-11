@@ -29,6 +29,38 @@
     align-items: flex-start;
 }
 
+.needs {
+    flex-direction: row;
+    margin-bottom: 12px;
+}
+
+.need {
+    align-items: center;
+    width: 64px;
+    margin-right: 6px;
+    opacity: 0;
+}
+
+.need-gauge {
+    width: 40px;
+    height: 40px;
+    --gauge-track: rgba(180, 188, 201, 0.3);
+    --gauge-fill: rgb(180, 188, 201);
+    --gauge-thickness: 5;
+}
+
+.need-gauge--low {
+    --gauge-track: rgba(167, 95, 59, 0.55);
+    --gauge-fill: rgb(167, 95, 59);
+}
+
+.need-label {
+    margin-top: 3px;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    color: rgb(138, 143, 150);
+}
+
 .bars {
     align-items: flex-start;
     flex-direction: column;

@@ -165,5 +165,27 @@ namespace DeadCounty.Tests
             Assert.That(model.Current, Is.EqualTo(100f));
             Assert.That(model.Exhausted, Is.False);
         }
+
+        [Test]
+        public void CapacityCapsStaminaAndItsRecoveryUntilReset()
+        {
+            var model = Create();
+            model.SetCapacity(0.5f);
+            Assert.That(model.Current, Is.EqualTo(50f));
+            SprintUntilExhausted(model);
+            Tick(model, StaminaActivity.Idle, 10f);
+            Assert.That(model.Current, Is.EqualTo(50f));
+            Assert.That(model.Exhausted, Is.False, "exhaustion must clear at 40");
+
+            model.SetCapacity(0.3f);
+            SprintUntilExhausted(model);
+            Tick(model, StaminaActivity.Idle, 10f);
+            Assert.That(model.Current, Is.EqualTo(30f).Within(1e-3f));
+            Assert.That(model.Exhausted, Is.False, "a capacity below the recovery threshold must not lock running for good");
+
+            model.Reset();
+            Tick(model, StaminaActivity.Idle, 1f);
+            Assert.That(model.Current, Is.EqualTo(100f));
+        }
     }
 }

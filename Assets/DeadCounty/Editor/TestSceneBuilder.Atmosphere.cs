@@ -78,28 +78,35 @@ namespace DeadCounty.EditorTools
             return sky;
         }
 
-        // Rebuilt in place so the asset GUID referenced by the scene stays stable.
-        static VolumeProfile VolumeProfileAsset()
+        // Rebuilt in place so the asset GUID referenced by the scene and the prefabs stays stable.
+        static VolumeProfile EmptiedProfile(string path)
         {
-            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(VolumeProfilePath);
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(path);
             if (profile == null)
             {
                 profile = ScriptableObject.CreateInstance<VolumeProfile>();
-                AssetDatabase.CreateAsset(profile, VolumeProfilePath);
+                AssetDatabase.CreateAsset(profile, path);
             }
             foreach (var component in profile.components.ToList())
             {
                 profile.Remove(component.GetType());
                 Object.DestroyImmediate(component, true);
             }
+            return profile;
+        }
 
-            T Add<T>() where T : VolumeComponent
-            {
-                var c = profile.Add<T>();
-                c.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
-                AssetDatabase.AddObjectToAsset(c, profile);
-                return c;
-            }
+        static T AddOverride<T>(VolumeProfile profile) where T : VolumeComponent
+        {
+            var c = profile.Add<T>();
+            c.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+            AssetDatabase.AddObjectToAsset(c, profile);
+            return c;
+        }
+
+        static VolumeProfile VolumeProfileAsset()
+        {
+            var profile = EmptiedProfile(VolumeProfilePath);
+            T Add<T>() where T : VolumeComponent => AddOverride<T>(profile);
 
             Add<Tonemapping>().mode.Override(TonemappingMode.ACES);
             var color = Add<ColorAdjustments>();

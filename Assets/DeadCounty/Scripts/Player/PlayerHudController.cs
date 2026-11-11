@@ -1,20 +1,24 @@
 using System;
 using System.Text;
 using DeadCounty.Core;
+using DeadCounty.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace DeadCounty.Player
 {
-    // UI Toolkit HUD, nearly absent while all is well (GDD 8.11): the health bar shows while not full or just
-    // after a hit and takes the danger colour when low, the stamina bar shows while not full and blinks when
-    // exhausted, the flashlight and clock readouts show for a few seconds when they change. Also draws the hit
-    // flash and the game over screen from PlayerDeathFlow. The only allocations are the clock and survival time
-    // strings when they change.
+    // UI Toolkit HUD, nearly absent while all is well (GDD 8.11): each need gauge shows once the need is half
+    // empty and takes the danger colour when low, the health bar shows while not full or just after a hit and
+    // takes the danger colour when low, the stamina bar shows while not full and blinks when exhausted, the
+    // flashlight and clock readouts show for a few seconds when they change, with the need gauges. Also draws the
+    // hit flash and the game over screen from PlayerDeathFlow. The only allocations are the clock and survival
+    // time strings when they change.
     public class PlayerHudController : MonoBehaviour
     {
         const float LowHealth = 0.4f;
+        const float NeedShowBelow = 0.5f;
+        const float LowNeed = 0.2f;
         const float HealthShowTime = 3f;
         const float ReadoutShowTime = 4f;
         const float FadeSpeed = 3f;
@@ -29,14 +33,18 @@ namespace DeadCounty.Player
 
         PlayerHealth health;
         PlayerStamina stamina;
+        PlayerNeeds needs;
         PlayerFlashlight flashlight;
         PlayerDeathFlow deathFlow;
         DayNightDirector director;
         VisualElement hud, healthRow, staminaRow, readouts, healthFill, staminaFill, flash, gameOver;
+        VisualElement hungerNeed, thirstNeed, fatigueNeed;
+        RadialGauge hungerGauge, thirstGauge, fatigueGauge;
         Label flashlightLabel, time, gameOverTitle, gameOverTime, gameOverPrompt;
         StringBuilder text;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
         float healthOpacity, staminaOpacity, readoutOpacity, readoutsUntil;
+        float hungerOpacity, thirstOpacity, fatigueOpacity;
         int day = -1, hour = -1, minute = -1, phase = -1;
         bool flashlightWasOn, deathShown;
 
@@ -52,10 +60,11 @@ namespace DeadCounty.Player
         {
             health = GetComponentInChildren<PlayerHealth>(true);
             stamina = GetComponentInChildren<PlayerStamina>(true);
+            needs = GetComponentInChildren<PlayerNeeds>(true);
             flashlight = GetComponentInChildren<PlayerFlashlight>(true);
             deathFlow = GetComponent<PlayerDeathFlow>();
             director = FindAnyObjectByType<DayNightDirector>();
-            if (health == null || stamina == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth and a PlayerStamina in its children");
+            if (health == null || stamina == null || needs == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a PlayerHealth, a PlayerStamina and a PlayerNeeds in its children");
 
             var document = GetComponent<UIDocument>();
             if (document == null) throw new InvalidOperationException($"PlayerHudController on '{name}' needs a UIDocument");
@@ -72,6 +81,12 @@ namespace DeadCounty.Player
             staminaFill = Find<VisualElement>(root, "stamina-fill");
             flash = Find<VisualElement>(root, "hit-flash");
             gameOver = Find<VisualElement>(root, "game-over");
+            hungerNeed = Find<VisualElement>(root, "hunger");
+            thirstNeed = Find<VisualElement>(root, "thirst");
+            fatigueNeed = Find<VisualElement>(root, "fatigue");
+            hungerGauge = Find<RadialGauge>(root, "hunger-gauge");
+            thirstGauge = Find<RadialGauge>(root, "thirst-gauge");
+            fatigueGauge = Find<RadialGauge>(root, "fatigue-gauge");
             flashlightLabel = Find<Label>(root, "flashlight");
             time = Find<Label>(root, "time");
             gameOverTitle = Find<Label>(root, "game-over-title");
@@ -144,7 +159,12 @@ namespace DeadCounty.Player
             var showStamina = model.Normalized < 1f || staminaValue < 0.995f;
             Fade(healthRow, ref healthOpacity, alive && showHealth, dt);
             Fade(staminaRow, ref staminaOpacity, alive && showStamina, dt);
-            Fade(readouts, ref readoutOpacity, alive && now < readoutsUntil, dt);
+            var readoutsShown = alive && now < readoutsUntil;
+            Fade(readouts, ref readoutOpacity, readoutsShown, dt);
+            var needsModel = needs.Model;
+            UpdateNeed(hungerNeed, hungerGauge, ref hungerOpacity, needsModel.Hunger, alive, readoutsShown, dt);
+            UpdateNeed(thirstNeed, thirstGauge, ref thirstOpacity, needsModel.Thirst, alive, readoutsShown, dt);
+            UpdateNeed(fatigueNeed, fatigueGauge, ref fatigueOpacity, needsModel.Fatigue, alive, readoutsShown, dt);
 
             flashValue = Mathf.Max(flashValue - dt / hitFlashTime, 0f);
             flash.style.opacity = flashValue * hitFlashAlpha;
@@ -156,6 +176,13 @@ namespace DeadCounty.Player
         {
             opacity = Mathf.MoveTowards(opacity, visible ? 1f : 0f, FadeSpeed * dt);
             element.style.opacity = opacity;
+        }
+
+        static void UpdateNeed(VisualElement need, RadialGauge gauge, ref float opacity, float value, bool alive, bool readoutsShown, float dt)
+        {
+            gauge.Value = value;
+            gauge.EnableInClassList("need-gauge--low", value <= LowNeed);
+            Fade(need, ref opacity, alive && (value < NeedShowBelow || readoutsShown), dt);
         }
 
         void UpdateClock()
