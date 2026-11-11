@@ -66,7 +66,7 @@ namespace DeadCounty.EditorTools
             }
         }
 
-        // 18 ambient zombies, none within 15 m of the player spawn, then 6 test zombies (no speed jitter, no limp):
+        // 21 ambient zombies, none within 15 m of the player spawn, then 6 test zombies (no speed jitter, no limp):
         // 4 facing away from the clearing's noise post at 5, 10, 20 and 30 m, and 2 in the dark warehouse.
         static List<(string name, Vector3 position, float yaw, bool test)> ZombieSpots()
         {
@@ -92,6 +92,9 @@ namespace DeadCounty.EditorTools
                 ("Maison_Barricadee", Room(2, false, 9.5f, 7.5f), 0f, false),
                 ("Eglise_Autel", Church(0f, 13f), ChurchYaw, false),
                 ("Eglise_Cimetiere", Church(11.1f, 8f), ChurchYaw + 180f, false),
+                ("Place_Kiosque", GreenPoint(2.5f, 5.5f), 200f, false),
+                ("Place_Jeux", GreenPoint(-6.5f, 7f), 70f, false),
+                ("Place_Triage", GreenPoint(5f, -8.5f), 310f, false),
                 ("Ferme_Cour", new Vector3(-85f, 0f, 86f), 120f, false),
                 ("Ferme_Grange", new Vector3(-96f, 0f, 106f), 180f, false),
                 ("Test_Clairiere_5m", Clearing(5f), 90f, true),

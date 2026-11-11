@@ -58,6 +58,7 @@ namespace DeadCounty.EditorTools
             BuildGasStation(Group(env, "Station_Service"));
             BuildGeneralStore(Group(env, "Epicerie"));
             BuildChurch(Group(env, "Eglise"));
+            BuildVillageGreen(Group(env, "Place_Village"));
             BuildFarm(Group(env, "Ferme"));
             BuildWarehouse(Group(env, "Entrepot_Sombre"));
             BuildAIClearing(Group(env, "Clairiere_IA"));
