@@ -58,8 +58,8 @@ namespace DeadCounty.EditorTools
             foreach (var t in env.GetComponentsInChildren<Transform>())
                 GameObjectUtility.SetStaticEditorFlags(t.gameObject, StaticEditorFlags.BatchingStatic);
 
-            BuildSpawn();
             SetupAtmosphere();
+            BuildPlayer();
             BakeNavMesh(env.gameObject);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -67,13 +67,6 @@ namespace DeadCounty.EditorTools
             DeleteUnusedMaterials();
             AssetDatabase.SaveAssets();
             Debug.Log($"[TestSceneBuilder] {ScenePath} built");
-        }
-
-        static void BuildSpawn()
-        {
-            var spawn = new GameObject("PlayerSpawn").transform;
-            spawn.SetPositionAndRotation(new Vector3(65.2f, 0.15f, -10f), Quaternion.identity);
-            Box("ScaleDummy_1m80", spawn, new Vector3(0.8f, 0.9f, 0f), new Vector3(0.5f, 1.8f, 0.3f), "Accent", solid: false);
         }
 
         static Transform Group(Transform parent, string name, Vector3? position = null, float yaw = 0f)

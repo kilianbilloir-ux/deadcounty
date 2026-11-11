@@ -37,7 +37,7 @@ namespace DeadCounty.EditorTools
             ["BusYellow"] = Rgb(0xD6A21E), ["TractorGreen"] = Rgb(0x3F6B3A),
             ["Furniture"] = Rgb(0x6A4E3A), ["Fabric"] = Rgb(0x5E6B7A), ["Mattress"] = Rgb(0xCFCAC0), ["Porcelain"] = Rgb(0xE8E8E4),
             ["Headstone"] = Rgb(0x8E8E8A), ["Crate"] = Rgb(0x8C734C),
-            ["Marker"] = Rgb(0xEDEDED), ["MarkerMajor"] = Rgb(0xC03A2E), ["Accent"] = Rgb(0xF2CC1A),
+            ["Player"] = Rgb(0x3E6FA0), ["Marker"] = Rgb(0xEDEDED), ["MarkerMajor"] = Rgb(0xC03A2E), ["Accent"] = Rgb(0xF2CC1A),
             ["Obstacle"] = Rgb(0xE08A33), ["Ramp"] = Rgb(0x4F7FD0), ["Stairs"] = Rgb(0x5AA866),
         };
 
