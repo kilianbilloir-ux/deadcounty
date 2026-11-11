@@ -227,9 +227,9 @@ namespace DeadCounty.EditorTools
         }
 
         // Double-sided store shelving, long axis on local X, products on both faces; most shelves half looted.
-        static Transform GroceryShelf(Transform parent, Vector3 pos, float yaw, System.Random rng)
+        static Transform GroceryShelf(Transform parent, Vector3 pos, float yaw, System.Random rng, float length = 6f)
         {
-            const float length = 6f, depth = 0.7f, height = 1.6f;
+            const float depth = 0.7f, height = 1.6f;
             var p = Piece(parent, "Rayon", pos, yaw, new Vector3(length, height, depth));
             Bit(p, "Dos", new Vector3(0f, height / 2f, 0f), new Vector3(length, height, 0.04f), "MetalLight");
             Bit(p, "Socle", new Vector3(0f, 0.08f, 0f), new Vector3(length, 0.16f, depth), "Metal");
@@ -256,15 +256,15 @@ namespace DeadCounty.EditorTools
             return p;
         }
 
-        static Transform Checkout(Transform parent, Vector3 pos, float yaw)
+        static Transform Checkout(Transform parent, Vector3 pos, float yaw, float length = 3f)
         {
-            const float length = 3f, depth = 0.7f;
+            const float depth = 0.7f;
             var p = Piece(parent, "Comptoir", pos, yaw, new Vector3(length, 1f, depth));
             Bit(p, "Caisson", new Vector3(0f, 0.47f, 0f), new Vector3(length, 0.94f, depth), "Furniture");
             Bit(p, "Dessus", new Vector3(0f, 0.97f, 0f), new Vector3(length + 0.05f, 0.05f, depth + 0.05f), "Countertop");
-            Bit(p, "Tapis", new Vector3(-0.5f, 1.0f, 0f), new Vector3(1.6f, 0.02f, 0.4f), "CarBlack");
-            Bit(p, "Caisse", new Vector3(1f, 1.1f, 0.05f), new Vector3(0.4f, 0.22f, 0.35f), "Metal");
-            Bit(p, "Tiroir_Caisse", new Vector3(1f, 0.93f, -0.33f), new Vector3(0.36f, 0.1f, 0.3f), "Metal");
+            Bit(p, "Tapis", new Vector3(-length / 6f, 1.0f, 0f), new Vector3(length * 0.53f, 0.02f, 0.4f), "CarBlack");
+            Bit(p, "Caisse", new Vector3(length / 2f - 0.5f, 1.1f, 0.05f), new Vector3(0.4f, 0.22f, 0.35f), "Metal");
+            Bit(p, "Tiroir_Caisse", new Vector3(length / 2f - 0.5f, 0.93f, -0.33f), new Vector3(0.36f, 0.1f, 0.3f), "Metal");
             return p;
         }
 

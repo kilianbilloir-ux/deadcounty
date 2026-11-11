@@ -12,6 +12,7 @@ namespace DeadCounty.EditorTools
         // South-east corner of the crossroads: canopy with two pump islands, shop facing the pumps.
         static void BuildGasStation(Transform parent)
         {
+            var rng = new System.Random(41);
             var lot = Group(parent, "Station", new Vector3(91f, 0f, -20.5f));
             Box("Dalle", lot, new Vector3(0f, 0.05f, 0f), new Vector3(28f, 0.1f, 27f), "Concrete");
 
@@ -25,10 +26,7 @@ namespace DeadCounty.EditorTools
                 Box("Pilier", canopy, new Vector3(x, 2.3f, -2.4f), new Vector3(0.4f, 4.6f, 0.4f), "SignWhite");
                 Box("Pilier", canopy, new Vector3(x, 2.3f, 2.4f), new Vector3(0.4f, 4.6f, 0.4f), "SignWhite");
                 foreach (var z in new[] { -1.1f, 1.1f })
-                {
-                    Box("Pompe", canopy, new Vector3(x, 1f, z), new Vector3(0.7f, 1.6f, 0.5f), "SignRed");
-                    Box("Ecran", canopy, new Vector3(x, 1.45f, z), new Vector3(0.72f, 0.3f, 0.3f), "CarBlack", solid: false);
-                }
+                    FuelPump(canopy, new Vector3(x, 0.2f, z), 90f);
                 Post("Borne", canopy, new Vector3(x, 0f, -3.2f), 0.9f, 0.1f, "SignYellow");
                 Post("Borne", canopy, new Vector3(x, 0f, 3.2f), 0.9f, 0.1f, "SignYellow");
                 BuiltLamps.Add(SpotLight(canopy, "Lumiere_Auvent", new Vector3(x * 1.6f, 4.5f, 0f), Quaternion.Euler(90f, 0f, 0f), ColdWhite, 8f, 9f, 120f, false));
@@ -47,16 +45,19 @@ namespace DeadCounty.EditorTools
             Box("Bandeau", shop, new Vector3(6f, 3.1f, 8.13f), new Vector3(12.2f, 0.45f, 0.06f), "SignRed", solid: false);
             Box("Toit", shop, new Vector3(6f, 3.7f, 4f), new Vector3(12.6f, 0.2f, 8.6f), "RoofGrey");
             foreach (var x in new[] { 3f, 5.5f, 8f })
-                Searchable(Box("Rayon", shop, new Vector3(x, 0.75f, 3.6f), new Vector3(0.6f, 1.5f, 3.6f), "MetalLight"), "Rayon", "LT_Magasin_Rayon");
-            Searchable(Box("Comptoir", shop, new Vector3(10.4f, 0.5f, 6.2f), new Vector3(2.4f, 1f, 0.7f), "Furniture"), "Comptoir", "LT_Magasin_Comptoir");
-            Box("Vitrine_Froide", shop, new Vector3(6f, 1f, 0.5f), new Vector3(7f, 2f, 0.7f), "Glass");
+                Searchable(GroceryShelf(shop, new Vector3(x, 0f, 3.6f), 90f, rng, 3.6f).gameObject, "Rayon", "LT_Magasin_Rayon");
+            Searchable(Checkout(shop, new Vector3(10.4f, 0f, 6.2f), 0f, 2.4f).gameObject, "Comptoir", "LT_Magasin_Comptoir");
+            ColdCase(shop, new Vector3(6f, 0f, 0.5f), 180f, 7f, rng);
 
             Box("Mat_Enseigne", lot, new Vector3(-12f, 4f, 12f), new Vector3(0.35f, 8f, 0.35f), "Metal");
             Box("Enseigne", lot, new Vector3(-12f, 7.4f, 12f), new Vector3(0.4f, 1.8f, 2.6f), "SignRed", solid: false);
             Box("Enseigne_Face", lot, new Vector3(-12f, 7.4f, 12f), new Vector3(0.44f, 1.2f, 2f), "PanelGlow", solid: false);
             Box("Prix", lot, new Vector3(-12f, 5.9f, 12f), new Vector3(0.3f, 1f, 2f), "SignWhite", solid: false);
-            Box("Glaciere", lot, new Vector3(-1.5f, 0.65f, -4.9f), new Vector3(1.6f, 1.1f, 0.8f), "SignWhite");
-            Box("Cage_Gaz", lot, new Vector3(7.5f, 0.85f, -4.9f), new Vector3(1.6f, 1.5f, 0.8f), "MetalLight");
+            PriceDigits(lot, new Vector3(-12f, 5.9f, 12f));
+            IceChest(lot, new Vector3(-1.5f, 0.1f, -4.9f));
+            PropaneCage(lot, new Vector3(7.5f, 0.1f, -4.9f));
+            TireStack(lot, new Vector3(-10.2f, 0.1f, -3.3f), 4, rng);
+            TireStack(lot, new Vector3(-10.9f, 0.1f, -3.9f), 2, rng);
             Box("Benne", lot, new Vector3(10.5f, 0.85f, -11f), new Vector3(1.8f, 1.5f, 1.2f), "CarGreen");
             Post("Gonfleur", lot, new Vector3(-11f, 0.1f, -2f), 1.2f, 0.12f, "SignRed");
             Car(lot, "Voiture_Pompe", new Vector3(-6.9f, 0.1f, 6.5f), 90f, "CarRed");
@@ -180,9 +181,10 @@ namespace DeadCounty.EditorTools
             Wall(w, "Mur_Est", new Vector2(30f, 0f), new Vector2(30f, 20f), style);
             Wall(w, "Mur_Ouest", new Vector2(0f, 20f), new Vector2(0f, 0f), style);
             Roof(w, "Toit", new Vector3(15f, 5f, 10f), 30.8f, 20.8f, 2f, "RoofRust");
+            var racks = new System.Random(43);
             for (var row = 0; row < 4; row++)
             for (var i = 0; i < 2; i++)
-                Box("Etagere", w, new Vector3(6f + i * 14f, 1.6f, 4f + row * 3.5f), new Vector3(8f, 3.2f, 0.8f), "Metal");
+                PalletRack(w, new Vector3(6f + i * 14f, 0f, 4f + row * 3.5f), racks);
             PalletStack(w, new Vector3(27f, 0.1f, 17f), 3);
             for (var i = 0; i < 3; i++) Barrel(w, new Vector3(27.5f, 0.1f, 3f + i * 0.7f), "SignRed");
             Box("Lampe_Porte", w, new Vector3(15f, 3.1f, 20.25f), new Vector3(0.4f, 0.15f, 0.3f), "LampGlow", solid: false);
