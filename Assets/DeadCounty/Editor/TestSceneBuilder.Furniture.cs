@@ -226,6 +226,48 @@ namespace DeadCounty.EditorTools
             return p;
         }
 
+        // Double-sided store shelving, long axis on local X, products on both faces; most shelves half looted.
+        static Transform GroceryShelf(Transform parent, Vector3 pos, float yaw, System.Random rng)
+        {
+            const float length = 6f, depth = 0.7f, height = 1.6f;
+            var p = Piece(parent, "Rayon", pos, yaw, new Vector3(length, height, depth));
+            Bit(p, "Dos", new Vector3(0f, height / 2f, 0f), new Vector3(length, height, 0.04f), "MetalLight");
+            Bit(p, "Socle", new Vector3(0f, 0.08f, 0f), new Vector3(length, 0.16f, depth), "Metal");
+            Bit(p, "Fronton", new Vector3(0f, height + 0.08f, 0f), new Vector3(length, 0.16f, 0.06f), "SignGreen");
+            string[] goods = { "SignRed", "SignYellow", "SignWhite", "ShutterGreen", "CarBlue", "Crate", "Hay" };
+            for (var shelf = 0; shelf < 3; shelf++)
+            {
+                var y = 0.16f + shelf * 0.48f;
+                foreach (var side in new[] { -1f, 1f })
+                {
+                    Bit(p, "Tablette", new Vector3(0f, y + 0.02f, side * depth / 4f), new Vector3(length - 0.04f, 0.03f, depth / 2f - 0.03f), "MetalLight");
+                    for (var x = -length / 2f + 0.2f; x < length / 2f - 0.2f; x += Range(rng, 0.25f, 0.6f))
+                    {
+                        if (rng.NextDouble() < 0.45) continue;
+                        var size = new Vector3(Range(rng, 0.12f, 0.28f), Range(rng, 0.12f, 0.3f), Range(rng, 0.1f, 0.2f));
+                        var z = side * Range(rng, 0.12f, 0.24f);
+                        if (rng.NextDouble() < 0.4)
+                            Cylinder("Conserve", p, new Vector3(x, y + 0.035f + 0.06f, z), 0.045f, 0.12f, goods[rng.Next(goods.Length)], solid: false);
+                        else
+                            Bit(p, "Produit", new Vector3(x, y + 0.035f + size.y / 2f, z), size, goods[rng.Next(goods.Length)], Quaternion.Euler(0f, Range(rng, -10f, 10f), 0f));
+                    }
+                }
+            }
+            return p;
+        }
+
+        static Transform Checkout(Transform parent, Vector3 pos, float yaw)
+        {
+            const float length = 3f, depth = 0.7f;
+            var p = Piece(parent, "Comptoir", pos, yaw, new Vector3(length, 1f, depth));
+            Bit(p, "Caisson", new Vector3(0f, 0.47f, 0f), new Vector3(length, 0.94f, depth), "Furniture");
+            Bit(p, "Dessus", new Vector3(0f, 0.97f, 0f), new Vector3(length + 0.05f, 0.05f, depth + 0.05f), "Countertop");
+            Bit(p, "Tapis", new Vector3(-0.5f, 1.0f, 0f), new Vector3(1.6f, 0.02f, 0.4f), "CarBlack");
+            Bit(p, "Caisse", new Vector3(1f, 1.1f, 0.05f), new Vector3(0.4f, 0.22f, 0.35f), "Metal");
+            Bit(p, "Tiroir_Caisse", new Vector3(1f, 0.93f, -0.33f), new Vector3(0.36f, 0.1f, 0.3f), "Metal");
+            return p;
+        }
+
         static Transform Nightstand(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Table_Chevet", pos, yaw, new Vector3(0.45f, 0.55f, 0.4f));

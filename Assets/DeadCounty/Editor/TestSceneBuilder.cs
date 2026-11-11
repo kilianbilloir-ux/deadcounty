@@ -59,6 +59,7 @@ namespace DeadCounty.EditorTools
             BuildWarehouse(Group(env, "Entrepot_Sombre"));
             BuildAIClearing(Group(env, "Clairiere_IA"));
             BuildRoadside(Group(env, "Bord_de_route"));
+            BuildStreetDressing(Group(env, "Habillage"));
             BuildVegetation(Group(env, "Vegetation"));
             GuaranteeStartingLoot(env);
 
