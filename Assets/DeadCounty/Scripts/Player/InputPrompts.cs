@@ -47,6 +47,8 @@ namespace DeadCounty.Player
             "Delete" => "Suppr",
             "Left Alt" or "Alt" => "Alt",
             "Left Ctrl" or "Ctrl" => "Ctrl",
+            "LMB" or "Left Button" => "Clic gauche",
+            "RMB" or "Right Button" => "Clic droit",
             _ => key,
         };
 

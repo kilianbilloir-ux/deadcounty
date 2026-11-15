@@ -182,6 +182,7 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerInventory>(player);
             added |= AddMissing<PlayerSleep>(player);
             added |= AddMissing<PlayerLoadout>(player);
+            added |= AddMissing<PlayerCombat>(player);
             added |= AddMissing<PlayerPoseDriver>(player);
             added |= AddMissing<PlayerDeathFlow>(rig);
             added |= AddMissing<PlayerHudController>(rig);

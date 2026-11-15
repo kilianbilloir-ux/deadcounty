@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DeadCounty.Combat;
 using DeadCounty.Items;
 using DeadCounty.Player;
 using UnityEditor;
@@ -27,6 +28,27 @@ namespace DeadCounty.EditorTools
             ("IT_SacADos", "Sac à dos", ItemCategory.Gear, 1f, "", 0f, 0f, 0f, 6f),
         };
 
+        // Melee weapons: the bat is the all-rounder and reaches two zombies, the crowbar hits harder and slower, the
+        // knife is quick, quiet and short. A zombie has 100 hit points.
+        static readonly (string File, string Name, float Weight, WeaponStats Stats)[] WeaponSpecs =
+        {
+            ("IT_Batte", "Batte de baseball", 1f, new WeaponStats
+            {
+                Damage = 34f, Reach = 1.5f, HalfAngle = 50f, MaxTargets = 2, Windup = 0.28f, Recovery = 0.5f,
+                StaminaCost = 9f, NoiseRadius = 7f, Stagger = 0.9f, Knockback = 0.5f,
+            }),
+            ("IT_PiedDeBiche", "Pied-de-biche", 1.8f, new WeaponStats
+            {
+                Damage = 50f, Reach = 1.4f, HalfAngle = 40f, MaxTargets = 1, Windup = 0.36f, Recovery = 0.6f,
+                StaminaCost = 13f, NoiseRadius = 8f, Stagger = 1.1f, Knockback = 0.6f,
+            }),
+            ("IT_Couteau", "Couteau de cuisine", 0.3f, new WeaponStats
+            {
+                Damage = 22f, Reach = 1f, HalfAngle = 35f, MaxTargets = 1, Windup = 0.16f, Recovery = 0.3f,
+                StaminaCost = 5f, NoiseRadius = 3f, Stagger = 0.35f, Knockback = 0.1f,
+            }),
+        };
+
         static readonly (string File, int Count)[] StartingKit = { ("IT_SacADos", 1), ("IT_Eau", 1), ("IT_Haricots", 1) };
 
         // Rebuilt in place so the GUIDs referenced by the prefab and the loot stay stable.
@@ -47,6 +69,17 @@ namespace DeadCounty.EditorTools
                 item.CapacityBonus = spec.Capacity;
                 // The bandage, the only care item of the demo, stops bleeding (GDD 8.4).
                 item.StopsBleeding = spec.Category == ItemCategory.Medical;
+                EditorUtility.SetDirty(item);
+                items[spec.File] = item;
+            }
+            foreach (var spec in WeaponSpecs)
+            {
+                var item = LoadOrCreate<ItemDefinition>($"{ItemsDir}/{spec.File}.asset");
+                item.DisplayName = spec.Name;
+                item.Category = ItemCategory.Weapon;
+                item.Weight = spec.Weight;
+                item.UseVerb = "Équiper";
+                item.Weapon = spec.Stats;
                 EditorUtility.SetDirty(item);
                 items[spec.File] = item;
             }

@@ -25,6 +25,11 @@ namespace DeadCounty.EditorTools
         const int BackgroundDifference = 384;
         // Three-quarter view from above: the top, the front and the right side read as three tones.
         static readonly Quaternion IconView = Quaternion.Euler(28f, -35f, 0f);
+        // Lying on the ground a weapon would show as a thin stick end on: it is stood across the picture, from
+        // the bottom left to the top right, its side to the camera.
+        static readonly Quaternion WeaponIconPose = Quaternion.LookRotation(
+            IconView * new Vector3(1f, 1f, 0f).normalized,
+            Vector3.Cross(IconView * new Vector3(1f, 1f, 0f).normalized, IconView * Vector3.back));
 
         static void EnsureItemIcons(Dictionary<string, ItemDefinition> items)
         {
@@ -42,6 +47,7 @@ namespace DeadCounty.EditorTools
                 foreach (var (file, item) in items)
                 {
                     var model = (GameObject)PrefabUtility.InstantiatePrefab(item.WorldModel, scene);
+                    if (item.IsWeapon) model.transform.rotation = WeaponIconPose;
                     Frame(view, model);
                     var overBlack = Shoot(view, Color.black, shot);
                     var overWhite = Shoot(view, Color.white, shot);
@@ -89,7 +95,8 @@ namespace DeadCounty.EditorTools
             light.shadows = LightShadows.None;
         }
 
-        // Orthographic, the model's bounds filling the square with a small margin whatever their shape.
+        // Orthographic, the model's bounds filling the square with a small margin whatever their shape. A turned
+        // model is measured part by part: its world bounds would be far looser than what it shows.
         static void Frame(Camera view, GameObject model)
         {
             var renderers = model.GetComponentsInChildren<Renderer>();
@@ -97,10 +104,17 @@ namespace DeadCounty.EditorTools
             foreach (var r in renderers) bounds.Encapsulate(r.bounds);
             var toView = Quaternion.Inverse(IconView);
             var half = 0f;
-            for (var i = 0; i < 8; i++)
+            var turned = model.transform.rotation != Quaternion.identity;
+            foreach (var r in turned ? renderers : new Renderer[] { null })
             {
-                var corner = toView * Vector3.Scale(bounds.extents, new Vector3((i & 1) == 0 ? -1f : 1f, (i & 2) == 0 ? -1f : 1f, (i & 4) == 0 ? -1f : 1f));
-                half = Mathf.Max(half, Mathf.Abs(corner.x), Mathf.Abs(corner.y));
+                var box = turned ? r.localBounds : bounds;
+                for (var i = 0; i < 8; i++)
+                {
+                    var corner = Vector3.Scale(box.extents, new Vector3((i & 1) == 0 ? -1f : 1f, (i & 2) == 0 ? -1f : 1f, (i & 4) == 0 ? -1f : 1f));
+                    if (turned) corner = r.transform.TransformPoint(box.center + corner) - bounds.center;
+                    corner = toView * corner;
+                    half = Mathf.Max(half, Mathf.Abs(corner.x), Mathf.Abs(corner.y));
+                }
             }
             var distance = bounds.extents.magnitude + 1f;
             view.orthographicSize = half * IconMargin;

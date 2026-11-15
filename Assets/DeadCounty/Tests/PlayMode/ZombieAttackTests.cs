@@ -33,7 +33,7 @@ namespace DeadCounty.Tests
         // The revive warps the body back to spawn: without the snap that warp would read as a
         // sprint and pitch the spine backward, so the test walks the zombie first to make it count.
         [UnityTest]
-        public IEnumerator DeadZombieAnimatorStopsAndRestartsOnReset()
+        public IEnumerator DeadZombieFallsAwayFromTheBlowAndStandsBackUpOnReset()
         {
             World = new ZombieTestWorld(4f);
             World.Target.Visible = false;
@@ -41,6 +41,8 @@ namespace DeadCounty.Tests
             var zombie = World.SpawnZombie(spawn, 90f, withAnimator: true);
             yield return ZombieTestWorld.Settle(zombie);
             var animator = zombie.GetComponent<ProceduralHumanoidAnimator>();
+            var body = zombie.GetComponent<Collider>();
+            var model = zombie.transform.Find("Model");
             Assert.That(animator, Is.Not.Null, "the test zombie has no animator");
             Assert.That(animator.enabled, Is.True);
 
@@ -50,7 +52,12 @@ namespace DeadCounty.Tests
             yield return ZombieTestWorld.WaitUntil(() => ZombieTestWorld.PlanarDistance(zombie.Position, spawn) >= 2.5f, 10f);
             Assert.That(ZombieTestWorld.PlanarDistance(zombie.Position, World.Target.Position), Is.GreaterThan(3f), "the zombie reached attack range before the kill");
 
-            Assert.That(zombie.Health.ApplyDamage(1000f, Vector3.zero), Is.True);
+            var blow = zombie.Position + Vector3.forward;
+            Assert.That(zombie.Health.ApplyDamage(1000f, blow), Is.True);
+            Assert.That(body.enabled, Is.False, "the corpse still blocks the way");
+            yield return ZombieTestWorld.WaitUntil(() => animator.Collapsed, 3f);
+            Assert.That(animator.Collapsed, Is.True, "the corpse never reached the ground");
+            Assert.That(Vector3.Angle(model.up, Vector3.back), Is.LessThan(2f), "the corpse does not lie away from the blow");
             Assert.That(animator.enabled, Is.False, "the corpse kept animating");
 
             World.Target.Visible = false;
@@ -59,12 +66,36 @@ namespace DeadCounty.Tests
             yield return null;
             Assert.That(zombie.MotionResetId, Is.EqualTo(resets + 1), "the revive did not snap the animator");
             Assert.That(animator.enabled, Is.True, "the revived zombie never animates again");
+            Assert.That(body.enabled, Is.True);
+            Assert.That(Vector3.Angle(model.up, Vector3.up), Is.LessThan(8f), "the revived zombie is still lying down");
             var spine = zombie.transform.Find("Model/Hips/Spine");
             for (var i = 0; i < 2; i++)
             {
                 yield return null;
                 Assert.That(SignedPitch(spine), Is.GreaterThan(0f), $"backward lean spike at frame {i}");
             }
+        }
+
+        [UnityTest]
+        public IEnumerator AStruckZombieIsShovedBackThenTurnsOnItsAttacker()
+        {
+            World = new ZombieTestWorld(4f);
+            World.Target.Visible = false;
+            World.Target.Position = new Vector3(0f, 0f, -1.2f);
+            var zombie = World.SpawnZombie(Vector3.zero);
+            yield return ZombieTestWorld.Settle(zombie);
+            Assert.That(ZombieTestWorld.IsCalm(zombie.State), Is.True);
+
+            Assert.That(zombie.Health.ApplyDamage(10f, World.Target.Position, 0.9f, 0.5f), Is.True);
+            Assert.That(zombie.State, Is.EqualTo(ZombieState.Stagger));
+            yield return ZombieTestWorld.WaitUntil(() => zombie.State != ZombieState.Stagger, 3f);
+
+            Assert.That(zombie.Position.z, Is.EqualTo(0.5f).Within(0.05f), "the blow did not push the zombie half a metre back");
+            Assert.That(zombie.State, Is.EqualTo(ZombieState.Chase));
+            Assert.That(World.Saw(zombie, ZombieState.Stagger, out var reel), Is.True);
+            Assert.That(reel.Reason, Is.EqualTo(TransitionReason.Hit));
+            Assert.That(World.Saw(zombie, ZombieState.Chase, out var chase), Is.True);
+            Assert.That(chase.Time - reel.Time, Is.EqualTo(0.9f).Within(0.05f));
         }
 
         static float SignedPitch(Transform joint)

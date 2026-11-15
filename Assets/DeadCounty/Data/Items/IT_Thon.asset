@@ -21,5 +21,16 @@ MonoBehaviour:
   Health: 0
   StopsBleeding: 0
   CapacityBonus: 0
+  Weapon:
+    Damage: 0
+    Reach: 0
+    HalfAngle: 0
+    MaxTargets: 0
+    Windup: 0
+    Recovery: 0
+    StaminaCost: 0
+    NoiseRadius: 0
+    Stagger: 0
+    Knockback: 0
   WorldModel: {fileID: 6150589586553761868, guid: 1bab51a28271747e8a01cce652438ad8, type: 3}
   Icon: {fileID: 2800000, guid: 459c7179c64d64aba8357322c142ae09, type: 3}

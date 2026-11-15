@@ -1,8 +1,9 @@
+using DeadCounty.Combat;
 using UnityEngine;
 
 namespace DeadCounty.Items
 {
-    public enum ItemCategory { Food, Drink, Medical, Gear }
+    public enum ItemCategory { Food, Drink, Medical, Gear, Weapon }
 
     // One kind of item (GDD 8.5): what it weighs and what using it does. Need effects are shares of a full gauge
     // (0.35 restores 35 %), health effects are hit points. Read-only at runtime.
@@ -24,19 +25,24 @@ namespace DeadCounty.Items
         [Tooltip("Carrying capacity added while the item is carried (backpack), in kg; only the largest counts.")]
         [Min(0f)] public float CapacityBonus;
 
-        [Tooltip("Model shown when the item lies on the ground, pivot on the ground with a collider on its root. Without one the item drops as a plain box.")]
+        [Tooltip("Swing of the item once in hand; read for the Weapon category only.")]
+        public WeaponStats Weapon;
+
+        [Tooltip("Model shown when the item lies on the ground, pivot on the ground with a collider on its root; a weapon lies along +Z with its grip at the pivot. Without one the item drops as a plain box.")]
         public GameObject WorldModel;
 
         [Tooltip("Picture of the item in the inventory and the pickup feed, rendered from the WorldModel by the scene builder.")]
         public Texture2D Icon;
 
         public bool Usable => !string.IsNullOrEmpty(UseVerb);
+        public bool IsWeapon => Category == ItemCategory.Weapon;
 
         public static string CategoryName(ItemCategory category) => category switch
         {
             ItemCategory.Food => "Nourriture",
             ItemCategory.Drink => "Boisson",
             ItemCategory.Medical => "Soin",
+            ItemCategory.Weapon => "Arme",
             _ => "Équipement",
         };
     }

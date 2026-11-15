@@ -12,6 +12,7 @@ namespace DeadCounty.Audio
         const float HandsHeight = 1.1f;
         const float HeadHeight = 1.6f;
         const float DropDistance = 0.6f;
+        const float StrikeDistance = 1f;
         // Progress per second above which a search is hurried (1 s instead of 2.5 s by default).
         const float HurriedProgressRate = 0.7f;
         const float RummageFadeOut = 8f;
@@ -24,11 +25,14 @@ namespace DeadCounty.Audio
         [SerializeField] SoundCue drop;
         [SerializeField] SoundCue flashlightClick;
         [SerializeField] SoundCue bed;
+        [SerializeField] SoundCue swing;
+        [SerializeField] SoundCue strike;
 
         PlayerInteractor interactor;
         PlayerInventory inventory;
         PlayerFlashlight flashlight;
         PlayerSleep sleep;
+        PlayerCombat combat;
         AudioSource rummageSource;
         float rummageVolume, lastProgress;
         bool flashlightWasOn, wasAsleep;
@@ -39,6 +43,7 @@ namespace DeadCounty.Audio
             inventory = GetComponent<PlayerInventory>();
             flashlight = GetComponent<PlayerFlashlight>();
             sleep = GetComponent<PlayerSleep>();
+            combat = GetComponent<PlayerCombat>();
             var holder = new GameObject("RummageAudio");
             holder.transform.SetParent(transform, false);
             rummageSource = holder.AddComponent<AudioSource>();
@@ -53,6 +58,9 @@ namespace DeadCounty.Audio
             inventory.Used += OnUsed;
             inventory.Dropped += OnDropped;
             GameSettings.Changed += ConfigureRummage;
+            if (combat == null) return;
+            combat.Swung += OnSwung;
+            combat.Struck += OnStruck;
         }
 
         void OnDisable()
@@ -61,6 +69,11 @@ namespace DeadCounty.Audio
             inventory.Used -= OnUsed;
             inventory.Dropped -= OnDropped;
             GameSettings.Changed -= ConfigureRummage;
+            if (combat != null)
+            {
+                combat.Swung -= OnSwung;
+                combat.Struck -= OnStruck;
+            }
             // Already destroyed with its holder when the scene unloads.
             if (rummageSource != null) rummageSource.Stop();
         }
@@ -136,6 +149,15 @@ namespace DeadCounty.Audio
                 _ => pickup,
             };
             Sfx.Play(cue, transform.position + Vector3.up * HeadHeight);
+        }
+
+        // A shove cuts less air than a weapon.
+        void OnSwung(ItemDefinition weapon)
+            => Sfx.Play(swing, transform.position + Vector3.up * HandsHeight + transform.forward * 0.4f, weapon != null ? 1f : 0.5f, weapon != null ? 1f : 0.8f);
+
+        void OnStruck(int hits, int kills)
+        {
+            if (hits > 0) Sfx.Play(strike, transform.position + Vector3.up * HandsHeight + transform.forward * StrikeDistance);
         }
 
         void OnDropped(ItemDefinition item) => Sfx.Play(drop, transform.position + transform.forward * DropDistance);

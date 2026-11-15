@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using DeadCounty.Core;
+using DeadCounty.Items;
 using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
@@ -44,6 +45,8 @@ namespace DeadCounty.Player
         PlayerStamina stamina;
         PlayerNeeds needs;
         PlayerFlashlight flashlight;
+        PlayerInventory inventory;
+        ItemDefinition weaponShown;
         PlayerDeathFlow deathFlow;
         PlayerInteractor interactor;
         PlayerSleep sleep;
@@ -59,7 +62,7 @@ namespace DeadCounty.Player
         RadialGauge interactionProgress;
         Interactable shownInteractable;
         string shownAction;
-        Label flashlightLabel, time, gameOverTitle, gameOverCause, gameOverTime, gameOverPrompt;
+        Label flashlightLabel, weaponLabel, time, gameOverTitle, gameOverCause, gameOverTime, gameOverPrompt;
         StringBuilder text;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
         float healthOpacity, staminaOpacity, readoutOpacity, readoutsUntil;
@@ -82,6 +85,7 @@ namespace DeadCounty.Player
             stamina = GetComponentInChildren<PlayerStamina>(true);
             needs = GetComponentInChildren<PlayerNeeds>(true);
             flashlight = GetComponentInChildren<PlayerFlashlight>(true);
+            inventory = GetComponentInChildren<PlayerInventory>(true);
             deathFlow = GetComponent<PlayerDeathFlow>();
             interactor = GetComponentInChildren<PlayerInteractor>(true);
             sleep = GetComponentInChildren<PlayerSleep>(true);
@@ -122,6 +126,7 @@ namespace DeadCounty.Player
             toast = Find<Label>(root, "loot-toast");
             interactionProgress = Find<RadialGauge>(root, "interaction-progress");
             flashlightLabel = Find<Label>(root, "flashlight");
+            weaponLabel = Find<Label>(root, "weapon");
             time = Find<Label>(root, "time");
             gameOverTitle = Find<Label>(root, "game-over-title");
             gameOverCause = Find<Label>(root, "game-over-cause");
@@ -251,6 +256,14 @@ namespace DeadCounty.Player
                 flashlightWasOn = lit;
                 flashlightLabel.text = lit ? "Lampe allumée" : "Lampe éteinte";
                 flashlightLabel.EnableInClassList("flashlight-readout--on", lit);
+                ShowReadouts();
+            }
+            var weapon = inventory != null ? inventory.Weapon : null;
+            if (weapon != weaponShown)
+            {
+                weaponShown = weapon;
+                weaponLabel.text = weapon != null ? weapon.DisplayName : "Mains nues";
+                weaponLabel.EnableInClassList("weapon-readout--armed", weapon != null);
                 ShowReadouts();
             }
             UpdateClock();

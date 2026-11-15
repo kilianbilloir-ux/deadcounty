@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f8c6ba0daaf477e846d465f637ccf7, type: 3}
+  m_Name: IT_PiedDeBiche
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Items.ItemDefinition
+  DisplayName: Pied-de-biche
+  Category: 4
+  Weight: 1.8
+  UseVerb: "\xC9quiper"
+  Hunger: 0
+  Thirst: 0
+  Health: 0
+  StopsBleeding: 0
+  CapacityBonus: 0
+  Weapon:
+    Damage: 50
+    Reach: 1.4
+    HalfAngle: 40
+    MaxTargets: 1
+    Windup: 0.36
+    Recovery: 0.6
+    StaminaCost: 13
+    NoiseRadius: 8
+    Stagger: 1.1
+    Knockback: 0.6
+  WorldModel: {fileID: 1700644943914897297, guid: bd659acaf6ba14e3f91ef335d7815cfe, type: 3}
+  Icon: {fileID: 2800000, guid: 8e30a67678b104d8ca19d3c2f457ffa2, type: 3}

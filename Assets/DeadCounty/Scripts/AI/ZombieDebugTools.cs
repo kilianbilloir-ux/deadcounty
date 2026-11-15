@@ -184,7 +184,7 @@ namespace DeadCounty.AI
             text.Clear();
             text.Append("<b>IA</b>  (F2)\n");
             text.Append($"zombies {manager.Agents.Count} · actifs {manager.ActiveCount}/{manager.ActiveBudget} · perception {manager.AverageSenseMs:0.000} ms · rayons {manager.RaysThisFrame}\n");
-            for (var s = ZombieState.Idle; s <= ZombieState.Feed; s++)
+            for (var s = ZombieState.Idle; s <= ZombieState.Stagger; s++)
                 text.Append(s).Append(' ').Append(manager.CountIn(s)).Append(s == ZombieState.Search ? "\n" : "   ");
             text.Append('\n');
             AppendNearest();

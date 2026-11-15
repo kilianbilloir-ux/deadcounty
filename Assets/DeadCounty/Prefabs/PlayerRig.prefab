@@ -3104,6 +3104,7 @@ GameObject:
   - component: {fileID: 4761732171727397079}
   - component: {fileID: 1735016780315068882}
   - component: {fileID: 7729205633923639746}
+  - component: {fileID: 7783617582736071195}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -3498,6 +3499,8 @@ MonoBehaviour:
   drop: {fileID: 11400000, guid: a43322dbedc054373bb88f324cb1b4d5, type: 2}
   flashlightClick: {fileID: 11400000, guid: f52f87aa427c744698ee60e44d412160, type: 2}
   bed: {fileID: 11400000, guid: 37b8504341d5b4ad19370c6899d63695, type: 2}
+  swing: {fileID: 11400000, guid: 58347639acbb2405cb7c125cdc480d81, type: 2}
+  strike: {fileID: 11400000, guid: 8b4376b4994864f77947255e1f8d5120, type: 2}
 --- !u!114 &7729205633923639746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3521,10 +3524,36 @@ MonoBehaviour:
   - {fileID: 232704401407880673}
   hand: {fileID: 942746505434671695}
   gripOffset: {x: 0, y: -0.36, z: 0.05}
+  weaponTilt: 20
+  strikeTilt: 78
   useTime: 1.3
   lampLens: {fileID: 2942321358989047299}
   lensLit: {fileID: 2100000, guid: c7fa7b23d2b5e465e95cf5b9858a6327, type: 2}
   lensDark: {fileID: 2100000, guid: 2712067cfbd2d46dabe559b3e7eda4f2, type: 2}
+--- !u!114 &7783617582736071195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc7a04db45c854bdea4f1bffb7beaca0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerCombat
+  bareHands:
+    Damage: 4
+    Reach: 1
+    HalfAngle: 55
+    MaxTargets: 2
+    Windup: 0.14
+    Recovery: 0.4
+    StaminaCost: 6
+    NoiseRadius: 2
+    Stagger: 1.1
+    Knockback: 0.9
+  surpriseFactor: 2
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0

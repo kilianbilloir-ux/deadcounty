@@ -9,7 +9,8 @@ using Object = UnityEngine.Object;
 namespace DeadCounty.EditorTools
 {
     // Rebuilt in place on every build, which keeps the GUIDs the item assets and the scene point to. Pivot on the
-    // ground, one box collider on the root for the interaction raycasts.
+    // ground, one box collider on the root for the interaction raycasts. A weapon lies along +Z with its grip at the
+    // pivot, which is how the hand takes it.
     public static partial class TestSceneBuilder
     {
         const string ItemModelDir = "Assets/DeadCounty/Prefabs/Items";
@@ -80,10 +81,31 @@ namespace DeadCounty.EditorTools
                         Box(name, m, new Vector3(x, 0.22f, 0.1f), new Vector3(0.05f, 0.36f, 0.02f), "Strap", solid: false);
                     Box("Poignee", m, new Vector3(0f, 0.44f, 0.04f), new Vector3(0.08f, 0.03f, 0.03f), "Strap", solid: false);
                     break;
+                case "IT_Batte":
+                    Lying("Pommeau", m, 0.032f, -0.06f, 0.024f, 0.025f, "Wood");
+                    Lying("Manche", m, 0.032f, 0.125f, 0.017f, 0.35f, "Wood");
+                    Lying("Ruban", m, 0.032f, 0.07f, 0.019f, 0.16f, "Strap");
+                    Lying("Col", m, 0.032f, 0.375f, 0.024f, 0.15f, "Wood");
+                    Lying("Fut", m, 0.032f, 0.595f, 0.032f, 0.29f, "Wood");
+                    break;
+                case "IT_PiedDeBiche":
+                    Box("Barre", m, new Vector3(0f, 0.012f, 0.24f), new Vector3(0.022f, 0.022f, 0.62f), "CarRed", solid: false);
+                    Box("Griffe", m, new Vector3(0f, 0.04f, 0.575f), new Vector3(0.022f, 0.022f, 0.1f), "CarRed", Quaternion.Euler(-50f, 0f, 0f), solid: false);
+                    Box("Biseau", m, new Vector3(0f, 0.006f, -0.09f), new Vector3(0.03f, 0.008f, 0.06f), "MetalLight", solid: false);
+                    break;
+                case "IT_Couteau":
+                    Box("Manche", m, new Vector3(0f, 0.011f, 0f), new Vector3(0.026f, 0.02f, 0.11f), "WoodDark", solid: false);
+                    Box("Garde", m, new Vector3(0f, 0.012f, 0.058f), new Vector3(0.03f, 0.024f, 0.008f), "Metal", solid: false);
+                    Box("Lame", m, new Vector3(0f, 0.012f, 0.16f), new Vector3(0.003f, 0.032f, 0.2f), "MetalLight", solid: false);
+                    break;
                 default:
                     throw new InvalidOperationException($"No ground model for {file}");
             }
         }
+
+        // A cylinder lying along Z, centred at `z` and `y` above the ground.
+        static void Lying(string name, Transform m, float y, float z, float radius, float length, string mat)
+            => Cylinder(name, m, new Vector3(0f, y, z), radius, length, mat, Quaternion.Euler(90f, 0f, 0f), solid: false);
 
         static void Can(Transform m, float radius, float height, string label)
         {

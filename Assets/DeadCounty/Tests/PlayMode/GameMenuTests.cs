@@ -201,7 +201,7 @@ namespace DeadCounty.Tests
             var savedOverrides = InputSystem.actions.SaveBindingOverridesAsJson();
             var savedPrefs = PlayerPrefs.GetString("dc.bindings", null);
             var jump = KeyBindings.Rows[7];
-            var interact = KeyBindings.Rows[8];
+            var interact = KeyBindings.Rows[9];
             try
             {
                 InputSystem.actions.RemoveAllBindingOverrides();
