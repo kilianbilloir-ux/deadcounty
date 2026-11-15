@@ -3555,7 +3555,21 @@ MonoBehaviour:
     NoiseRadius: 2
     Stagger: 1.1
     Knockback: 0.9
+    Knockdown: 0.5
+  stomp:
+    Damage: 13
+    Reach: 1
+    HalfAngle: 45
+    MaxTargets: 1
+    Windup: 0.3
+    Recovery: 0.4
+    StaminaCost: 7
+    NoiseRadius: 4
+    Stagger: 0
+    Knockback: 0
+    Knockdown: 0
   surpriseFactor: 2
+  groundFactor: 2
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0

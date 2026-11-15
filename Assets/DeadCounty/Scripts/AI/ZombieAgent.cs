@@ -184,6 +184,7 @@ namespace DeadCounty.AI
         {
             RefreshSnapshot();
             brain.Tick(dt, snapshot, this, ref commands);
+            FollowFall();
             noisePending = false;
             noiseMargin = float.NegativeInfinity;
             if (brain.TransitionedThisTick)
@@ -215,6 +216,7 @@ namespace DeadCounty.AI
             var record = manager.GetRecord(RecordIndex);
             dead = false;
             hitAt = float.NegativeInfinity;
+            if (down) GetUp();
             if (body != null) body.enabled = true;
             navAgent.enabled = true;
             motor.Reset(record.SpawnPosition, record.SpawnRotation);
@@ -273,7 +275,7 @@ namespace DeadCounty.AI
             return limp;
         }
 
-        // Raised before Died by the blow that kills: the corpse keeps the recoil, only the living reel.
+        // Raised before Died by the blow that kills: the corpse keeps the recoil, only the living reel or fall.
         void OnDamaged(ZombieHealth _)
         {
             var away = AwayFromLastHit();
@@ -282,8 +284,9 @@ namespace DeadCounty.AI
             hitFlinchPitch = local.z * HitFlinchAngle;
             hitFlinchRoll = -local.x * HitFlinchAngle;
             if (!health.IsAlive) return;
-            brain.TakeHit(motor.Position, health.LastHitSource, health.LastStagger, health.LastKnockback);
+            brain.TakeHit(motor.Position, health.LastHitSource, health.LastStagger, health.LastKnockback, health.LastKnockdown);
             AIEvents.RaiseTransition(ownId, brain.LastTransition, motor.Position);
+            if (brain.State == ZombieState.Down) Fall();
         }
 
         Vector3 AwayFromLastHit()

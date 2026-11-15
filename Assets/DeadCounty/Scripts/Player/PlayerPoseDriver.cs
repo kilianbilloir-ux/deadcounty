@@ -51,16 +51,23 @@ namespace DeadCounty.Player
         }
 
         // The arm is cocked early in the wind-up and starts coming down before its end, so it crosses in front
-        // of the body on the frame the blow lands; a shove peaks on that frame.
-        static void Strike(ref PoseModifiers pose, bool windup, float progress, bool shove)
+        // of the body on the frame the blow lands, or reaches the ground for a body lying there; a shove peaks and
+        // a stomp lands on that frame.
+        static void Strike(ref PoseModifiers pose, bool windup, float progress, bool bareHands, bool ground)
         {
             pose.Reach = 0f;
             pose.HandToMouth = 0f;
-            if (shove)
+            if (bareHands && ground)
+            {
+                pose.Stomp = 0.5f * (windup ? progress : 1f + progress);
+                return;
+            }
+            if (bareHands)
             {
                 pose.Shove = windup ? progress * progress : 1f - Mathf.SmoothStep(0f, 1f, progress / 0.6f);
                 return;
             }
+            pose.Chop = ground ? 1f : 0f;
             if (windup)
             {
                 var down = Mathf.InverseLerp(0.7f, 1f, progress);
@@ -99,7 +106,7 @@ namespace DeadCounty.Player
                 pose.Reach = 1f;
             }
             var swing = combat.Swing;
-            if (swing.Busy) Strike(ref pose, swing.Phase == SwingPhase.Windup, swing.Progress, combat.Weapon == null);
+            if (swing.Busy) Strike(ref pose, swing.Phase == SwingPhase.Windup, swing.Progress, combat.Weapon == null, combat.Ground);
             if (stamina.Model.Exhausted)
             {
                 pose.Pant = 1f;

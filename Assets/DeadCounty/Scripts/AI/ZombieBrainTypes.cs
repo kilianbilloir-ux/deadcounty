@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    public enum ZombieState { Idle, Wander, Alert, Investigate, Chase, Search, Attack, Feed, Stagger }
+    public enum ZombieState { Idle, Wander, Alert, Investigate, Chase, Search, Attack, Feed, Stagger, Down }
 
     public enum AttackPhase { None, Windup, Lunge, Recover }
 
-    public enum TransitionReason { SawTarget, HeardNoise, Proximity, AlertTimeout, LostTarget, SearchDone, Arrived, AttackStart, AttackDone, TargetDead, Called, Reset, IdleDone, Hit, Recovered }
+    public enum TransitionReason { SawTarget, HeardNoise, Proximity, AlertTimeout, LostTarget, SearchDone, Arrived, AttackStart, AttackDone, TargetDead, Called, Reset, IdleDone, Hit, Recovered, Felled }
 
     public struct ZombieTransition
     {

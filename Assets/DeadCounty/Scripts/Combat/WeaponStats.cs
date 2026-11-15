@@ -22,6 +22,8 @@ namespace DeadCounty.Combat
         public float Stagger;
         [Tooltip("Distance the blow pushes a target back.")]
         public float Knockback;
+        [Tooltip("Chance that the blow fells a target facing the attacker; doubled from behind.")]
+        [Range(0f, 1f)] public float Knockdown;
 
         // Bare hands: a shove buys room and barely hurts.
         public static WeaponStats Shove => new()
@@ -36,6 +38,20 @@ namespace DeadCounty.Combat
             NoiseRadius = 2f,
             Stagger = 1.1f,
             Knockback = 0.9f,
+            Knockdown = 0.5f,
+        };
+
+        // Bare hands on a zombie on the ground, before the ground factor.
+        public static WeaponStats Stomp => new()
+        {
+            Damage = 13f,
+            Reach = 1f,
+            HalfAngle = 45f,
+            MaxTargets = 1,
+            Windup = 0.3f,
+            Recovery = 0.4f,
+            StaminaCost = 7f,
+            NoiseRadius = 4f,
         };
 
         // The same swing from an exhausted arm.
@@ -45,6 +61,7 @@ namespace DeadCounty.Combat
             tired.Damage *= 0.5f;
             tired.Stagger *= 0.5f;
             tired.Knockback = 0f;
+            tired.Knockdown *= 0.5f;
             return tired;
         }
     }

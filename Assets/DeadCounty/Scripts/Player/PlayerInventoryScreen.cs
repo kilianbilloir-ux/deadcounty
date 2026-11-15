@@ -318,6 +318,7 @@ namespace DeadCounty.Player
             {
                 Effect(ref shown, "Dégâts", item.Weapon.Damage.ToString("0", French), true);
                 Effect(ref shown, "Portée", $"{item.Weapon.Reach.ToString("0.#", French)} m", true);
+                Effect(ref shown, "Renverse", $"{Percent(item.Weapon.Knockdown)} % de face", true);
                 Effect(ref shown, "Endurance", $"−{item.Weapon.StaminaCost.ToString("0", French)} par coup", true);
             }
             for (var i = shown; i < EffectCount; i++) effects[i].style.display = DisplayStyle.None;

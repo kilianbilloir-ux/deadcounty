@@ -32,5 +32,6 @@ MonoBehaviour:
     NoiseRadius: 3
     Stagger: 0.35
     Knockback: 0.1
+    Knockdown: 0.1
   WorldModel: {fileID: 1141116407366456099, guid: 9ca6798be14c0494fae2e7dec0529e78, type: 3}
   Icon: {fileID: 2800000, guid: 7c7f7e1389cfd4e53afe985632eab357, type: 3}

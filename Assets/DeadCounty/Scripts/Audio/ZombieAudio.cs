@@ -24,7 +24,7 @@ namespace DeadCounty.Audio
         const float BangIntervalMax = 0.9f;
         // Zombies set off by the same call answer it one after the other, not on the same frame.
         const float AnswerDelayMax = 0.4f;
-        // The body reaches the ground this long after the blow that kills.
+        // The body reaches the ground this long after the blow that kills or fells it.
         const float FallDelay = 0.45f;
         const float DeathPitch = 0.85f;
         // Ahead of the pooled one-shots (128) when Unity runs out of real voices: the attack telegraph must play.
@@ -73,6 +73,7 @@ namespace DeadCounty.Audio
             AIEvents.Strike += OnStrike;
             GameSettings.Changed += OnSettingsChanged;
             health.Damaged += OnDamaged;
+            agent.Felled += OnFelled;
             nextVocal = Time.time + ZombieVocals.FirstDelay(random);
         }
 
@@ -82,6 +83,7 @@ namespace DeadCounty.Audio
             AIEvents.Strike -= OnStrike;
             GameSettings.Changed -= OnSettingsChanged;
             health.Damaged -= OnDamaged;
+            agent.Felled -= OnFelled;
             fallAt = float.PositiveInfinity;
             Silence();
         }
@@ -179,6 +181,8 @@ namespace DeadCounty.Audio
             OneShot(death, at, distance, 1f, identity.Pitch * DeathPitch);
             fallAt = Time.time + FallDelay;
         }
+
+        void OnFelled() => fallAt = Time.time + FallDelay;
 
         void OnSettingsChanged()
         {

@@ -35,17 +35,17 @@ namespace DeadCounty.EditorTools
             ("IT_Batte", "Batte de baseball", 1f, new WeaponStats
             {
                 Damage = 34f, Reach = 1.5f, HalfAngle = 50f, MaxTargets = 2, Windup = 0.28f, Recovery = 0.5f,
-                StaminaCost = 9f, NoiseRadius = 7f, Stagger = 0.9f, Knockback = 0.5f,
+                StaminaCost = 9f, NoiseRadius = 7f, Stagger = 0.9f, Knockback = 0.5f, Knockdown = 0.35f,
             }),
             ("IT_PiedDeBiche", "Pied-de-biche", 1.8f, new WeaponStats
             {
                 Damage = 50f, Reach = 1.4f, HalfAngle = 40f, MaxTargets = 1, Windup = 0.36f, Recovery = 0.6f,
-                StaminaCost = 13f, NoiseRadius = 8f, Stagger = 1.1f, Knockback = 0.6f,
+                StaminaCost = 13f, NoiseRadius = 8f, Stagger = 1.1f, Knockback = 0.6f, Knockdown = 0.25f,
             }),
             ("IT_Couteau", "Couteau de cuisine", 0.3f, new WeaponStats
             {
                 Damage = 22f, Reach = 1f, HalfAngle = 35f, MaxTargets = 1, Windup = 0.16f, Recovery = 0.3f,
-                StaminaCost = 5f, NoiseRadius = 3f, Stagger = 0.35f, Knockback = 0.1f,
+                StaminaCost = 5f, NoiseRadius = 3f, Stagger = 0.35f, Knockback = 0.1f, Knockdown = 0.1f,
             }),
         };
 

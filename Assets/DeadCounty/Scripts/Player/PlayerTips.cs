@@ -19,7 +19,9 @@ namespace DeadCounty.Player
         const float NeedShownBelow = 0.5f;
         const float ZombieNoticeRange = 25f;
         const string SeenPrefix = "dc.tip.";
-        const string Search = "search", Need = "need", Zombie = "zombie", Night = "night", Weapon = "weapon";
+        const string Search = "search", Need = "need", Zombie = "zombie", Night = "night", Weapon = "weapon", Felled = "felled";
+        // A zombie felled this close was most likely felled by the player.
+        const float FelledNoticeRange = 4f;
 
         readonly Queue<string> pending = new();
         // Tips already queued or seen, so PlayerPrefs is read once per tip.
@@ -34,7 +36,7 @@ namespace DeadCounty.Player
         VisualElement panel;
         Label body;
         float remaining, opacity;
-        bool zombieNoticed;
+        bool zombieNoticed, zombieFelled;
 
         // Id of the tip on screen, null when none.
         public string Showing { get; private set; }
@@ -72,9 +74,9 @@ namespace DeadCounty.Player
 
         void OnZombieTransition(ZombieTransitionEvent e)
         {
-            if (e.To is not (ZombieState.Alert or ZombieState.Chase)) return;
-            var offset = e.Position - health.transform.position;
-            if (offset.sqrMagnitude <= ZombieNoticeRange * ZombieNoticeRange) zombieNoticed = true;
+            var distance = (e.Position - health.transform.position).magnitude;
+            if (e.To is ZombieState.Alert or ZombieState.Chase && distance <= ZombieNoticeRange) zombieNoticed = true;
+            if (e.To == ZombieState.Down && distance <= FelledNoticeRange) zombieFelled = true;
         }
 
         // Game time, which the engine caps per frame so a hitch cannot eat a tip. A menu or sleep hides the tip
@@ -88,6 +90,7 @@ namespace DeadCounty.Player
                 Check(Need, Mathf.Min(model.Hunger, Mathf.Min(model.Thirst, model.Fatigue)) < NeedShownBelow);
                 Check(Zombie, zombieNoticed);
                 Check(Weapon, inventory.Weapon != null);
+                Check(Felled, zombieFelled);
                 Check(Night, director != null && (director.Hour >= DayNightModel.DuskStart || director.Hour < DayNightModel.DawnStart));
             }
             else
@@ -139,6 +142,7 @@ namespace DeadCounty.Player
             Need => $"Une jauge apparaît quand un besoin baisse. Mangez et buvez depuis l'inventaire ({Key("Player/Inventory")}).",
             Zombie => $"Un zombie vous a remarqué. En marchant, vous allez plus vite que lui : éloignez-vous et sortez de sa vue. Accroupi ({Key("Player/Crouch")}), vous êtes plus discret.",
             Weapon => $"Vous avez une arme en main : {Key("Player/Attack")} pour frapper. Chaque coup coûte de l'endurance et s'entend. Un zombie qui ne vous a pas remarqué encaisse le double.",
+            Felled => $"Un zombie est à terre. {Key("Player/Attack")} sur lui pour frapper au sol : le coup fait le double et le maintient au sol. Sinon, il se relève au bout de quelques secondes.",
             Night => $"La nuit tombe. Les zombies voient moins loin, mais une lampe allumée ({Key("Player/Flashlight")}) se voit de très loin.",
             _ => throw new ArgumentOutOfRangeException(nameof(id), id, "unknown tip"),
         };
