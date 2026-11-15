@@ -6,7 +6,8 @@ using UnityEngine;
 namespace DeadCounty.Player
 {
     // Carrying more than the capacity encumbers the controller (GDD 8.5); respawning restores the starting items.
-    // One carried weapon may be in hand: using it takes it out or puts it away, and it stays in the inventory.
+    // One carried weapon may be in hand: using it takes it out or puts it away, and it stays in the inventory. The
+    // first starting weapon, like the first one found, goes to empty hands.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerHealth), typeof(PlayerNeeds))]
     public class PlayerInventory : MonoBehaviour, IItemReceiver
     {
@@ -123,6 +124,7 @@ namespace DeadCounty.Player
             {
                 if (start.Item == null) throw new InvalidOperationException($"PlayerInventory on '{name}' has an empty starting item");
                 Items.Add(start.Item, start.Count);
+                if (Weapon == null && start.Item.IsWeapon) SetWeapon(start.Item);
             }
         }
     }

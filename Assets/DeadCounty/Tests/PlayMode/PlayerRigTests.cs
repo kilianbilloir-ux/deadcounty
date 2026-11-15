@@ -41,6 +41,7 @@ namespace DeadCounty.Tests
             ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             ground.transform.localScale = new Vector3(4f, 1f, 4f);
             Physics.SyncTransforms();
+            BeforeRigSpawn();
             Rig = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(RigPath));
             Health = Rig.GetComponentInChildren<PlayerHealth>();
             Stamina = Rig.GetComponentInChildren<PlayerStamina>();
@@ -58,6 +59,9 @@ namespace DeadCounty.Tests
             InputSystem.settings.backgroundBehavior = savedBackground;
             yield return null;
         }
+
+        // Runs before the rig is made: anything its components read on their first frame.
+        private protected virtual void BeforeRigSpawn() { }
 
         // Down for one frame, then up: the action sees exactly one press.
         private protected static IEnumerator Tap<TState>(InputDevice device, TState pressed, TState released) where TState : struct, IInputStateTypeInfo

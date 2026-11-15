@@ -321,7 +321,7 @@ namespace DeadCounty.EditorTools
             return p;
         }
 
-        // Keeps the name GuaranteeStartingLoot looks for, like the kitchen counter's Plan_Travail.
+        // Keeps the name GuaranteeStartingLoot looks for.
         static Transform BathroomCabinet(Transform parent, Vector3 pos, float yaw)
         {
             const float width = 1f, depth = 0.5f;

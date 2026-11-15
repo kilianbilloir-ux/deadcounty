@@ -49,7 +49,8 @@ namespace DeadCounty.EditorTools
             }),
         };
 
-        static readonly (string File, int Count)[] StartingKit = { ("IT_SacADos", 1), ("IT_Eau", 1), ("IT_Haricots", 1) };
+        // The knife starts in hand: the player can fight from the first minute, the other weapons are upgrades.
+        static readonly (string File, int Count)[] StartingKit = { ("IT_SacADos", 1), ("IT_Eau", 1), ("IT_Haricots", 1), ("IT_Couteau", 1) };
 
         // Rebuilt in place so the GUIDs referenced by the prefab and the loot stay stable.
         static Dictionary<string, ItemDefinition> EnsureItems()

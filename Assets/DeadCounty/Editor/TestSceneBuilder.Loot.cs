@@ -17,10 +17,10 @@ namespace DeadCounty.EditorTools
 
         // Loot by room and furniture (GDD 8.6): kitchens feed, fridges water, bathrooms bandage; the shops are the
         // richest. Every house holds about two meals and one or two drinks. Weapons are rarer and sit where they
-        // would: a knife in a kitchen, a bat in a bedroom or under a shop counter, a crowbar in a workshop.
+        // would: a spare knife in a kitchen, a bat in a bedroom or under a shop counter, a crowbar in a workshop.
         static readonly (string File, int MinDraws, int MaxDraws, (string Item, float Weight)[] Entries)[] LootSpecs =
         {
-            ("LT_Cuisine_Placard", 0, 2, Cans.Append(("IT_Soda", 1f)).Append(("IT_Couteau", 1.5f)).ToArray()),
+            ("LT_Cuisine_Placard", 0, 2, Cans.Append(("IT_Soda", 1f)).Append(("IT_Couteau", 0.5f)).ToArray()),
             ("LT_Cuisine_Frigo", 0, 2, new[] { ("IT_Eau", 3f), ("IT_Soda", 2f) }),
             ("LT_SalleDeBain", 0, 1, new[] { ("IT_Bandage", 1f) }),
             ("LT_Chambre", 0, 1, new[] { ("IT_Bandage", 1f), ("IT_Soda", 1f), ("IT_Sardines", 1f), ("IT_Batte", 0.6f) }),
@@ -62,24 +62,17 @@ namespace DeadCounty.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        // GDD 8.6: the house nearest to the spawn always has a bandage and a kitchen knife, so a bad draw cannot
-        // ruin a short session.
+        // GDD 8.6: the house nearest to the spawn always has a bandage, so a bad draw cannot ruin a short session.
         static void GuaranteeStartingLoot(Transform environment)
         {
-            Guarantee(environment, "Meuble_SdB", "IT_Bandage");
-            Guarantee(environment, "Plan_Travail", "IT_Couteau");
-        }
-
-        static void Guarantee(Transform environment, string furniture, string item)
-        {
-            var nearest = environment.GetComponentsInChildren<LootContainer>()
-                .Where(c => c.name == furniture)
+            var cabinet = environment.GetComponentsInChildren<LootContainer>()
+                .Where(c => c.name == "Meuble_SdB")
                 .OrderBy(c => Vector3.Distance(c.transform.position, SpawnPosition))
                 .First();
-            var so = new SerializedObject(nearest);
+            var so = new SerializedObject(cabinet);
             var guaranteed = so.FindProperty("guaranteed");
             guaranteed.arraySize = 1;
-            guaranteed.GetArrayElementAtIndex(0).objectReferenceValue = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"{ItemsDir}/{item}.asset");
+            guaranteed.GetArrayElementAtIndex(0).objectReferenceValue = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"{ItemsDir}/IT_Bandage.asset");
             so.ApplyModifiedPropertiesWithoutUndo();
         }
     }

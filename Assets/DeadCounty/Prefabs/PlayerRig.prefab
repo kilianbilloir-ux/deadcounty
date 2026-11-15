@@ -3392,6 +3392,8 @@ MonoBehaviour:
     Count: 1
   - Item: {fileID: 11400000, guid: a43dd927d28f04d8dab835ffe024928e, type: 2}
     Count: 1
+  - Item: {fileID: 11400000, guid: e3a350ee075b5420592fed93047ab498, type: 2}
+    Count: 1
 --- !u!114 &107859788260795814
 MonoBehaviour:
   m_ObjectHideFlags: 0

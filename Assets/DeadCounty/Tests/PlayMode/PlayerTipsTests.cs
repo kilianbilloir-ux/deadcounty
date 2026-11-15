@@ -14,7 +14,9 @@ namespace DeadCounty.Tests
     // each test, since PlayerPrefs is shared with the editor's own play sessions.
     public class PlayerTipsTests : PlayerRigTests
     {
-        static readonly string[] SeenKeys = { "dc.tip.search", "dc.tip.need", "dc.tip.zombie", "dc.tip.night" };
+        static readonly string[] SeenKeys = { "dc.tip.search", "dc.tip.need", "dc.tip.zombie", "dc.tip.night", "dc.tip.weapon" };
+        // The starting knife is in hand from the first frame: its tip would come before any other.
+        const string WeaponKey = "dc.tip.weapon";
 
         readonly int[] savedSeen = new int[SeenKeys.Length];
         bool savedTips;
@@ -23,16 +25,21 @@ namespace DeadCounty.Tests
 
         Label Text => Rig.GetComponent<UIDocument>().rootVisualElement.Q<Label>("tip-text");
 
-        [UnitySetUp]
-        public IEnumerator SetUpTips()
+        private protected override void BeforeRigSpawn()
         {
             for (var i = 0; i < SeenKeys.Length; i++)
             {
                 savedSeen[i] = PlayerPrefs.GetInt(SeenKeys[i], -1);
                 PlayerPrefs.DeleteKey(SeenKeys[i]);
             }
+            PlayerPrefs.SetInt(WeaponKey, 1);
             savedTips = GameSettings.Tips;
             GameSettings.Tips = true;
+        }
+
+        [UnitySetUp]
+        public IEnumerator SetUpTips()
+        {
             tips = Rig.GetComponent<PlayerTips>();
             needs = Rig.GetComponentInChildren<PlayerNeeds>();
             yield return null;

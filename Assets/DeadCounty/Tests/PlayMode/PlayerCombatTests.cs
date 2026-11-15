@@ -32,6 +32,8 @@ namespace DeadCounty.Tests
             combat = Rig.GetComponentInChildren<PlayerCombat>();
             inventory = Rig.GetComponentInChildren<PlayerInventory>();
             player = combat.transform;
+            // Bare hands, so the weapon a test takes goes straight to the hand.
+            inventory.Use(inventory.Weapon);
             yield return null;
         }
 
