@@ -135,7 +135,7 @@ namespace DeadCounty.EditorTools
                 Box("Bordure", sandbox, new Vector3(x, 0.15f, z), size, "Wood", solid: false);
         }
 
-        // Half court: the hoop stands on the south baseline, a ball left where it stopped rolling.
+        // Half court: the hoop stands on the south baseline, a ball left where it stopped rolling, a bat beside it.
         static void BasketballCourt(Transform c)
         {
             const float halfWidth = 4.5f;
@@ -157,6 +157,7 @@ namespace DeadCounty.EditorTools
             Box("Panneau", c, new Vector3(0f, 3.4f, -halfLength + 0.6f), new Vector3(1.8f, 1.05f, 0.05f), "SignWhite", solid: false);
             Cylinder("Cercle", c, new Vector3(0f, 3.05f, -halfLength + 0.88f), 0.23f, 0.03f, "SignRed", solid: false);
             Primitive(PrimitiveType.Sphere, "Ballon", c, new Vector3(2.3f, 0.16f, 0.8f), Vector3.one * 0.24f, "Obstacle", null, false);
+            PlaceItem(c, "IT_Batte", new Vector3(-2.6f, 0.04f, 1.6f), 35f);
         }
 
         // Two army tents with cots and supplies, a row of body bags behind sandbags, and a floodlight nobody turned off.

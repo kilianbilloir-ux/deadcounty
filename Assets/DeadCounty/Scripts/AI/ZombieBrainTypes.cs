@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    public enum ZombieState { Idle, Wander, Alert, Investigate, Chase, Search, Attack, Feed }
+    public enum ZombieState { Idle, Wander, Alert, Investigate, Chase, Search, Attack, Feed, Stagger }
 
     public enum AttackPhase { None, Windup, Lunge, Recover }
 
-    public enum TransitionReason { SawTarget, HeardNoise, Proximity, AlertTimeout, LostTarget, SearchDone, Arrived, AttackStart, AttackDone, TargetDead, Called, Reset, IdleDone }
+    public enum TransitionReason { SawTarget, HeardNoise, Proximity, AlertTimeout, LostTarget, SearchDone, Arrived, AttackStart, AttackDone, TargetDead, Called, Reset, IdleDone, Hit, Recovered }
 
     public struct ZombieTransition
     {
@@ -72,6 +72,9 @@ namespace DeadCounty.AI
         public Vector3 LungeDirection;
         // Last lunge frame only: move the body, resolve the strike, then call ZombieBrain.ReportStrike.
         public bool StrikeNow;
+        // Reeling from a blow: the agent also slides the body along PushDirection at PushSpeed, without turning it.
+        public Vector3 PushDirection;
+        public float PushSpeed;
         // One frame: growl a ZombieCall noise of ZombieTuning.CallRadius.
         public bool EmitCall;
         public PoseModifiers Pose;

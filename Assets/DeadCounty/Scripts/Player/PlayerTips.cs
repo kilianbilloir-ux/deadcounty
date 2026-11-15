@@ -19,7 +19,7 @@ namespace DeadCounty.Player
         const float NeedShownBelow = 0.5f;
         const float ZombieNoticeRange = 25f;
         const string SeenPrefix = "dc.tip.";
-        const string Search = "search", Need = "need", Zombie = "zombie", Night = "night";
+        const string Search = "search", Need = "need", Zombie = "zombie", Night = "night", Weapon = "weapon";
 
         readonly Queue<string> pending = new();
         // Tips already queued or seen, so PlayerPrefs is read once per tip.
@@ -28,6 +28,7 @@ namespace DeadCounty.Player
         PlayerNeeds needs;
         PlayerInteractor interactor;
         PlayerSleep sleep;
+        PlayerInventory inventory;
         ThirdPersonController controller;
         DayNightDirector director;
         VisualElement panel;
@@ -44,6 +45,7 @@ namespace DeadCounty.Player
             needs = Require<PlayerNeeds>();
             interactor = Require<PlayerInteractor>();
             sleep = Require<PlayerSleep>();
+            inventory = Require<PlayerInventory>();
             controller = Require<ThirdPersonController>();
             director = FindAnyObjectByType<DayNightDirector>();
         }
@@ -85,6 +87,7 @@ namespace DeadCounty.Player
                 Check(Search, interactor.Current is LootContainer);
                 Check(Need, Mathf.Min(model.Hunger, Mathf.Min(model.Thirst, model.Fatigue)) < NeedShownBelow);
                 Check(Zombie, zombieNoticed);
+                Check(Weapon, inventory.Weapon != null);
                 Check(Night, director != null && (director.Hour >= DayNightModel.DuskStart || director.Hour < DayNightModel.DawnStart));
             }
             else
@@ -135,6 +138,7 @@ namespace DeadCounty.Player
             Search => $"Appuyez sur {Key("Player/Interact")} pour fouiller, sans bouger. En maintenant {Key("Player/Run")}, la fouille va plus vite mais fait du bruit.",
             Need => $"Une jauge apparaît quand un besoin baisse. Mangez et buvez depuis l'inventaire ({Key("Player/Inventory")}).",
             Zombie => $"Un zombie vous a remarqué. En marchant, vous allez plus vite que lui : éloignez-vous et sortez de sa vue. Accroupi ({Key("Player/Crouch")}), vous êtes plus discret.",
+            Weapon => $"Vous avez une arme en main : {Key("Player/Attack")} pour frapper. Chaque coup coûte de l'endurance et s'entend. Un zombie qui ne vous a pas remarqué encaisse le double.",
             Night => $"La nuit tombe. Les zombies voient moins loin, mais une lampe allumée ({Key("Player/Flashlight")}) se voit de très loin.",
             _ => throw new ArgumentOutOfRangeException(nameof(id), id, "unknown tip"),
         };

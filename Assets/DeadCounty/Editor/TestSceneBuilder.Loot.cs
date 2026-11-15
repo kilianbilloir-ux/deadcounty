@@ -16,17 +16,18 @@ namespace DeadCounty.EditorTools
         };
 
         // Loot by room and furniture (GDD 8.6): kitchens feed, fridges water, bathrooms bandage; the shops are the
-        // richest. Every house holds about two meals and one or two drinks.
+        // richest. Every house holds about two meals and one or two drinks. Weapons are rarer and sit where they
+        // would: a spare knife in a kitchen, a bat in a bedroom or under a shop counter, a crowbar in a workshop.
         static readonly (string File, int MinDraws, int MaxDraws, (string Item, float Weight)[] Entries)[] LootSpecs =
         {
-            ("LT_Cuisine_Placard", 0, 2, Cans.Append(("IT_Soda", 1f)).ToArray()),
+            ("LT_Cuisine_Placard", 0, 2, Cans.Append(("IT_Soda", 1f)).Append(("IT_Couteau", 0.5f)).ToArray()),
             ("LT_Cuisine_Frigo", 0, 2, new[] { ("IT_Eau", 3f), ("IT_Soda", 2f) }),
             ("LT_SalleDeBain", 0, 1, new[] { ("IT_Bandage", 1f) }),
-            ("LT_Chambre", 0, 1, new[] { ("IT_Bandage", 1f), ("IT_Soda", 1f), ("IT_Sardines", 1f) }),
+            ("LT_Chambre", 0, 1, new[] { ("IT_Bandage", 1f), ("IT_Soda", 1f), ("IT_Sardines", 1f), ("IT_Batte", 0.6f) }),
             ("LT_Salon", 0, 1, new[] { ("IT_Soda", 1f), ("IT_Bandage", 1f) }),
             ("LT_Magasin_Rayon", 1, 3, Cans.Append(("IT_Eau", 2f)).Append(("IT_Soda", 2f)).ToArray()),
-            ("LT_Magasin_Comptoir", 0, 2, new[] { ("IT_Soda", 2f), ("IT_Eau", 1f), ("IT_Bandage", 1f) }),
-            ("LT_Atelier", 0, 1, new[] { ("IT_Eau", 1f), ("IT_Bandage", 1f) }),
+            ("LT_Magasin_Comptoir", 0, 2, new[] { ("IT_Soda", 2f), ("IT_Eau", 1f), ("IT_Bandage", 1f), ("IT_Batte", 0.5f) }),
+            ("LT_Atelier", 0, 1, new[] { ("IT_Eau", 1f), ("IT_Bandage", 1f), ("IT_PiedDeBiche", 1.5f) }),
         };
 
         static readonly Dictionary<string, LootTable> LootTables = new();

@@ -43,6 +43,7 @@
             <ui:VisualElement name="readouts" picking-mode="Ignore" class="readouts">
                 <ui:Label name="time" text="Jour 1 — 11:00" picking-mode="Ignore" class="readout time-readout" />
                 <ui:Label name="flashlight" text="Lampe éteinte" picking-mode="Ignore" class="readout flashlight-readout" />
+                <ui:Label name="weapon" text="Mains nues" picking-mode="Ignore" class="readout weapon-readout" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="interaction" picking-mode="Ignore" class="interaction">

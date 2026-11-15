@@ -33,8 +33,8 @@ namespace DeadCounty.Core
         };
     }
 
-    // Only sprinting drains it: running is free, its cost is noise. Emptying it exhausts the player, who can then
-    // only walk until it recovers.
+    // Sprinting, jumping and swinging drain it: running is free, its cost is noise. Emptying it exhausts the
+    // player, who can then only walk until it recovers.
     public class StaminaModel
     {
         readonly StaminaSettings settings;
@@ -79,6 +79,12 @@ namespace DeadCounty.Core
             if (Exhausted || Current < settings.MinToJump) return false;
             Spend(settings.JumpCost);
             return true;
+        }
+
+        // A one-off effort such as a swing. An exhausted player can still make it: the caller weakens the result.
+        public void Exert(float cost)
+        {
+            if (cost > 0f) Spend(cost);
         }
 
         // Share of Max that stamina can reach (fatigue lowers it); anything above is lost at once.

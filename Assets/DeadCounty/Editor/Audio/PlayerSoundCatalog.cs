@@ -52,6 +52,8 @@ namespace DeadCounty.EditorTools
         public const string Drop = "Player/Drop";
         public const string Flashlight = "Player/Flashlight";
         public const string Bed = "Player/Bed";
+        public const string Swing = "Player/Swing";
+        public const string Strike = "Player/Strike";
         public const string DoorLatch = "World/Door_Latch";
         public const string DoorCreak = "World/Door_Creak";
         public const string DoorShut = "World/Door_Shut";
@@ -83,6 +85,8 @@ namespace DeadCounty.EditorTools
             entries.Add(new Entry(Drop, 4, Trimmed(ActionRecipes.Drop), 0.7f, 0.08f, 1f, 15f));
             entries.Add(new Entry(Flashlight, 3, Trimmed(ActionRecipes.FlashlightClick), 0.45f, 0.03f, 1f, 8f));
             entries.Add(new Entry(Bed, 2, Trimmed(ActionRecipes.Bed), 0.6f, 0.04f, 1f, 12f));
+            entries.Add(new Entry(Swing, 4, Trimmed(ZombieBodyRecipes.Whoosh), 0.6f, 0.1f, 1f, 12f));
+            entries.Add(new Entry(Strike, 4, Trimmed(ZombieBodyRecipes.Hit), 1f, 0.08f, 1f, 20f));
             entries.Add(new Entry(DoorLatch, 4, Trimmed(ActionRecipes.DoorLatch), 0.6f, 0.05f, 1f, 15f));
             entries.Add(new Entry(DoorCreak, 5, Trimmed(ActionRecipes.DoorCreak), 0.3f, 0.08f, 1f, 20f));
             entries.Add(new Entry(DoorShut, 4, Trimmed(ActionRecipes.DoorShut), 0.75f, 0.05f, 1.5f, 25f));

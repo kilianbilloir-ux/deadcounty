@@ -13,7 +13,7 @@ namespace DeadCounty.AI
     public class ZombieManager : MonoBehaviour
     {
         const float GoldenRatio = 0.618034f;
-        const int StateCount = (int)ZombieState.Feed + 1;
+        const int StateCount = (int)ZombieState.Stagger + 1;
         const float SenseTimeSmoothing = 0.1f;
 
         static readonly ProfilerMarker ManagerMarker = new("DC.AI.Manager");

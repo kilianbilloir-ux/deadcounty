@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f8c6ba0daaf477e846d465f637ccf7, type: 3}
+  m_Name: IT_Batte
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Items.ItemDefinition
+  DisplayName: Batte de baseball
+  Category: 4
+  Weight: 1
+  UseVerb: "\xC9quiper"
+  Hunger: 0
+  Thirst: 0
+  Health: 0
+  StopsBleeding: 0
+  CapacityBonus: 0
+  Weapon:
+    Damage: 34
+    Reach: 1.5
+    HalfAngle: 50
+    MaxTargets: 2
+    Windup: 0.28
+    Recovery: 0.5
+    StaminaCost: 9
+    NoiseRadius: 7
+    Stagger: 0.9
+    Knockback: 0.5
+  WorldModel: {fileID: 8441430489331911859, guid: b018aea753f4642e281310a0802fc0af, type: 3}
+  Icon: {fileID: 2800000, guid: c9ee8ffe944cd45b38999fb2e68adbd2, type: 3}

@@ -24,6 +24,9 @@ namespace DeadCounty.Audio
         const float BangIntervalMax = 0.9f;
         // Zombies set off by the same call answer it one after the other, not on the same frame.
         const float AnswerDelayMax = 0.4f;
+        // The body reaches the ground this long after the blow that kills.
+        const float FallDelay = 0.45f;
+        const float DeathPitch = 0.85f;
         // Ahead of the pooled one-shots (128) when Unity runs out of real voices: the attack telegraph must play.
         const int VoicePriority = 64;
 
@@ -33,17 +36,20 @@ namespace DeadCounty.Audio
         [SerializeField] SoundCue moan, breath, alert, sniff, growl, call, windup, frustrated;
         [Header("Attack")]
         [SerializeField] SoundCue whoosh, hit, miss;
+        [Header("Struck")]
+        [SerializeField] SoundCue hurt, death, fall;
         [Header("Body")]
         [SerializeField] SoundCue stepSoft, stepHard, stepGravel, dragSoft, dragHard, doorBang;
 
         ZombieAgent agent;
         ProceduralHumanoidAnimator animator;
+        ZombieHealth health;
         AudioSource voice;
         ZombieVoice identity;
         System.Random random;
         SoundCue speaking;
         AttackPhase lastPhase;
-        float nextVocal, nextBang, answerAt = float.PositiveInfinity;
+        float nextVocal, nextBang, answerAt = float.PositiveInfinity, fallAt = float.PositiveInfinity;
         bool leftPlanted, rightPlanted;
 
         public bool IsSpeaking => Voices.IsSpeaking(this, Time.time);
@@ -52,6 +58,7 @@ namespace DeadCounty.Audio
         {
             agent = GetComponent<ZombieAgent>();
             animator = GetComponent<ProceduralHumanoidAnimator>();
+            health = GetComponent<ZombieHealth>();
             voice = GetComponent<AudioSource>();
             voice.playOnAwake = false;
             voice.loop = false;
@@ -65,6 +72,7 @@ namespace DeadCounty.Audio
             AIEvents.Transition += OnTransition;
             AIEvents.Strike += OnStrike;
             GameSettings.Changed += OnSettingsChanged;
+            health.Damaged += OnDamaged;
             nextVocal = Time.time + ZombieVocals.FirstDelay(random);
         }
 
@@ -73,11 +81,18 @@ namespace DeadCounty.Audio
             AIEvents.Transition -= OnTransition;
             AIEvents.Strike -= OnStrike;
             GameSettings.Changed -= OnSettingsChanged;
+            health.Damaged -= OnDamaged;
+            fallAt = float.PositiveInfinity;
             Silence();
         }
 
         void LateUpdate()
         {
+            if (Time.time >= fallAt)
+            {
+                fallAt = float.PositiveInfinity;
+                OneShot(fall, transform.position, DistanceToListener());
+            }
             if (agent.IsDead || agent.Lod == ZombieLod.Dormant)
             {
                 answerAt = float.PositiveInfinity;
@@ -109,7 +124,11 @@ namespace DeadCounty.Audio
         {
             if (e.AgentId != agent.AgentId) return;
             answerAt = float.PositiveInfinity;
-            if (e.Reason == TransitionReason.Reset) Silence();
+            if (e.Reason == TransitionReason.Reset)
+            {
+                fallAt = float.PositiveInfinity;
+                Silence();
+            }
             else if (agent.Lod != ZombieLod.Dormant)
             {
                 var distance = DistanceToListener();
@@ -145,6 +164,20 @@ namespace DeadCounty.Audio
             if (e.AgentId != agent.AgentId) return;
             var at = e.Origin + Vector3.up * ChestHeight + (e.Hit ? e.Direction * StrikeReach : Vector3.zero);
             OneShot(e.Hit ? hit : miss, at, DistanceToListener());
+        }
+
+        // Off the voice source: a dead zombie's voice is silenced, its last breath is not.
+        void OnDamaged(ZombieHealth _)
+        {
+            var distance = DistanceToListener();
+            var at = transform.position + Vector3.up * ChestHeight;
+            if (health.IsAlive)
+            {
+                OneShot(hurt, at, distance, 1f, identity.Pitch);
+                return;
+            }
+            OneShot(death, at, distance, 1f, identity.Pitch * DeathPitch);
+            fallAt = Time.time + FallDelay;
         }
 
         void OnSettingsChanged()

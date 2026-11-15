@@ -114,12 +114,14 @@ namespace DeadCounty.Player
             sortCategory.RegisterCallback<ClickEvent>(_ => SetSort(SortMode.Category));
             sortWeight.RegisterCallback<ClickEvent>(_ => SetSort(SortMode.Weight));
             inventory.Items.Changed += MarkDirty;
+            inventory.WeaponChanged += MarkDirty;
             screen.style.display = DisplayStyle.None;
         }
 
         void OnDestroy()
         {
             if (inventory != null && inventory.Items != null) inventory.Items.Changed -= MarkDirty;
+            if (inventory != null) inventory.WeaponChanged -= MarkDirty;
             InputPrompts.KeysChanged -= ShowKeys;
         }
 
@@ -217,7 +219,8 @@ namespace DeadCounty.Player
                 if (!shown) continue;
                 var stack = sorted[i];
                 var labels = row.Query<Label>().ToList();
-                labels[0].text = stack.Count > 1 ? $"{stack.Item.DisplayName} ×{stack.Count}" : stack.Item.DisplayName;
+                var itemName = stack.Count > 1 ? $"{stack.Item.DisplayName} ×{stack.Count}" : stack.Item.DisplayName;
+                labels[0].text = stack.Item == inventory.Weapon ? $"{itemName} (en main)" : itemName;
                 labels[1].text = ItemDefinition.CategoryName(stack.Item.Category);
                 labels[2].text = $"{stack.Weight.ToString("0.##", French)} kg";
                 row[0].style.backgroundImage = Picture(stack.Item);
@@ -237,7 +240,7 @@ namespace DeadCounty.Player
             sortWeight.EnableInClassList("item-column--active", Sort == SortMode.Weight);
             var item = Selected;
             ShowDetail(item);
-            useHint.Show(item != null && item.Usable, item != null ? item.UseVerb : null);
+            useHint.Show(item != null && item.Usable, item != null ? inventory.UseVerb(item) : null);
             dropHint.Show(item != null);
             dirty = false;
         }
@@ -311,6 +314,12 @@ namespace DeadCounty.Player
             if (item.Health > 0f) Gain(ref shown, "Santé", pool.Normalized, item.Health / pool.Max);
             if (item.StopsBleeding) Effect(ref shown, "Saignement", health.Bleeding ? "En cours → arrêté" : "Aucun", health.Bleeding);
             if (item.CapacityBonus > 0f) Effect(ref shown, "Capacité", $"+{item.CapacityBonus.ToString("0.#", French)} kg", true);
+            if (item.IsWeapon)
+            {
+                Effect(ref shown, "Dégâts", item.Weapon.Damage.ToString("0", French), true);
+                Effect(ref shown, "Portée", $"{item.Weapon.Reach.ToString("0.#", French)} m", true);
+                Effect(ref shown, "Endurance", $"−{item.Weapon.StaminaCost.ToString("0", French)} par coup", true);
+            }
             for (var i = shown; i < EffectCount; i++) effects[i].style.display = DisplayStyle.None;
         }
 

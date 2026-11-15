@@ -20,6 +20,9 @@ namespace DeadCounty.AI
         // Noticing something jerks the torso and the head back (deg), then lets go.
         const float StartleAngle = 12f;
         const float StartleDuration = 0.35f;
+        // A blow whips the torso and the head away from where it came from (deg), then lets go.
+        const float HitFlinchAngle = 20f;
+        const float HitFlinchDuration = 0.4f;
 
         [Header("Setup")]
         [SerializeField] ZombieProfile profile;
@@ -42,6 +45,9 @@ namespace DeadCounty.AI
         Quaternion spawnRotation;
         float twitchPeriod, twitchPhase;
         float startledAt = float.NegativeInfinity;
+        float hitAt = float.NegativeInfinity;
+        float hitFlinchPitch, hitFlinchRoll;
+        Collider body;
         int ownId;
         bool dead;
 
@@ -67,13 +73,19 @@ namespace DeadCounty.AI
         public bool IsCrouching => false;
         public float AimYaw { get; private set; }
         public float AimPitch { get; private set; }
-        // The brain's pose plus a seeded convulsive jerk every few seconds; deterministic zombies keep still for
-        // repeatable measurements.
+        // The brain's pose, the recoil of a blow, plus a seeded convulsive jerk every few seconds; deterministic
+        // zombies do without the jerk, for repeatable measurements.
         public PoseModifiers Pose
         {
             get
             {
                 var pose = commands.Pose;
+                var reel = 1f - (Time.time - hitAt) / HitFlinchDuration;
+                if (reel > 0f)
+                {
+                    pose.FlinchPitch += hitFlinchPitch * reel;
+                    pose.FlinchRoll += hitFlinchRoll * reel;
+                }
                 if (deterministic) return pose;
                 var startle = 1f - (Time.time - startledAt) / StartleDuration;
                 if (startle > 0f) pose.FlinchPitch -= StartleAngle * startle;
@@ -111,6 +123,7 @@ namespace DeadCounty.AI
                 throw new InvalidOperationException($"{name}: its ProceduralHumanoidAnimator is not assigned to the ZombieAgent");
             navAgent = GetComponent<NavMeshAgent>();
             health = GetComponent<ZombieHealth>();
+            TryGetComponent(out body);
             // GetInstanceID and the EntityId to int cast are compile errors in Unity 6.6; NoiseEvent keeps an int id.
             ownId = gameObject.GetEntityId().GetHashCode();
             tuning = profile.Tuning;
@@ -136,6 +149,7 @@ namespace DeadCounty.AI
             brain = new ZombieBrain(tuning, seed, spawnPosition);
             motor = new ZombieMotor(navAgent, transform, profile.Locomotion, tuning.Attack, seed);
             lastNoiseId = NoiseSystem.Buffer.LatestId;
+            health.Damaged += OnDamaged;
             health.Died += OnDied;
             UpdateAim();
         }
@@ -161,7 +175,9 @@ namespace DeadCounty.AI
 
         void OnDestroy()
         {
-            if (health != null) health.Died -= OnDied;
+            if (health == null) return;
+            health.Damaged -= OnDamaged;
+            health.Died -= OnDied;
         }
 
         public void Think(float dt)
@@ -198,6 +214,8 @@ namespace DeadCounty.AI
             if (manager == null) throw new InvalidOperationException($"{name}: ResetToSpawn needs an enabled ZombieManager");
             var record = manager.GetRecord(RecordIndex);
             dead = false;
+            hitAt = float.NegativeInfinity;
+            if (body != null) body.enabled = true;
             navAgent.enabled = true;
             motor.Reset(record.SpawnPosition, record.SpawnRotation);
             motor.SetDormant(Lod == ZombieLod.Dormant);
@@ -255,6 +273,27 @@ namespace DeadCounty.AI
             return limp;
         }
 
+        // Raised before Died by the blow that kills: the corpse keeps the recoil, only the living reel.
+        void OnDamaged(ZombieHealth _)
+        {
+            var away = AwayFromLastHit();
+            var local = transform.InverseTransformDirection(away);
+            hitAt = Time.time;
+            hitFlinchPitch = local.z * HitFlinchAngle;
+            hitFlinchRoll = -local.x * HitFlinchAngle;
+            if (!health.IsAlive) return;
+            brain.TakeHit(motor.Position, health.LastHitSource, health.LastStagger, health.LastKnockback);
+            AIEvents.RaiseTransition(ownId, brain.LastTransition, motor.Position);
+        }
+
+        Vector3 AwayFromLastHit()
+        {
+            var away = motor.Position - health.LastHitSource;
+            away.y = 0f;
+            // A source standing exactly on the zombie has no direction: it goes over backward.
+            return away.sqrMagnitude > 1e-4f ? away.normalized : -motor.Heading;
+        }
+
         void OnDied(ZombieHealth _)
         {
             if (dead) return;
@@ -262,8 +301,10 @@ namespace DeadCounty.AI
             motor.Halt();
             CurrentSpeed = 0f;
             navAgent.enabled = false;
-            // A corpse must not keep idling: the animator would hold its last pose and sway forever.
-            if (animator != null) animator.enabled = false;
+            // The corpse stays where it fell, but nothing bumps into it.
+            if (body != null) body.enabled = false;
+            // The animator topples the body, then switches itself off.
+            if (animator != null) animator.Collapse(AwayFromLastHit());
             if (manager != null) manager.ReportDeath(this);
             else Debug.LogWarning($"{name}: died without an enabled ZombieManager, staying frozen until ResetToSpawn.", this);
         }

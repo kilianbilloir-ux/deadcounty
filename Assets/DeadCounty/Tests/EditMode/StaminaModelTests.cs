@@ -187,5 +187,24 @@ namespace DeadCounty.Tests
             Tick(model, StaminaActivity.Idle, 1f);
             Assert.That(model.Current, Is.EqualTo(100f));
         }
+
+        [Test]
+        public void ASwingCostsStaminaAndHoldsBackItsReturn()
+        {
+            var model = Create();
+            model.Exert(9f);
+            Assert.That(model.Current, Is.EqualTo(91f));
+            Tick(model, StaminaActivity.Idle, 0.9f);
+            Assert.That(model.Current, Is.EqualTo(91f), "regenerated inside the delay");
+        }
+
+        [Test]
+        public void SwingingOnEmptyExhausts()
+        {
+            var model = Create();
+            model.Exert(1000f);
+            Assert.That(model.Current, Is.Zero);
+            Assert.That(model.Exhausted, Is.True);
+        }
     }
 }

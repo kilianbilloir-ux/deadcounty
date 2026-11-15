@@ -83,6 +83,8 @@ namespace DeadCounty.AI
 
             if (lunging) Lunge(c, targetPosition, hasTarget, dt);
             else Walk(c, dt);
+            // A shove slides the body without turning it; the NavMesh stops it at walls just below.
+            if (c.PushSpeed > 0f) Position += c.PushDirection * (c.PushSpeed * dt);
 
             agent.nextPosition = Position;
             Position = agent.nextPosition;

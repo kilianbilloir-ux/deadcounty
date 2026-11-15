@@ -20,6 +20,27 @@ namespace DeadCounty.Animation
         // Shoulder pitch and elbow bend of the right arm with the hand at the mouth (deg).
         const float MouthPitch = -38f;
         const float MouthBend = 128f;
+        // A swing, from the right hand cocked up beside the head to followed through across the body: shoulder
+        // pitch and spread, elbow bend, chest twist and chest pitch (deg). Halfway the arm is out in front.
+        const float SwingCockPitch = -110f, SwingFollowPitch = -45f;
+        const float SwingCockSpread = 30f, SwingFollowSpread = -30f;
+        const float SwingCockBend = 50f, SwingFollowBend = 25f;
+        const float SwingCockTwist = 25f, SwingFollowTwist = -30f;
+        const float SwingCockLean = -5f, SwingFollowLean = 12f;
+        // A shove leans the chest into it (deg).
+        const float ShoveLean = 10f;
+        // Death: seconds to reach the ground, and how far the model rises so that a body lying flat rests on the
+        // ground instead of half in it (m).
+        const float CollapseTime = 0.55f;
+        const float CollapseLift = 0.12f;
+        // Joint rotations of a slack body, in the order of `joints`.
+        static readonly Quaternion[] SlackPose =
+        {
+            Quaternion.identity, Quaternion.Euler(4f, 0f, 6f), Quaternion.Euler(10f, 25f, 12f),
+            Quaternion.Euler(-12f, 0f, -38f), Quaternion.Euler(8f, 0f, 26f), Quaternion.Euler(-28f, 0f, 0f), Quaternion.Euler(-12f, 0f, 0f),
+            Quaternion.Euler(-6f, 0f, -7f), Quaternion.Euler(4f, 0f, 5f), Quaternion.Euler(16f, 0f, 0f), Quaternion.Euler(6f, 0f, 0f),
+            Quaternion.Euler(20f, 0f, 0f), Quaternion.Euler(20f, 0f, 0f),
+        };
         // Turning faster than PivotStartRate (deg/s) the body starts to pivot instead of following a curve: at
         // PivotFullRate the feet hold back only PivotFoothold of the turn and the body leans only that share. A
         // foothold kept still under a quarter-turn snap ends up crossed and trailing far behind.
@@ -66,6 +87,12 @@ namespace DeadCounty.Animation
         FootTrack leftTrack, rightTrack;
         int resetId, framesSinceUpdate, updateEvery = 1;
         bool wasGrounded = true, snapped;
+        Transform[] joints;
+        Quaternion[] collapseFrom;
+        Quaternion collapseModelFrom;
+        Vector3 collapseAxis, modelRest;
+        float collapse;
+        bool collapsing;
 
         // LOD: without ground rays the feet assume flat ground.
         public bool GroundRays { get; set; } = true;
@@ -89,6 +116,8 @@ namespace DeadCounty.Animation
         // -1 to 1: which outstretched arm droops, and how much. Zombies get theirs from their seed.
         public float ArmBias { get; set; }
 
+        // Lying on the ground, the fall over.
+        public bool Collapsed => collapsing && collapse >= 1f;
         public bool LeftFootPlanted { get; private set; }
         public bool RightFootPlanted { get; private set; }
         // Boot pitch (deg) of each foot, test observability for the flat-foot slip gate.
@@ -104,6 +133,7 @@ namespace DeadCounty.Animation
             motion = source ?? throw new ArgumentNullException(nameof(source));
             if (gait == null) throw new InvalidOperationException($"{name}: the animator needs a {nameof(GaitProfile)}");
             model = hips.parent;
+            modelRest = model.localPosition;
             standingHipHeight = hipY = hips.localPosition.y;
             hipJointOffset = leftHip.localPosition.y;
             leftTrackX = leftHip.localPosition.x;
@@ -120,8 +150,39 @@ namespace DeadCounty.Animation
             snapped = true;
         }
 
+        // Death: the body topples toward worldDirection and goes slack, then the animator switches itself off.
+        // Snap stands it back up once the animator is enabled again.
+        public void Collapse(Vector3 worldDirection)
+        {
+            worldDirection.y = 0f;
+            if (worldDirection.sqrMagnitude < 1e-6f) worldDirection = -transform.forward;
+            collapseAxis = Vector3.Cross(Vector3.up, transform.InverseTransformDirection(worldDirection.normalized));
+            joints ??= new[] { hips, spine, neck, leftShoulder, rightShoulder, leftElbow, rightElbow, leftHip, rightHip, leftKnee, rightKnee, leftAnkle, rightAnkle };
+            collapseFrom ??= new Quaternion[joints.Length];
+            for (var i = 0; i < joints.Length; i++) collapseFrom[i] = joints[i].localRotation;
+            collapseModelFrom = model.localRotation;
+            collapse = 0f;
+            collapsing = true;
+        }
+
+        void EvaluateCollapse(float dt)
+        {
+            collapse = Mathf.Min(1f, collapse + dt / CollapseTime);
+            // Slow to tip, fast to land.
+            var fall = collapse * collapse;
+            var slack = Mathf.SmoothStep(0f, 1f, collapse);
+            model.SetLocalPositionAndRotation(modelRest + Vector3.up * (CollapseLift * fall), Quaternion.AngleAxis(90f * fall, collapseAxis) * collapseModelFrom);
+            for (var i = 0; i < joints.Length; i++) joints[i].localRotation = Quaternion.Slerp(collapseFrom[i], SlackPose[i], slack);
+            if (collapse >= 1f) enabled = false;
+        }
+
         void ResetTracking()
         {
+            if (collapsing)
+            {
+                collapsing = false;
+                model.localPosition = modelRest;
+            }
             resetId = motion.MotionResetId;
             lastPosition = transform.position;
             lastYaw = transform.eulerAngles.y;
@@ -151,6 +212,11 @@ namespace DeadCounty.Animation
         {
             if (dt <= 0f) return;
             if (motion.MotionResetId != resetId) Snap();
+            if (collapsing)
+            {
+                EvaluateCollapse(dt);
+                return;
+            }
             var g = gait;
             clock += dt;
             TrackMotion(dt);
@@ -270,20 +336,24 @@ namespace DeadCounty.Animation
             var headTilt = Mathf.Clamp(motion.AimPitch * g.HeadPitchFollow, -g.HeadPitchLimit, g.HeadPitchLimit) * follow;
             // The neck makes up for most of the hunch and lunge to keep looking ahead, not for feeding.
             var posePitch = pose.Hunch + g.LungePitch * pose.Lunge;
+            // A swing winds the chest up with the arm and unwinds it through the blow; the head stays on the target.
+            var strikeTwist = pose.SwingWeight * Mathf.Lerp(SwingCockTwist, SwingFollowTwist, pose.Swing);
+            var strikeLean = pose.SwingWeight * Mathf.Lerp(SwingCockLean, SwingFollowLean, pose.Swing) + ShoveLean * pose.Shove;
             // The chest takes back most of the idle pelvis roll and the neck the rest, so the head stays level.
             var lurch = g.StepLurch * (left.Support - right.Support) * moving;
             var wobble = g.HeadWobble * Mathf.Sin(phase * 2f * Mathf.PI) * moving;
-            spine.localRotation = Quaternion.Euler(lean + breathe + posePitch + g.FeedPitch * pose.Feed + pose.FlinchPitch,
-                -pelvisYaw * 0.9f + headYaw * 0.3f - ReachTwist * pose.Reach, idleSway + lurch - 0.7f * g.IdleShiftRoll * settle + pose.FlinchRoll);
+            spine.localRotation = Quaternion.Euler(lean + breathe + posePitch + g.FeedPitch * pose.Feed + pose.FlinchPitch + strikeLean,
+                -pelvisYaw * 0.9f + headYaw * 0.3f - ReachTwist * pose.Reach + strikeTwist, idleSway + lurch - 0.7f * g.IdleShiftRoll * settle + pose.FlinchRoll);
             // The head whips a little further than the torso.
-            neck.localRotation = Quaternion.Euler(headPitch - (lean + posePitch) * 0.7f + headTilt + pose.FlinchPitch * 0.5f, headYaw * 0.7f + ReachTwist * pose.Reach,
+            neck.localRotation = Quaternion.Euler(headPitch - (lean + posePitch) * 0.7f + headTilt + pose.FlinchPitch * 0.5f - strikeLean * 0.7f,
+                headYaw * 0.7f + ReachTwist * pose.Reach - strikeTwist * 0.8f,
                 pose.HeadRoll + wobble - 0.5f * lurch - 0.3f * g.IdleShiftRoll * settle + pose.FlinchRoll * 0.5f);
 
             // Each arm swings with the opposite leg.
             var armBlend = 1f - Mathf.Exp(-15f * dt);
             leftArmDrive = Mathf.Lerp(leftArmDrive, right.Forward * (rightHalf > 0.01f ? 1f / rightHalf : 0f), armBlend);
             rightArmDrive = Mathf.Lerp(rightArmDrive, left.Forward * (leftHalf > 0.01f ? 1f / leftHalf : 0f), armBlend);
-            var armsForward = pose.ArmsForward;
+            var armsForward = Mathf.Max(pose.ArmsForward, 0.8f * pose.Shove);
             var armSwing = (Mathf.Lerp(g.WalkArmSwing, g.RunArmSwing, runness) + g.SprintArmSwing * sprintness) * moving
                 * (1f - g.CrouchArmSwingDrop * crouch) * (1f - g.ArmsForwardSwingDrop * armsForward);
             var bend = Mathf.Lerp(g.WalkElbowBend, g.RunElbowBend, runness) * moving + g.SprintElbowBend * sprintness + g.BaseElbowBend + g.CrouchElbowBend * crouch;
@@ -299,6 +369,13 @@ namespace DeadCounty.Animation
             Arm(rightShoulder, rightElbow, -armSwing * rightArmDrive + raise, g.ArmSpread, bend, Mathf.Max(reach, pose.Reach, pose.HandToMouth),
                 Mathf.Lerp(reachPitch - dig + ArmBiasPitch * rightDroop, MouthPitch, pose.HandToMouth),
                 Mathf.Lerp(g.ReachElbowBend - dig + ArmBiasBend * rightDroop, MouthBend, pose.HandToMouth));
+            if (pose.SwingWeight > 0f)
+            {
+                var shoulder = Quaternion.Euler(Mathf.Lerp(SwingCockPitch, SwingFollowPitch, pose.Swing), 0f, Mathf.Lerp(SwingCockSpread, SwingFollowSpread, pose.Swing));
+                var elbow = Quaternion.Euler(-Mathf.Lerp(SwingCockBend, SwingFollowBend, pose.Swing), 0f, 0f);
+                rightShoulder.localRotation = Quaternion.Slerp(rightShoulder.localRotation, shoulder, pose.SwingWeight);
+                rightElbow.localRotation = Quaternion.Slerp(rightElbow.localRotation, elbow, pose.SwingWeight);
+            }
         }
 
         float Duty(float walkDuty, float runness, float sprintness) => Mathf.Lerp(Mathf.Lerp(walkDuty, gait.RunDuty, runness), gait.SprintDuty, sprintness);
@@ -319,6 +396,9 @@ namespace DeadCounty.Animation
             pose.HandToMouth = Mathf.Lerp(pose.HandToMouth, target.HandToMouth, handBlend);
             pose.Rummage = Mathf.Lerp(pose.Rummage, target.Rummage, k);
             pose.Pant = Mathf.Lerp(pose.Pant, target.Pant, k);
+            pose.Swing = target.Swing;
+            pose.SwingWeight = target.SwingWeight;
+            pose.Shove = target.Shove;
             pose.FlinchPitch = target.FlinchPitch;
             pose.FlinchRoll = target.FlinchRoll;
         }

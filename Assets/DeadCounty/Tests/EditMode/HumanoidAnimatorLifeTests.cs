@@ -139,5 +139,67 @@ namespace DeadCounty.Tests
             var level = bias > 0f ? rig.RightShoulder : rig.LeftShoulder;
             Assert.That(ShoulderPitch(drooping) - ShoulderPitch(level), Is.EqualTo(18f).Within(3f));
         }
+
+        [Test]
+        public void ASwingCocksTheRightHandUpBesideTheHeadThenBringsItDownAcrossTheBody()
+        {
+            using var rig = new HumanoidTestRig(ScriptableObject.CreateInstance<GaitProfile>());
+            rig.Initialize();
+            var pose = PoseModifiers.Neutral;
+            pose.SwingWeight = 1f;
+            rig.Motion.Pose = pose;
+            rig.Step(0f);
+            var hand = rig.RightElbow.TransformPoint(Vector3.down * 0.3f) - rig.RightShoulder.position;
+            Assert.That(hand.y, Is.GreaterThan(0.25f), "the cocked hand is not well above the shoulder");
+
+            pose.Swing = 1f;
+            rig.Motion.Pose = pose;
+            rig.Step(0f);
+            var followed = rig.RightElbow.position - rig.RightShoulder.position;
+            Assert.That(followed.y, Is.LessThan(-0.05f), "the arm did not come down");
+            Assert.That(followed.x, Is.LessThan(-0.05f), "the arm did not cross the body");
+            Assert.That(followed.z, Is.GreaterThan(0f), "the arm ended behind the body");
+        }
+
+        [Test]
+        public void AShoveThrustsBothHandsForward()
+        {
+            using var rig = new HumanoidTestRig(ScriptableObject.CreateInstance<GaitProfile>());
+            rig.Initialize();
+            rig.Step(0f);
+            var rest = ShoulderPitch(rig.LeftShoulder);
+            var pose = PoseModifiers.Neutral;
+            pose.Shove = 1f;
+            rig.Motion.Pose = pose;
+            rig.Step(0f);
+            Assert.That(ShoulderPitch(rig.LeftShoulder), Is.LessThan(rest - 40f));
+            Assert.That(ShoulderPitch(rig.RightShoulder), Is.LessThan(rest - 40f));
+        }
+
+        [Test]
+        public void ADeadBodyFallsFlatAwayFromTheBlowThenStandsBackUpOnSnap()
+        {
+            using var rig = new HumanoidTestRig(ScriptableObject.CreateInstance<GaitProfile>());
+            rig.Initialize();
+            for (var i = 0; i < 30; i++) rig.Step(1f);
+
+            rig.Animator.Collapse(Vector3.back);
+            rig.Animator.Evaluate(Dt);
+            Assert.That(Vector3.Angle(rig.Model.up, Vector3.up), Is.LessThan(5f), "the body dropped at once instead of toppling");
+            for (var i = 0; i < 60 && !rig.Animator.Collapsed; i++) rig.Animator.Evaluate(Dt);
+            Assert.That(rig.Animator.Collapsed, Is.True);
+            Assert.That(Vector3.Angle(rig.Model.up, Vector3.back), Is.LessThan(1f), "the body does not lie away from the blow");
+            Assert.That(rig.Animator.enabled, Is.False, "the corpse keeps animating");
+            var lying = rig.RightShoulder.position;
+            rig.Animator.Evaluate(Dt);
+            Assert.That(rig.RightShoulder.position, Is.EqualTo(lying), "the corpse moved once on the ground");
+
+            rig.Animator.enabled = true;
+            rig.Animator.Snap();
+            rig.Step(0f);
+            Assert.That(rig.Animator.Collapsed, Is.False);
+            Assert.That(Vector3.Angle(rig.Model.up, Vector3.up), Is.LessThan(1f), "the body did not stand back up");
+            Assert.That(rig.Model.localPosition, Is.EqualTo(Vector3.zero));
+        }
     }
 }

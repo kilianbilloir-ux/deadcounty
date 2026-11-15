@@ -52,8 +52,14 @@ namespace DeadCounty.Tests
         }
 
         [Test]
-        public void StartsWithABackpackWaterAndACan()
+        public void StartsWithABackpackWaterACanAndAKnifeInHand()
         {
+            var knife = Load("IT_Couteau");
+            Assert.That(inventory.Items.Count(knife), Is.EqualTo(1));
+            Assert.That(inventory.Weapon, Is.EqualTo(knife));
+            inventory.Use(knife);
+            inventory.ResetFull();
+            Assert.That(inventory.Weapon, Is.EqualTo(knife), "respawning must give the knife back to the hand");
             Assert.That(inventory.Items.Count(Load("IT_SacADos")), Is.EqualTo(1));
             Assert.That(inventory.Items.Count(Load("IT_Eau")), Is.EqualTo(1));
             Assert.That(inventory.Items.Count(Load("IT_Haricots")), Is.EqualTo(1));
@@ -186,7 +192,7 @@ namespace DeadCounty.Tests
             Assert.That(controller.MenuOpen, "the player must stop while the inventory is open");
             Assert.That(panel.style.display.value, Is.EqualTo(DisplayStyle.Flex));
             Assert.That(root.Q<Label>("inventory-weight").text, Does.EndWith("/ 12 kg"));
-            // Sorted by name: Bouteille d'eau, Conserve de haricots, Sac à dos.
+            // Sorted by name: Bouteille d'eau, Conserve de haricots, Couteau de cuisine, Sac à dos.
             Assert.That(screen.Selected, Is.EqualTo(Load("IT_Eau")));
 
             yield return Tap(Keyboard, new KeyboardState(Key.DownArrow), new KeyboardState());
@@ -247,7 +253,7 @@ namespace DeadCounty.Tests
             var bandage = Load("IT_Bandage");
             inventory.Items.Add(bandage, 1);
             screen.SetOpen(true);
-            // Bandage, Bouteille d'eau, Conserve de haricots, Sac à dos.
+            // Bandage, Bouteille d'eau, Conserve de haricots, Couteau de cuisine, Sac à dos.
             screen.Select(0);
             yield return null;
             Assert.That(screen.Selected, Is.EqualTo(bandage));
@@ -259,7 +265,7 @@ namespace DeadCounty.Tests
             Assert.That(Effects()[0], Is.EqualTo("Santé 50\u00A0% → 70\u00A0%"));
             Assert.That(Root.Q("item-effects").Children().First().ClassListContains("item-effect--wasted"), Is.False);
 
-            screen.Select(3);
+            screen.Select(4);
             yield return null;
             Assert.That(Effects(), Is.EqualTo(new[] { "Capacité +6 kg" }));
             screen.SetOpen(false);

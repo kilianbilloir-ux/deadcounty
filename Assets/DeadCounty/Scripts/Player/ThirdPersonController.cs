@@ -72,6 +72,7 @@ namespace DeadCounty.Player
         Vector3 groundNormal = Vector3.up, knockbackVelocity;
         float yaw, pitch, verticalVelocity, cameraTargetStandingY, landingNoiseTimer, recoveryTimer;
         float knockbackTimer, staggerTimer, staggerSpeedFactor = 1f;
+        float commitTimer, commitYaw;
         float lastGroundedTime = float.NegativeInfinity, lastJumpPressTime = float.NegativeInfinity;
         bool menuOpen;
 
@@ -185,7 +186,8 @@ namespace DeadCounty.Player
         void Move()
         {
             var dt = Time.deltaTime;
-            var input = Controllable ? Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f) : Vector2.zero;
+            var committed = commitTimer > 0f;
+            var input = Controllable && !committed ? Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f) : Vector2.zero;
             var hasInput = input.sqrMagnitude > 0.01f;
             var onStick = move.activeControl?.device is Gamepad;
             var staggered = staggerTimer > 0f;
@@ -195,7 +197,9 @@ namespace DeadCounty.Player
                 : (run.IsPressed() || (onStick && input.magnitude > stickRunThreshold)) && stamina.Model.CanRun ? Gait.Run
                 : Gait.Walk;
 
-            var wish = hasInput ? Quaternion.Euler(0f, Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + yaw, 0f) * Vector3.forward : motion.Heading;
+            var wish = hasInput ? Quaternion.Euler(0f, Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + yaw, 0f) * Vector3.forward
+                : committed ? Quaternion.Euler(0f, commitYaw, 0f) * Vector3.forward
+                : motion.Heading;
             var targetSpeed = !hasInput ? 0f : GaitSpeed() * (onStick && Gait == Gait.Walk ? Mathf.Clamp01(input.magnitude / stickRunThreshold) : 1f);
             if (IsGrounded)
             {
@@ -204,9 +208,11 @@ namespace DeadCounty.Player
             }
             if (staggered) targetSpeed *= staggerSpeedFactor;
             if (Encumbered) targetSpeed *= encumberedSpeedFactor;
-            PlanarLocomotion.Step(ref motion, locomotion, wish, targetSpeed, hasInput, IsGrounded, dt);
+            // Committed, the body brakes and turns on the spot as if steered toward the committed heading.
+            PlanarLocomotion.Step(ref motion, locomotion, wish, targetSpeed, hasInput || committed, IsGrounded, dt);
             transform.rotation = Quaternion.LookRotation(motion.Heading);
             recoveryTimer -= dt;
+            commitTimer -= dt;
             staggerTimer -= dt;
 
             if (Controllable && jump.WasPressedThisFrame()) lastJumpPressTime = Time.time;
@@ -281,6 +287,14 @@ namespace DeadCounty.Player
             staggerSpeedFactor = speedFactor;
         }
 
+        // A committed action (a swing): for `duration` seconds the player stops and turns to face `yaw` (world
+        // degrees), whatever the move input.
+        public void Commit(float duration, float yaw)
+        {
+            commitTimer = duration;
+            commitYaw = yaw;
+        }
+
         public void Teleport(Vector3 position, Quaternion rotation)
         {
             var delta = position - transform.position;
@@ -291,7 +305,7 @@ namespace DeadCounty.Player
             controller.enabled = true;
 
             verticalVelocity = 0f;
-            knockbackTimer = staggerTimer = recoveryTimer = landingNoiseTimer = 0f;
+            knockbackTimer = staggerTimer = recoveryTimer = landingNoiseTimer = commitTimer = 0f;
             lastJumpPressTime = float.NegativeInfinity;
             Velocity = Vector3.zero;
             CurrentSpeed = 0f;

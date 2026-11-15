@@ -32,6 +32,7 @@ namespace DeadCounty.AI
         float sinceKnown;
         float sinceCall;
         float attackCooldown;
+        float lastDt;
         bool callThisTick;
         bool strikeThisTick;
         Vector3 lookBase;
@@ -79,6 +80,7 @@ namespace DeadCounty.AI
             callThisTick = false;
             strikeThisTick = false;
             now = p.Time;
+            lastDt = dt;
             StateTime += dt;
             sinceCall += dt;
             attackCooldown = Mathf.Max(0f, attackCooldown - dt);
@@ -112,6 +114,9 @@ namespace DeadCounty.AI
                         break;
                     case ZombieState.Feed:
                         if (p.TargetAlive) ReturnToAnchor(TransitionReason.LostTarget);
+                        break;
+                    case ZombieState.Stagger:
+                        UpdateStagger(p);
                         break;
                 }
             }
@@ -263,6 +268,9 @@ namespace DeadCounty.AI
                 case ZombieState.Feed:
                     Hold(ref c, p.TargetPosition, FeedArms);
                     c.Pose.Feed = 1f;
+                    break;
+                case ZombieState.Stagger:
+                    WriteStagger(ref c);
                     break;
             }
         }

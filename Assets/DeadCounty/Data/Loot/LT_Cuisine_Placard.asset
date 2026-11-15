@@ -45,5 +45,9 @@ MonoBehaviour:
     Weight: 1
     Min: 1
     Max: 1
+  - Item: {fileID: 11400000, guid: e3a350ee075b5420592fed93047ab498, type: 2}
+    Weight: 0.5
+    Min: 1
+    Max: 1
   MinDraws: 0
   MaxDraws: 2
