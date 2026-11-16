@@ -142411,11 +142411,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 600
-  field of view: 60
+  field of view: 45
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -142439,8 +142439,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 250930158}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.005494481, y: 0.06622622, z: -0.00036468488, w: 0.99778944}
-  m_LocalPosition: {x: 64.4, y: 1.9, z: -15}
+  m_LocalRotation: {x: 0.011753016, y: 0.0708841, z: -0.0008352611, w: 0.997415}
+  m_LocalPosition: {x: 64, y: 3, z: -17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -144191,7 +144191,7 @@ MonoBehaviour:
     m_Value: 10
   OutputChannel: 1
   StandbyUpdate: 2
-  m_StreamingVersion: 0
+  m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 0}
@@ -789863,6 +789863,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 359943300387110147, guid: b455fa0662e8a4cbd8d7256dc70f87aa, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.55000305
+      objectReference: {fileID: 0}
+    - target: {fileID: 359943300387110147, guid: b455fa0662e8a4cbd8d7256dc70f87aa, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 359943300387110147, guid: b455fa0662e8a4cbd8d7256dc70f87aa, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.1999998
+      objectReference: {fileID: 0}
     - target: {fileID: 3012412907313332803, guid: b455fa0662e8a4cbd8d7256dc70f87aa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 65.2
@@ -841215,7 +841227,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 6aa265e72dab742b58be2a114206fe0d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 96aa1951913491b4092c998db2cbbbc4, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &1539088359
 GameObject:
