@@ -1,3 +1,4 @@
+using DeadCounty.Player;
 using UnityEngine;
 
 namespace DeadCounty.EditorTools
@@ -67,6 +68,7 @@ namespace DeadCounty.EditorTools
         {
             var p = Piece(parent, "Banc", pos, 0f, new Vector3(2.6f, 0.9f, 0.5f));
             Model("Modele", p, Vector3.zero, null, "banc_eglise");
+            Sittable(p, "Banc d'église", 0.47f, 0.95f, 0.03f, 0f);
         }
 
         // Altar cloth, candles, lectern, cross on the back wall and a red runner down the aisle (church frame).
@@ -146,6 +148,7 @@ namespace DeadCounty.EditorTools
         {
             var p = Piece(parent, "Banc_Public", pos, yaw, new Vector3(1.6f, 0.85f, 0.5f));
             Model("Modele", p, Vector3.zero, null, "banc");
+            Sittable(p, "Banc", 0.49f, 0.45f, -0.05f);
         }
 
         static void NewsBox(Transform parent, Vector3 pos, float yaw, string mat)

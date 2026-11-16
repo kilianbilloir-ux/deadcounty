@@ -2,6 +2,7 @@ using System;
 using DeadCounty.AI;
 using DeadCounty.Core;
 using DeadCounty.Perception;
+using DeadCounty.UI;
 using UnityEngine;
 
 namespace DeadCounty.Player
@@ -64,7 +65,7 @@ namespace DeadCounty.Player
 
         void OnDamaged(PlayerHealth _)
         {
-            if (Asleep) Wake("Réveillé en sursaut");
+            if (Asleep) Wake(Loc.T("Réveillé en sursaut"));
         }
 
         public bool TrySleep()
@@ -94,10 +95,10 @@ namespace DeadCounty.Player
             var model = needs.Model;
             if (!health.Bleeding && model.Hunger > 0f && model.Thirst > 0f) health.Heal(healPerSecond * Time.deltaTime);
 
-            if (model.Fatigue >= 1f) Wake("Reposé");
-            else if (MorningCame()) Wake("Le jour se lève");
-            else if (HeardNoise()) Wake("Réveillé par un bruit");
-            else if (ZombieNearby()) Wake("Un zombie est tout près");
+            if (model.Fatigue >= 1f) Wake(Loc.T("Reposé"));
+            else if (MorningCame()) Wake(Loc.T("Le jour se lève"));
+            else if (HeardNoise()) Wake(Loc.T("Réveillé par un bruit"));
+            else if (ZombieNearby()) Wake(Loc.T("Un zombie est tout près"));
         }
 
         bool MorningCame()

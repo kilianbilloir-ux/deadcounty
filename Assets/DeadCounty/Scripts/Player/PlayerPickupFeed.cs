@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DeadCounty.Items;
+using DeadCounty.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -90,7 +91,7 @@ namespace DeadCounty.Player
                 line.Item = item;
                 line.Total = 0;
                 line.Opacity = 0f;
-                line.Name.text = item != null ? item.DisplayName : "Rien trouvé";
+                line.Name.text = item != null ? item.LocalizedName : Loc.T("Rien trouvé");
                 line.Icon.style.backgroundImage = item != null && item.Icon != null ? new StyleBackground(item.Icon) : StyleKeyword.None;
                 line.Row.EnableInClassList("pickup--empty", item == null);
             }

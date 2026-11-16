@@ -11,6 +11,7 @@ namespace DeadCounty.UI
         const string UiScaleKey = "dc.uiScale";
         const string TipsKey = "dc.tips";
         const string ReduceFlashesKey = "dc.reduceFlashes";
+        const string LanguageKey = "dc.language";
         const string MasterVolumeKey = "dc.volume.master";
         const string EffectsVolumeKey = "dc.volume.effects";
         const string AmbienceVolumeKey = "dc.volume.ambience";
@@ -20,9 +21,12 @@ namespace DeadCounty.UI
         static bool loaded;
         static float uiScale;
         static bool tips, reduceFlashes;
+        static Language language;
         static float masterVolume, effectsVolume, ambienceVolume, musicVolume, interfaceVolume;
 
         public static event Action Changed;
+        // Raised after Changed with the language shown until then: every text on screen must be written again.
+        public static event Action<Language> LanguageChanged;
 
         public static float UiScale
         {
@@ -70,6 +74,26 @@ namespace DeadCounty.UI
                 reduceFlashes = value;
                 PlayerPrefs.SetInt(ReduceFlashesKey, value ? 1 : 0);
                 Changed?.Invoke();
+            }
+        }
+
+        // French on a French system, English anywhere else, until the player chooses.
+        public static Language Language
+        {
+            get
+            {
+                Load();
+                return language;
+            }
+            set
+            {
+                Load();
+                if (value == language) return;
+                var before = language;
+                language = value;
+                PlayerPrefs.SetInt(LanguageKey, (int)value);
+                Changed?.Invoke();
+                LanguageChanged?.Invoke(before);
             }
         }
 
@@ -138,6 +162,8 @@ namespace DeadCounty.UI
             uiScale = Mathf.Clamp(PlayerPrefs.GetFloat(UiScaleKey, 1f), MinUiScale, MaxUiScale);
             tips = PlayerPrefs.GetInt(TipsKey, 1) == 1;
             reduceFlashes = PlayerPrefs.GetInt(ReduceFlashesKey, 0) == 1;
+            var systemLanguage = Application.systemLanguage == SystemLanguage.French ? Language.French : Language.English;
+            language = PlayerPrefs.GetInt(LanguageKey, (int)systemLanguage) == (int)Language.French ? Language.French : Language.English;
             masterVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(MasterVolumeKey, 0.8f));
             effectsVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(EffectsVolumeKey, 1f));
             ambienceVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(AmbienceVolumeKey, 1f));
@@ -151,6 +177,7 @@ namespace DeadCounty.UI
         {
             loaded = false;
             Changed = null;
+            LanguageChanged = null;
         }
     }
 }

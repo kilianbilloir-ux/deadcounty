@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DeadCounty.Items;
+using DeadCounty.UI;
 using UnityEngine;
 
 namespace DeadCounty.Player
@@ -78,7 +79,7 @@ namespace DeadCounty.Player
         }
 
         // What using the item would do now: a weapon in hand is put away.
-        public string UseVerb(ItemDefinition item) => item == Weapon ? "Ranger" : item.UseVerb;
+        public string UseVerb(ItemDefinition item) => Loc.T(item == Weapon ? "Ranger" : item.UseVerb);
 
         public bool Drop(ItemDefinition item)
         {

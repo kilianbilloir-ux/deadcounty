@@ -1,4 +1,5 @@
 using System;
+using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
 
@@ -13,8 +14,8 @@ namespace DeadCounty.Player
 
         Vector3 promptPoint;
 
-        public override string DisplayName => CanSleep ? "Lit" : "Lit (pas fatigué)";
-        public override string Action => CanSleep ? "Dormir" : null;
+        public override string DisplayName => Loc.T(CanSleep ? "Lit" : "Lit (pas fatigué)");
+        public override string Action => CanSleep ? Loc.T("Dormir") : null;
         public override Vector3 PromptPoint => promptPoint;
 
         static bool CanSleep

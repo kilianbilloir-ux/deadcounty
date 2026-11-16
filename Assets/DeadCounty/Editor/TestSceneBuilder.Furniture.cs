@@ -1,3 +1,4 @@
+using DeadCounty.Player;
 using UnityEngine;
 
 namespace DeadCounty.EditorTools
@@ -19,6 +20,11 @@ namespace DeadCounty.EditorTools
             return root;
         }
 
+        // Somewhere to sit and rest: `height` is the top of the seat, `halfWidth` how far from the middle one can sit,
+        // `depth` the sitter's local Z; furniture faces -Z, a pew the other way.
+        static void Sittable(Transform piece, string name, float height, float halfWidth, float depth, float facing = 180f)
+            => piece.gameObject.AddComponent<Seat>().Configure(name, height, halfWidth, depth, facing);
+
         static void Bit(Transform piece, string name, Vector3 center, Vector3 size, string mat, Quaternion? rot = null)
             => Box(name, piece, center, size, mat, rot, solid: false);
 
@@ -28,6 +34,7 @@ namespace DeadCounty.EditorTools
             var p = Piece(parent, name, pos, yaw, new Vector3(width, 0.85f, depth));
             // One model per size: the armchair, or the three-seater whatever the width asked for.
             Model("Modele", p, Vector3.zero, null, width < 1.5f ? "fauteuil" : "canape", ("#5E6B7A", fabric), ("#6C7A8A", Shade(fabric, 0.12f)));
+            Sittable(p, width < 1.5f ? "Fauteuil" : "Canapé", 0.48f, Mathf.Max(0f, width / 2f - 0.45f), -0.1f);
             return p;
         }
 

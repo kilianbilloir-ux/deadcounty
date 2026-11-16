@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace DeadCounty.Core
 {
-    // Crouch-idle maps to Idle and crouch-walk to Walk.
-    public enum StaminaActivity { Idle, Walk, Run, Sprint, Airborne }
+    // Crouch-idle maps to Idle and crouch-walk to Walk. Rest is sitting down, on a seat or on the ground.
+    public enum StaminaActivity { Idle, Walk, Run, Sprint, Airborne, Rest }
 
     [Serializable]
     public struct StaminaSettings
@@ -17,6 +17,8 @@ namespace DeadCounty.Core
         public float RegenDelay;
         public float IdleRegenPerSecond;
         public float WalkRegenPerSecond;
+        [Tooltip("Sitting down, the only quick way to get it back.")]
+        public float RestRegenPerSecond;
         [Tooltip("Running and sprinting stay locked after hitting 0 until stamina is back to this value.")]
         public float ExhaustionRecoverThreshold;
 
@@ -26,15 +28,17 @@ namespace DeadCounty.Core
             SprintDrainPerSecond = 20f,
             JumpCost = 10f,
             MinToJump = 10f,
-            RegenDelay = 1f,
-            IdleRegenPerSecond = 25f,
-            WalkRegenPerSecond = 18f,
-            ExhaustionRecoverThreshold = 40f,
+            RegenDelay = 2f,
+            IdleRegenPerSecond = 2f,
+            WalkRegenPerSecond = 1f,
+            RestRegenPerSecond = 6f,
+            ExhaustionRecoverThreshold = 25f,
         };
     }
 
-    // Sprinting, jumping and swinging drain it: running is free, its cost is noise. Emptying it exhausts the
-    // player, who can then only walk until it recovers.
+    // Sprinting, jumping and swinging drain it: running is free, its cost is noise. It comes back slowly, as in
+    // Project Zomboid: a full bar takes most of a minute standing still, twice that walking, a third of it sitting
+    // down. Emptying it exhausts the player, who can then only walk until it recovers.
     public class StaminaModel
     {
         readonly StaminaSettings settings;
@@ -65,6 +69,7 @@ namespace DeadCounty.Core
             {
                 StaminaActivity.Idle => settings.IdleRegenPerSecond,
                 StaminaActivity.Walk => settings.WalkRegenPerSecond,
+                StaminaActivity.Rest => settings.RestRegenPerSecond,
                 _ => 0f,
             };
             sinceCost += dt;

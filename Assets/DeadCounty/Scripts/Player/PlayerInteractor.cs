@@ -48,7 +48,7 @@ namespace DeadCounty.Player
                 ContinueUse();
                 return;
             }
-            Current = health.IsAlive && controller.Controllable ? Pick() : null;
+            Current = health.IsAlive && controller.Controllable && !controller.Seated ? Pick() : null;
             if (Current == null || !interact.WasPressedThisFrame()) return;
             var hurried = run.IsPressed() || sprint.IsPressed();
             var time = Current.UseTime(hurried);
