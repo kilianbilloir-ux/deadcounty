@@ -1,0 +1,6 @@
+﻿<Solution>
+  <Project Path="DeadCounty.Runtime.csproj" />
+  <Project Path="DeadCounty.Tests.PlayMode.csproj" />
+  <Project Path="DeadCounty.Tests.EditMode.csproj" />
+  <Project Path="DeadCounty.Editor.csproj" />
+</Solution>
