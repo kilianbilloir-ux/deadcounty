@@ -57,10 +57,13 @@ namespace DeadCounty.Tests
                 texts.Add(item.DisplayName);
                 if (item.Usable) texts.Add(item.UseVerb);
             }
-            // The names the builder gives to the furniture that can be searched.
-            var containers = Directory.GetFiles(Builder, "*.cs").SelectMany(file => Regex.Matches(File.ReadAllText(file), "Searchable\\([^;\"]*\"([^\"]+)\"").Select(m => m.Groups[1].Value)).Distinct().ToList();
-            Assert.That(containers.Count, Is.GreaterThan(5), "the containers were not found");
-            texts.AddRange(containers);
+            // The names the builder gives to the furniture that can be searched or sat on.
+            var furniture = Directory.GetFiles(Builder, "*.cs")
+                .SelectMany(file => Regex.Matches(File.ReadAllText(file), "(?:Searchable|Sittable)\\([^;]*;").SelectMany(call => Regex.Matches(call.Value, "\"([^\"]+)\"")))
+                .Select(m => m.Groups[1].Value).Where(text => !text.StartsWith("LT_")).Distinct().ToList();
+            Assert.That(furniture.Count, Is.GreaterThan(8), "the furniture was not found");
+            Assert.That(furniture, Does.Contain("Banc"));
+            texts.AddRange(furniture);
             Assert.That(texts.Where(t => !Loc.EnglishTexts.ContainsKey(t)), Is.Empty);
         }
 

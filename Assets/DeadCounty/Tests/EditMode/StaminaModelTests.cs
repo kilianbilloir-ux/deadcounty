@@ -49,17 +49,17 @@ namespace DeadCounty.Tests
         }
 
         [Test]
-        public void ExhaustionBlocksRunAndSprintUntilForty()
+        public void ExhaustionBlocksRunAndSprintUntilTwentyFive()
         {
             var model = Create();
             SprintUntilExhausted(model);
-            for (var i = 0; i < 1000 && model.Current < 40f; i++)
+            for (var i = 0; i < 2000 && model.Current < 25f; i++)
             {
                 Assert.That(model.CanRun, Is.False);
                 Assert.That(model.CanSprint, Is.False);
                 model.Tick(StaminaActivity.Idle, Dt);
             }
-            Assert.That(model.Current, Is.GreaterThanOrEqualTo(40f));
+            Assert.That(model.Current, Is.GreaterThanOrEqualTo(25f));
             Assert.That(model.Exhausted, Is.False);
             Assert.That(model.CanRun);
             Assert.That(model.CanSprint);
@@ -71,19 +71,22 @@ namespace DeadCounty.Tests
             var model = Create();
             Tick(model, StaminaActivity.Sprint, 2f);
             Assert.That(model.Current, Is.EqualTo(60f).Within(0.01f));
-            Tick(model, StaminaActivity.Idle, 1f);
+            Tick(model, StaminaActivity.Idle, 2f);
             Assert.That(model.Current, Is.EqualTo(60f).Within(0.01f));
-            Tick(model, StaminaActivity.Idle, 1f);
-            Assert.That(model.Current, Is.EqualTo(85f).Within(0.01f));
+            Tick(model, StaminaActivity.Idle, 5f);
+            Assert.That(model.Current, Is.EqualTo(70f).Within(0.01f));
         }
 
-        [Test]
-        public void WalkRegeneratesEighteenPerSecond()
+        // A full bar takes 50 s standing still, 100 s walking and about 17 s sitting down.
+        [TestCase(StaminaActivity.Idle, 2f)]
+        [TestCase(StaminaActivity.Walk, 1f)]
+        [TestCase(StaminaActivity.Rest, 6f)]
+        public void StaminaComesBackSlowlyAndFastestSittingDown(StaminaActivity activity, float perSecond)
         {
             var model = Create();
-            Tick(model, StaminaActivity.Sprint, 2f);
-            Tick(model, StaminaActivity.Walk, 2f);
-            Assert.That(model.Current, Is.EqualTo(78f).Within(0.01f));
+            Tick(model, StaminaActivity.Sprint, 3f);
+            Tick(model, activity, 2f + 5f);
+            Assert.That(model.Current, Is.EqualTo(40f + 5f * perSecond).Within(0.01f));
         }
 
         [Test]
@@ -91,9 +94,9 @@ namespace DeadCounty.Tests
         {
             var model = Create();
             Tick(model, StaminaActivity.Sprint, 2f);
-            Tick(model, StaminaActivity.Run, 1f);
+            Tick(model, StaminaActivity.Run, 2f);
             Tick(model, StaminaActivity.Idle, 1f);
-            Assert.That(model.Current, Is.EqualTo(85f).Within(0.01f));
+            Assert.That(model.Current, Is.EqualTo(62f).Within(0.01f));
         }
 
         [Test]
@@ -101,7 +104,7 @@ namespace DeadCounty.Tests
         {
             var model = Create();
             Tick(model, StaminaActivity.Sprint, 1f);
-            Tick(model, StaminaActivity.Idle, 5f);
+            Tick(model, StaminaActivity.Rest, 10f);
             Assert.That(model.Current, Is.EqualTo(100f));
             Assert.That(model.Normalized, Is.EqualTo(1f));
         }
@@ -111,11 +114,11 @@ namespace DeadCounty.Tests
         {
             var model = Create();
             Tick(model, StaminaActivity.Sprint, 2f);
-            Tick(model, StaminaActivity.Idle, 1.5f);
+            Tick(model, StaminaActivity.Idle, 3f);
             var beforeJump = model.Current;
             Assert.That(model.TryJump());
             Assert.That(model.Current, Is.EqualTo(beforeJump - 10f).Within(1e-4f));
-            Tick(model, StaminaActivity.Idle, 0.5f);
+            Tick(model, StaminaActivity.Idle, 1.5f);
             Assert.That(model.Current, Is.EqualTo(beforeJump - 10f).Within(1e-4f));
         }
 
@@ -135,7 +138,7 @@ namespace DeadCounty.Tests
         {
             var model = Create();
             SprintUntilExhausted(model);
-            Tick(model, StaminaActivity.Idle, 2f);
+            Tick(model, StaminaActivity.Idle, 9f);
             Assert.That(model.Current, Is.GreaterThan(10f));
             Assert.That(model.Exhausted);
             var before = model.Current;
@@ -173,14 +176,14 @@ namespace DeadCounty.Tests
             model.SetCapacity(0.5f);
             Assert.That(model.Current, Is.EqualTo(50f));
             SprintUntilExhausted(model);
-            Tick(model, StaminaActivity.Idle, 10f);
+            Tick(model, StaminaActivity.Rest, 20f);
             Assert.That(model.Current, Is.EqualTo(50f));
-            Assert.That(model.Exhausted, Is.False, "exhaustion must clear at 40");
+            Assert.That(model.Exhausted, Is.False, "exhaustion must clear at 25");
 
-            model.SetCapacity(0.3f);
+            model.SetCapacity(0.2f);
             SprintUntilExhausted(model);
-            Tick(model, StaminaActivity.Idle, 10f);
-            Assert.That(model.Current, Is.EqualTo(30f).Within(1e-3f));
+            Tick(model, StaminaActivity.Rest, 20f);
+            Assert.That(model.Current, Is.EqualTo(20f).Within(1e-3f));
             Assert.That(model.Exhausted, Is.False, "a capacity below the recovery threshold must not lock running for good");
 
             model.Reset();
@@ -194,7 +197,7 @@ namespace DeadCounty.Tests
             var model = Create();
             model.Exert(9f);
             Assert.That(model.Current, Is.EqualTo(91f));
-            Tick(model, StaminaActivity.Idle, 0.9f);
+            Tick(model, StaminaActivity.Idle, 1.9f);
             Assert.That(model.Current, Is.EqualTo(91f), "regenerated inside the delay");
         }
 
