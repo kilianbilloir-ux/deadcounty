@@ -64,6 +64,7 @@ namespace DeadCounty.Player
         string shownAction;
         Label flashlightLabel, weaponLabel, time, gameOverTitle, gameOverCause, gameOverTime, gameOverPrompt;
         StringBuilder text;
+        Loc.Layout layout;
         float healthValue, healthVelocity, staminaValue, staminaVelocity, flashValue;
         float healthOpacity, staminaOpacity, readoutOpacity, readoutsUntil;
         float hungerOpacity, thirstOpacity, fatigueOpacity, toastOpacity, toastUntil;
@@ -104,6 +105,7 @@ namespace DeadCounty.Player
             var root = document.rootVisualElement;
             if (root == null) throw new InvalidOperationException($"PlayerHudController on '{name}': no UI root");
             if (hudStyles != null) root.styleSheets.Add(hudStyles);
+            layout = new Loc.Layout(root);
             hud = Find<VisualElement>(root, "hud");
             healthRow = Find<VisualElement>(root, "health-row");
             staminaRow = Find<VisualElement>(root, "stamina-row");
@@ -174,6 +176,7 @@ namespace DeadCounty.Player
             sleep.WokeUp += ShowToast;
             InputPrompts.KeysChanged += ShowKeys;
             GameSettings.Changed += ApplyUiScale;
+            GameSettings.LanguageChanged += Translate;
         }
 
         void OnDisable()
@@ -183,11 +186,26 @@ namespace DeadCounty.Player
             sleep.WokeUp -= ShowToast;
             InputPrompts.KeysChanged -= ShowKeys;
             GameSettings.Changed -= ApplyUiScale;
+            GameSettings.LanguageChanged -= Translate;
         }
 
         void OnDestroy() => Destroy(panel);
 
         void ApplyUiScale() => panel.scale = GameSettings.UiScale;
+
+        // The layout's own texts, then those written here only when what they tell changes.
+        void Translate(Language before)
+        {
+            layout.Apply(before);
+            flashlightLabel.text = FlashlightText(flashlightWasOn);
+            weaponLabel.text = WeaponText(weaponShown);
+            shownInteractable = null;
+            minute = -1;
+        }
+
+        static string FlashlightText(bool lit) => Loc.T(lit ? "Lampe allumée" : "Lampe éteinte");
+
+        static string WeaponText(ItemDefinition weapon) => weapon != null ? weapon.LocalizedName : Loc.T("Mains nues");
 
         void ShowToast(string message)
         {
@@ -213,16 +231,16 @@ namespace DeadCounty.Player
 
         public static string CauseOfDeath(bool struck, bool bleeding, bool starving, bool dehydrated)
         {
-            if (struck) return "Tué par un zombie";
+            if (struck) return Loc.T("Tué par un zombie");
             var causes = new List<string>(3);
-            if (bleeding) causes.Add("d'une hémorragie");
-            if (starving) causes.Add("de faim");
-            if (dehydrated) causes.Add("de soif");
+            if (bleeding) causes.Add(Loc.T("d'une hémorragie"));
+            if (starving) causes.Add(Loc.T("de faim"));
+            if (dehydrated) causes.Add(Loc.T("de soif"));
             return causes.Count switch
             {
                 0 => "",
-                1 => $"Mort {causes[0]}",
-                _ => $"Mort {string.Join(", ", causes.GetRange(0, causes.Count - 1))} et {causes[^1]}",
+                1 => Loc.T("Mort {0}", causes[0]),
+                _ => Loc.T("Mort {0}", Loc.T("{0} et {1}", string.Join(", ", causes.GetRange(0, causes.Count - 1)), causes[^1])),
             };
         }
 
@@ -254,7 +272,7 @@ namespace DeadCounty.Player
             if (lit != flashlightWasOn)
             {
                 flashlightWasOn = lit;
-                flashlightLabel.text = lit ? "Lampe allumée" : "Lampe éteinte";
+                flashlightLabel.text = FlashlightText(lit);
                 flashlightLabel.EnableInClassList("flashlight-readout--on", lit);
                 ShowReadouts();
             }
@@ -262,7 +280,7 @@ namespace DeadCounty.Player
             if (weapon != weaponShown)
             {
                 weaponShown = weapon;
-                weaponLabel.text = weapon != null ? weapon.DisplayName : "Mains nues";
+                weaponLabel.text = WeaponText(weapon);
                 weaponLabel.EnableInClassList("weapon-readout--armed", weapon != null);
                 ShowReadouts();
             }
@@ -333,7 +351,7 @@ namespace DeadCounty.Player
                 return;
             }
             // Interact again stops a search: say so rather than repeat the action.
-            var action = interactor.Busy ? "Arrêter" : current.Action;
+            var action = interactor.Busy ? Loc.T("Arrêter") : current.Action;
             if (current != shownInteractable || action != shownAction)
             {
                 shownInteractable = current;
@@ -368,7 +386,7 @@ namespace DeadCounty.Player
             hour = h;
             minute = m;
             text.Clear();
-            text.Append("Jour ").Append(day).Append(" — ").Append(h.ToString("00")).Append(':').Append(m.ToString("00"));
+            text.Append(Loc.T("Jour ")).Append(day).Append(" — ").Append(h.ToString("00")).Append(':').Append(m.ToString("00"));
             time.text = text.ToString();
         }
 
@@ -389,7 +407,7 @@ namespace DeadCounty.Player
             {
                 var seconds = Mathf.FloorToInt(deathFlow.SurvivedSeconds);
                 text.Clear();
-                text.Append("Temps survécu : ").Append((seconds / 60).ToString("00")).Append(':').Append((seconds % 60).ToString("00"));
+                text.Append(Loc.T("Temps survécu : ")).Append((seconds / 60).ToString("00")).Append(':').Append((seconds % 60).ToString("00"));
                 gameOverTime.text = text.ToString();
             }
             else if (!dead && deathShown)

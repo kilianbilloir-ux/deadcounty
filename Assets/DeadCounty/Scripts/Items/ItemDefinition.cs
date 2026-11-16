@@ -1,5 +1,6 @@
 using DeadCounty.Audio;
 using DeadCounty.Combat;
+using DeadCounty.UI;
 using UnityEngine;
 
 namespace DeadCounty.Items
@@ -39,16 +40,18 @@ namespace DeadCounty.Items
         [Tooltip("Picture of the item in the inventory and the pickup feed, rendered from the WorldModel by the scene builder.")]
         public Texture2D Icon;
 
+        // DisplayName in the language of the game.
+        public string LocalizedName => Loc.T(DisplayName);
         public bool Usable => !string.IsNullOrEmpty(UseVerb);
         public bool IsWeapon => Category == ItemCategory.Weapon;
 
-        public static string CategoryName(ItemCategory category) => category switch
+        public static string CategoryName(ItemCategory category) => Loc.T(category switch
         {
             ItemCategory.Food => "Nourriture",
             ItemCategory.Drink => "Boisson",
             ItemCategory.Medical => "Soin",
             ItemCategory.Weapon => "Arme",
             _ => "Équipement",
-        };
+        });
     }
 }

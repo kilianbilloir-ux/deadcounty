@@ -68,9 +68,22 @@ namespace DeadCounty.Player
             panel.style.display = DisplayStyle.None;
         }
 
-        void OnEnable() => AIEvents.Transition += OnZombieTransition;
+        void OnEnable()
+        {
+            AIEvents.Transition += OnZombieTransition;
+            GameSettings.LanguageChanged += Translate;
+        }
 
-        void OnDisable() => AIEvents.Transition -= OnZombieTransition;
+        void OnDisable()
+        {
+            AIEvents.Transition -= OnZombieTransition;
+            GameSettings.LanguageChanged -= Translate;
+        }
+
+        void Translate(Language _)
+        {
+            if (Showing != null) body.text = Text(Showing);
+        }
 
         void OnZombieTransition(ZombieTransitionEvent e)
         {
@@ -138,12 +151,12 @@ namespace DeadCounty.Player
         // Written when shown, so the keys are those of the device in use.
         static string Text(string id) => id switch
         {
-            Search => $"Appuyez sur {Key("Player/Interact")} pour fouiller, sans bouger. En maintenant {Key("Player/Run")}, la fouille va plus vite mais fait du bruit.",
-            Need => $"Une jauge apparaît quand un besoin baisse. Mangez et buvez depuis l'inventaire ({Key("Player/Inventory")}).",
-            Zombie => $"Un zombie vous a remarqué. En marchant, vous allez plus vite que lui : éloignez-vous et sortez de sa vue. Accroupi ({Key("Player/Crouch")}), vous êtes plus discret.",
-            Weapon => $"Vous avez une arme en main : {Key("Player/Attack")} pour frapper. Chaque coup coûte de l'endurance et s'entend. Un zombie qui ne vous a pas remarqué encaisse le double.",
-            Felled => $"Un zombie est à terre. {Key("Player/Attack")} sur lui pour frapper au sol : le coup fait le double et le maintient au sol. Sinon, il se relève au bout de quelques secondes.",
-            Night => $"La nuit tombe. Les zombies voient moins loin, mais une lampe allumée ({Key("Player/Flashlight")}) se voit de très loin.",
+            Search => Loc.T("Appuyez sur {0} pour fouiller, sans bouger. En maintenant {1}, la fouille va plus vite mais fait du bruit.", Key("Player/Interact"), Key("Player/Run")),
+            Need => Loc.T("Une jauge apparaît quand un besoin baisse. Mangez et buvez depuis l'inventaire ({0}).", Key("Player/Inventory")),
+            Zombie => Loc.T("Un zombie vous a remarqué. En marchant, vous allez plus vite que lui : éloignez-vous et sortez de sa vue. Accroupi ({0}), vous êtes plus discret.", Key("Player/Crouch")),
+            Weapon => Loc.T("Vous avez une arme en main : {0} pour frapper. Chaque coup coûte de l'endurance et s'entend. Un zombie qui ne vous a pas remarqué encaisse le double.", Key("Player/Attack")),
+            Felled => Loc.T("Un zombie est à terre. {0} sur lui pour frapper au sol : le coup fait le double et le maintient au sol. Sinon, il se relève au bout de quelques secondes.", Key("Player/Attack")),
+            Night => Loc.T("La nuit tombe. Les zombies voient moins loin, mais une lampe allumée ({0}) se voit de très loin.", Key("Player/Flashlight")),
             _ => throw new ArgumentOutOfRangeException(nameof(id), id, "unknown tip"),
         };
 

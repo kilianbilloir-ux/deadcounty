@@ -196,6 +196,44 @@ namespace DeadCounty.Tests
         }
 
         [UnityTest]
+        public IEnumerator TheLanguageOptionRewritesEveryTextAtOnce()
+        {
+            var saved = GameSettings.Language;
+            try
+            {
+                GameSettings.Language = Language.French;
+                yield return Press(Key.Escape);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                for (var i = 0; i < 8; i++) yield return Press(Key.DownArrow);
+                Assert.That(Root.Q<Label>("option-language-value").text, Is.EqualTo("Français"));
+                yield return Press(Key.Enter);
+
+                Assert.That(GameSettings.Language, Is.EqualTo(Language.English));
+                Assert.That(Root.Q<Label>("option-language-value").text, Is.EqualTo("English"));
+                Assert.That(Root.Q<Label>("option-back").text, Is.EqualTo("Back"), "a text of the layout");
+                Assert.That(Root.Q<Label>("option-tips-value").text, Is.EqualTo(GameSettings.Tips ? "Yes" : "No"), "a value the menu writes");
+                Assert.That(Root.Q("controls-list").Q<Label>(className: "option-label").text, Is.EqualTo("Move forward"), "a row the menu built");
+                Assert.That(Root.Q("pause-hints").Query<Label>(className: "prompt-action").ToList().ConvertAll(l => l.text), Is.EqualTo(new[] { "Confirm", "Back" }));
+                Assert.That(Root.Q("pause-hints").Query<Label>(className: "keycap").ToList().ConvertAll(l => l.text), Is.EqualTo(new[] { "Enter", "Esc" }), "the keys are named in English too");
+                Assert.That(Root.Q<Label>("flashlight").text, Is.EqualTo("Flashlight off"), "a text the HUD writes when the lamp changes");
+                Assert.That(Root.Q<Label>("weapon").text, Is.EqualTo("Kitchen knife"));
+                Assert.That(Root.Q<Label>("game-over-title").text, Is.EqualTo("YOU DIED"));
+
+                yield return Press(Key.RightArrow);
+                Assert.That(GameSettings.Language, Is.EqualTo(Language.French));
+                Assert.That(Root.Q<Label>("option-back").text, Is.EqualTo("Retour"));
+                Assert.That(Root.Q<Label>("flashlight").text, Is.EqualTo("Lampe éteinte"));
+                Assert.That(Root.Q<Label>("weapon").text, Is.EqualTo("Couteau de cuisine"));
+                Assert.That(Root.Q("pause-hints").Query<Label>(className: "keycap").ToList().ConvertAll(l => l.text), Is.EqualTo(new[] { "Entrée", "Échap" }));
+            }
+            finally
+            {
+                GameSettings.Language = saved;
+            }
+        }
+
+        [UnityTest]
         public IEnumerator ControlsRebindAKeySwapTheOneItTookAndEscapeCancels()
         {
             var savedOverrides = InputSystem.actions.SaveBindingOverridesAsJson();
