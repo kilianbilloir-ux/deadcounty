@@ -1,0 +1,18 @@
+// Litter: two splintered pieces of crate board, one across the other, 0.2 x 0.16 x 0.04 m.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "board", "color": "#8C734C"},
+  {"op": "material", "name": "board_dark", "color": "#7A5A3C"},
+  {"op": "material", "name": "nail", "color": "#4D5257"},
+
+  {"op": "create", "id": "plank", "material": "board",
+   "gen": {"box": {"size": [0.2, 0.06, 0.018]}}, "t": [0, -0.03, 0.009],
+   "mods": [{"boolean": {"op": "difference", "with": ["break_a"]}}]},
+  {"op": "create", "id": "break_a", "gen": {"box": {"size": [0.06, 0.06, 0.04]}}, "r": [0, 0, 35], "t": [0.1, -0.005, 0.009]},
+  {"op": "create", "id": "piece", "material": "board_dark", "embed": ["plank"],
+   "gen": {"box": {"size": [0.14, 0.05, 0.016]}}, "r": [0, -6, 50], "t": [-0.02, 0.02, 0.022],
+   "mods": [{"boolean": {"op": "difference", "with": ["break_b"]}}]},
+  {"op": "create", "id": "break_b", "gen": {"box": {"size": [0.04, 0.05, 0.04]}}, "r": [0, 0, 80], "t": [0.03, 0.08, 0.022]},
+  {"op": "create", "id": "nail", "material": "nail", "embed": ["piece"],
+   "gen": {"cylinder": {"r": 0.003, "h": 0.03, "seg": 4}}, "r": [70, 0, 0], "t": [-0.05, -0.01, 0.03]}
+]

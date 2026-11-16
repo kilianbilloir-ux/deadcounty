@@ -1,5 +1,6 @@
 using DeadCounty.Audio;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace DeadCounty.Tests
 {
@@ -28,6 +29,26 @@ namespace DeadCounty.Tests
         [TestCase("Gravel", Surface.Gravel)]
         public void PaletteKeysMapToTheirSurface(string material, Surface expected) =>
             Assert.That(GroundSurface.FromMaterialName(material), Is.EqualTo(expected));
+
+        [Test]
+        public void ABlockWithoutARendererSaysItsSurfaceWithATag()
+        {
+            var block = new GameObject("TestBlock");
+            try
+            {
+                block.transform.position = new Vector3(500f, 300f, 500f);
+                block.AddComponent<BoxCollider>();
+                Physics.SyncTransforms();
+                var above = block.transform.position + Vector3.up * 0.6f;
+                Assert.That(GroundSurface.At(above), Is.EqualTo(GroundSurface.Fallback));
+                block.AddComponent<GroundSurfaceTag>().surface = Surface.Metal;
+                Assert.That(GroundSurface.At(above), Is.EqualTo(Surface.Metal));
+            }
+            finally
+            {
+                Object.DestroyImmediate(block);
+            }
+        }
 
         [TestCase("Default-Material")]
         [TestCase("Lit")]

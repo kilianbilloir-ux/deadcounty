@@ -1,0 +1,44 @@
+// Bathroom vanity, 1.0 x 0.5 x 0.9 m, facing -Y: a two-door cabinet on a plinth, a worktop with a round basin set
+// into it and a tap, a tiled splashback, and above it a medicine cabinet (1.2 to 2.0 m) whose mirror door keeps the
+// builder's glass (mat_Glass).
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "enamel", "color": "#E8E8E4"},
+  {"op": "material", "name": "enamel_shade", "color": "#D2D2CC"},
+  {"op": "material", "name": "plinth", "color": "#B8B2A4"},
+  {"op": "material", "name": "worktop", "color": "#B5AFA2"},
+  {"op": "material", "name": "tile", "color": "#D8D5CC"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+  {"op": "material", "name": "mat_Glass", "color": "#34424D"},
+
+  {"op": "create", "id": "plinth", "material": "plinth",
+   "gen": {"box": {"size": [0.94, 0.44, 0.08]}}, "t": [0, 0.02, 0.04]},
+  {"op": "create", "id": "body", "material": "enamel_shade",
+   "gen": {"box": {"size": [0.98, 0.48, 0.78]}}, "t": [0, 0.01, 0.47],
+   "mods": [{"boolean": {"op": "difference", "with": ["bowl_cut"]}}]},
+  {"op": "create", "id": "doors", "material": "enamel", "embed": ["body"],
+   "gen": {"box": {"size": [0.47, 0.02, 0.72]}}, "mods": [{"bevel": {"width": "8mm"}}, {"array": {"count": 2, "step": [0.48, 0, 0]}}], "t": [0, -0.235, 0.47]},
+  {"op": "create", "id": "handles", "material": "steel", "embed": ["doors"],
+   "gen": {"box": {"size": [0.02, 0.025, 0.12]}}, "mods": [{"array": {"count": 2, "step": [0.1, 0, 0]}}], "t": [0, -0.255, 0.72]},
+  {"op": "create", "id": "worktop", "material": "worktop",
+   "gen": {"box": {"size": [1.0, 0.5, 0.04]}}, "mods": [{"boolean": {"op": "difference", "with": ["bowl_cut"]}}], "t": [0, 0, 0.88]},
+
+  {"op": "create", "id": "bowl_cut", "gen": {"cylinder": {"r": 0.19, "h": 0.14, "seg": 12}}, "t": [0, -0.03, 0.85]},
+  {"op": "create", "id": "bowl_hollow", "gen": {"cylinder": {"r": 0.165, "h": 0.14, "seg": 12}}, "t": [0, -0.03, 0.87]},
+  {"op": "create", "id": "basin", "material": "enamel",
+   "gen": {"cylinder": {"r": 0.19, "h": 0.12, "seg": 12}}, "t": [0, -0.03, 0.84],
+   "mods": [{"boolean": {"op": "difference", "with": ["bowl_hollow"]}}]},
+  {"op": "create", "id": "drain", "material": "steel",
+   "gen": {"cylinder": {"r": 0.025, "h": 0.006, "seg": 8}}, "t": [0, -0.03, 0.803]},
+  {"op": "create", "id": "tap", "material": "steel",
+   "gen": {"tube": {"r": 0.014, "seg": 8, "bend": 0.04, "path": [[0, 0.2, 0.9], [0, 0.2, 1.04], [0, 0.07, 1.04], [0, 0.07, 1.0]]}}},
+  {"op": "create", "id": "tap_knobs", "material": "steel", "embed": ["tap"],
+   "gen": {"cylinder": {"r": 0.022, "h": 0.04, "seg": 8}}, "mods": [{"array": {"count": 2, "step": [0.12, 0, 0]}}], "t": [0, 0.2, 0.92]},
+
+  {"op": "create", "id": "splashback", "material": "tile",
+   "gen": {"box": {"size": [1.0, 0.02, 0.3]}}, "t": [0, 0.24, 1.05]},
+  {"op": "create", "id": "cabinet", "material": "enamel",
+   "gen": {"box": {"size": [0.7, 0.12, 0.8]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, 0.19, 1.6]},
+  {"op": "create", "id": "mirror", "material": "mat_Glass", "embed": ["cabinet"],
+   "gen": {"box": {"size": [0.62, 0.01, 0.72]}}, "t": [0, 0.128, 1.6]}
+]

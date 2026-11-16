@@ -1,0 +1,20 @@
+// Pallet racking, 8 x 0.8 x 3.2 m, along X: four blue upright frames braced front to back, three levels of orange
+// beams. The pallets and the goods are placed by the scene builder.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "blue", "color": "#2E4766"},
+  {"op": "material", "name": "blue_dark", "color": "#24384F"},
+  {"op": "material", "name": "orange", "color": "#E08A33"},
+
+  {"op": "create", "id": "uprights", "material": "blue",
+   "gen": {"box": {"size": [0.08, 0.08, 3.2]}},
+   "mods": [{"array": {"count": 4, "step": [2.63333, 0, 0]}}, {"array": {"count": 2, "step": [0, 0.72, 0]}}], "t": [0, 0, 1.6]},
+  {"op": "create", "id": "bracing", "material": "blue_dark", "embed": ["uprights"],
+   "gen": {"tube": {"r": 0.018, "seg": 4,
+     "path": [[-3.95, -0.33, 0.12], [-3.95, 0.33, 0.12], [-3.95, -0.33, 0.7], [-3.95, 0.33, 1.3], [-3.95, -0.33, 1.9],
+              [-3.95, 0.33, 2.5], [-3.95, -0.33, 3.05], [-3.95, 0.33, 3.05]]}},
+   "mods": [{"array": {"count": 4, "step": [2.63333, 0, 0]}}]},
+  {"op": "create", "id": "beams", "material": "orange", "embed": ["uprights"],
+   "gen": {"box": {"size": [8, 0.06, 0.1]}},
+   "mods": [{"array": {"count": 2, "step": [0, 0.72, 0]}}, {"array": {"count": 3, "step": [0, 0, 1.05]}}], "t": [0, 0, 1.2]}
+]

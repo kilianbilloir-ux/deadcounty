@@ -1,0 +1,22 @@
+// Pendant ceiling lamp, 0.68 m drop, origin on the ceiling it hangs from: a ceiling rose, a cord, a socket with its
+// bulb (unlit: the power is out) and a cone shade.
+[
+  {"op": "settings", "ground": false},
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "fitting", "color": "#E6E6E0"},
+  {"op": "material", "name": "cord", "color": "#2A2A2A"},
+  {"op": "material", "name": "shade", "color": "#C9BC9C"},
+  {"op": "material", "name": "bulb", "color": "#E2DED2"},
+
+  {"op": "create", "id": "rose", "material": "fitting",
+   "gen": {"cylinder": {"r": 0.06, "h": 0.03, "seg": 12}}, "t": [0, 0, -0.015]},
+  {"op": "create", "id": "cord", "material": "cord",
+   "gen": {"cylinder": {"r": 0.006, "h": 0.45, "seg": 4}}, "t": [0, 0, -0.255]},
+  {"op": "create", "id": "socket", "material": "fitting", "embed": ["cord", "shade"],
+   "gen": {"cylinder": {"r": 0.025, "h": 0.07, "seg": 8}}, "t": [0, 0, -0.51]},
+  {"op": "create", "id": "shade", "material": "shade",
+   "gen": {"revolve": {"axis": "z", "seg": 12,
+     "profile": [[0, -0.48], [0.06, -0.48], [0.23, -0.67], [0.21, -0.67], [0.045, -0.5], [0, -0.5]]}}},
+  {"op": "create", "id": "bulb", "material": "bulb", "embed": ["socket"],
+   "gen": {"sphere": {"r": 0.04, "seg": 8}}, "t": [0, 0, -0.58]}
+]

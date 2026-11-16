@@ -18,63 +18,39 @@ namespace DeadCounty.EditorTools
         {
             const float height = 2f, depth = 0.7f;
             var p = Piece(parent, "Vitrine_Froide", pos, yaw, new Vector3(length, height, depth));
-            Bit(p, "Fond", new Vector3(0f, height / 2f, depth / 2f - 0.03f), new Vector3(length, height, 0.06f), "Porcelain");
-            Bit(p, "Socle", new Vector3(0f, 0.08f, 0f), new Vector3(length, 0.16f, depth), "CarBlack");
-            Bit(p, "Fronton", new Vector3(0f, height - 0.1f, -depth / 2f + 0.03f), new Vector3(length, 0.2f, 0.06f), "SignRed");
+            // The model is 7 m long, the only length asked for; another one stretches its door frames.
+            Model("Modele", p, Vector3.zero, null, "vitrine_froide").transform.localScale = new Vector3(length / 7f, 1f, 1f);
             string[] drinks = { "SignRed", "CarBlue", "SignYellow", "ShutterGreen", "Water", "SignWhite" };
             for (var shelf = 0; shelf < 4; shelf++)
             {
-                var y = 0.2f + shelf * 0.42f;
-                Bit(p, "Grille", new Vector3(0f, y, 0.02f), new Vector3(length - 0.06f, 0.02f, depth - 0.15f), "MetalLight");
+                var top = 0.21f + shelf * 0.42f;
                 for (var x = -length / 2f + 0.12f; x < length / 2f - 0.1f; x += 0.11f)
                 {
                     if (rng.NextDouble() < 0.4) continue;
                     var tall = rng.NextDouble() < 0.5;
-                    Cylinder(tall ? "Bouteille" : "Canette", p, new Vector3(x, y + (tall ? 0.12f : 0.07f), Range(rng, -0.08f, 0.12f)), tall ? 0.035f : 0.033f, tall ? 0.24f : 0.13f,
-                        drinks[rng.Next(drinks.Length)], solid: false);
+                    Model(tall ? "Bouteille" : "Canette", p, new Vector3(x, top, Range(rng, -0.08f, 0.12f)), null, tall ? "bouteille_soda" : "canette",
+                        ("#A8322A", drinks[rng.Next(drinks.Length)]));
                 }
             }
-            var doors = Mathf.Max(1, Mathf.RoundToInt(length / 0.9f));
-            for (var i = 0; i <= doors; i++)
-                Bit(p, "Montant", new Vector3(-length / 2f + length * i / doors, height / 2f, -depth / 2f + 0.02f), new Vector3(0.05f, height - 0.2f, 0.04f), "Metal");
-            for (var i = 0; i < doors; i++)
-                Bit(p, "Poignee", new Vector3(-length / 2f + length * (i + 0.85f) / doors, 1.1f, -depth / 2f - 0.01f), new Vector3(0.03f, 0.4f, 0.03f), "MetalLight");
         }
 
         static void PropaneCage(Transform parent, Vector3 pos)
         {
             var p = Piece(parent, "Cage_Gaz", pos, 0f, new Vector3(1.6f, 1.5f, 0.8f));
-            foreach (var x in new[] { -0.78f, 0.78f })
-            foreach (var z in new[] { -0.38f, 0.38f })
-                Bit(p, "Montant", new Vector3(x, 0.75f, z), new Vector3(0.04f, 1.5f, 0.04f), "MetalLight");
-            foreach (var y in new[] { 0.05f, 0.75f, 1.48f })
-                Bit(p, "Etagere", new Vector3(0f, y, 0f), new Vector3(1.6f, 0.03f, 0.8f), "MetalLight");
-            for (var x = -0.55f; x <= 0.56f; x += 0.37f)
-            foreach (var y in new[] { 0.07f, 0.77f })
-            {
-                Cylinder("Bouteille_Gaz", p, new Vector3(x, y + 0.27f, 0f), 0.15f, 0.5f, "SignWhite", solid: false);
-                Cylinder("Robinet", p, new Vector3(x, y + 0.57f, 0f), 0.05f, 0.1f, "CarBlue", solid: false);
-            }
-            // Wire front: thin bars so the bottles show through.
-            for (var x = -0.7f; x <= 0.71f; x += 0.14f)
-                Bit(p, "Grillage", new Vector3(x, 0.75f, -0.4f), new Vector3(0.01f, 1.45f, 0.01f), "Metal");
+            Model("Modele", p, Vector3.zero, null, "cage_gaz");
         }
 
         static void IceChest(Transform parent, Vector3 pos)
         {
             var p = Piece(parent, "Glaciere", pos, 0f, new Vector3(1.6f, 1.1f, 0.8f));
-            Bit(p, "Caisse", new Vector3(0f, 0.55f, 0f), new Vector3(1.6f, 1.1f, 0.8f), "SignWhite");
-            Bit(p, "Bande", new Vector3(0f, 0.75f, -0.405f), new Vector3(1.2f, 0.22f, 0.01f), "CarBlue");
-            Bit(p, "Joint", new Vector3(0f, 0.55f, -0.405f), new Vector3(0.015f, 1f, 0.01f), "MetalLight");
-            foreach (var x in new[] { -0.12f, 0.12f })
-                Bit(p, "Poignee", new Vector3(x, 0.45f, -0.42f), new Vector3(0.03f, 0.25f, 0.03f), "MetalLight");
+            Model("Modele", p, Vector3.zero, null, "glaciere");
         }
 
         static void TireStack(Transform parent, Vector3 pos, int count, System.Random rng)
         {
             var stack = Group(parent, "Pneus", pos);
             for (var i = 0; i < count; i++)
-                Cylinder("Pneu", stack, new Vector3(Range(rng, -0.05f, 0.05f), 0.11f + i * 0.22f, Range(rng, -0.05f, 0.05f)), 0.33f, 0.22f, "Tire", solid: false);
+                Model("Pneu", stack, new Vector3(Range(rng, -0.05f, 0.05f), i * 0.22f, Range(rng, -0.05f, 0.05f)), null, "pneu");
         }
 
         // Price board digits on both faces of the station's sign.
@@ -89,32 +65,20 @@ namespace DeadCounty.EditorTools
         // Church pew facing +Z: seat, back on the -Z side, carved ends.
         static void Pew(Transform parent, Vector3 pos)
         {
-            const float length = 2.6f;
-            var p = Piece(parent, "Banc", pos, 0f, new Vector3(length, 0.9f, 0.5f));
-            Bit(p, "Assise", new Vector3(0f, 0.44f, 0.03f), new Vector3(length - 0.1f, 0.06f, 0.42f), "Wood");
-            Bit(p, "Dossier", new Vector3(0f, 0.72f, -0.2f), new Vector3(length - 0.1f, 0.46f, 0.06f), "Wood");
-            Bit(p, "Tablette", new Vector3(0f, 0.86f, -0.26f), new Vector3(length - 0.1f, 0.03f, 0.14f), "WoodDark");
-            foreach (var x in new[] { -length / 2f + 0.03f, length / 2f - 0.03f })
-                Bit(p, "Joue", new Vector3(x, 0.45f, 0f), new Vector3(0.06f, 0.9f, 0.5f), "WoodDark");
+            var p = Piece(parent, "Banc", pos, 0f, new Vector3(2.6f, 0.9f, 0.5f));
+            Model("Modele", p, Vector3.zero, null, "banc_eglise");
         }
 
         // Altar cloth, candles, lectern, cross on the back wall and a red runner down the aisle (church frame).
         static void ChurchDetails(Transform church)
         {
             Box("Tapis_Allee", church, new Vector3(0f, 0.105f, 7.5f), new Vector3(1.1f, 0.01f, 13f), "BlanketRed", solid: false);
-            Box("Nappe", church, new Vector3(0f, 0.85f, 14.28f), new Vector3(2.4f, 0.5f, 0.02f), "Linen", solid: false);
-            Box("Nappe_Dessus", church, new Vector3(0f, 1.005f, 14.8f), new Vector3(2.6f, 0.01f, 1.02f), "Linen", solid: false);
-            foreach (var x in new[] { -1.1f, 1.1f })
-            {
-                Cylinder("Cierge", church, new Vector3(x, 1.2f, 14.9f), 0.04f, 0.4f, "Linen", solid: false);
-                Box("Flamme", church, new Vector3(x, 1.43f, 14.9f), new Vector3(0.03f, 0.06f, 0.03f), "LampGlow", solid: false);
-            }
+            // Dresses the altar block of BuildChurch, 3 x 1 x 1 m centred on z = 14.8.
+            Model("Garniture_Autel", church, new Vector3(0f, 0f, 14.8f), null, "garniture_autel");
             Box("Croix", church, new Vector3(0f, 2.9f, 15.85f), new Vector3(0.18f, 2f, 0.08f), "WoodDark", solid: false);
             Box("Croix", church, new Vector3(0f, 3.3f, 15.85f), new Vector3(1.1f, 0.18f, 0.08f), "WoodDark", solid: false);
             var lectern = Group(church, "Pupitre", new Vector3(2.6f, 0f, 13f));
-            Box("Pied", lectern, new Vector3(0f, 0.55f, 0f), new Vector3(0.12f, 1.1f, 0.12f), "Wood", solid: false);
-            Box("Plateau", lectern, new Vector3(0f, 1.15f, 0f), new Vector3(0.6f, 0.04f, 0.45f), "Wood", Quaternion.Euler(-20f, 0f, 0f), solid: false);
-            Box("Livre", lectern, new Vector3(0f, 1.19f, 0.01f), new Vector3(0.4f, 0.04f, 0.3f), "BlanketRed", Quaternion.Euler(-20f, 0f, 0f), solid: false);
+            Model("Modele", lectern, Vector3.zero, null, "pupitre");
         }
 
         // Pallet racking along local X: orange beams on blue frames, pallets of boxes on three levels, gaps where
@@ -123,18 +87,14 @@ namespace DeadCounty.EditorTools
         {
             const float length = 8f, height = 3.2f, depth = 0.8f;
             var p = Piece(parent, "Etagere", pos, 0f, new Vector3(length, height, depth));
-            for (var i = 0; i <= 3; i++)
-            foreach (var z in new[] { -depth / 2f + 0.04f, depth / 2f - 0.04f })
-                Bit(p, "Montant", new Vector3(-length / 2f + 0.05f + i * (length - 0.1f) / 3f, height / 2f, z), new Vector3(0.08f, height, 0.08f), "CarBlue");
+            Model("Modele", p, Vector3.zero, null, "rayonnage");
             foreach (var y in new[] { 0.15f, 1.2f, 2.25f })
             {
-                foreach (var z in new[] { -depth / 2f + 0.04f, depth / 2f - 0.04f })
-                    Bit(p, "Lisse", new Vector3(0f, y, z), new Vector3(length, 0.1f, 0.06f), "Obstacle");
                 for (var bay = 0; bay < 3; bay++)
                 {
                     if (rng.NextDouble() < 0.3) continue;
                     var x = -length / 2f + (bay + 0.5f) * length / 3f;
-                    Bit(p, "Palette", new Vector3(x, y + 0.11f, 0f), new Vector3(1.2f, 0.12f, depth - 0.1f), "Wood");
+                    Model("Palette", p, new Vector3(x, y + 0.05f, 0f), null, "palette_rayonnage");
                     var boxes = rng.Next(1, 4);
                     for (var b = 0; b < boxes; b++)
                     {
@@ -191,10 +151,7 @@ namespace DeadCounty.EditorTools
         static void NewsBox(Transform parent, Vector3 pos, float yaw, string mat)
         {
             var p = Piece(parent, "Distributeur_Journaux", pos, yaw, new Vector3(0.45f, 1.05f, 0.4f));
-            Bit(p, "Pieds", new Vector3(0f, 0.15f, 0f), new Vector3(0.4f, 0.3f, 0.35f), "Metal");
-            Bit(p, "Caisse", new Vector3(0f, 0.68f, 0f), new Vector3(0.45f, 0.76f, 0.4f), mat);
-            Bit(p, "Vitre", new Vector3(0f, 0.78f, -0.205f), new Vector3(0.34f, 0.3f, 0.01f), "Glass");
-            Bit(p, "Journal", new Vector3(0f, 0.74f, -0.2f), new Vector3(0.28f, 0.2f, 0.005f), "Paper");
+            Model("Modele", p, Vector3.zero, null, "distributeur_journaux", ("#2E4766", mat), ("#3A5578", Shade(mat, 0.12f)));
         }
     }
 }

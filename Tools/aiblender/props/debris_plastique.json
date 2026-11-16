@@ -1,0 +1,18 @@
+// Car debris: a torn-off side mirror and two shards of black trim, 0.2 x 0.16 x 0.05 m.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "black", "color": "#1C1D20"},
+  {"op": "material", "name": "grey", "color": "#3A3E42"},
+  {"op": "material", "name": "mat_Glass", "color": "#34424D"},
+
+  {"op": "create", "id": "mirror", "material": "black",
+   "gen": {"box": {"size": [0.13, 0.08, 0.05]}}, "mods": [{"bevel": {"width": "1.5cm"}}], "r": [0, 0, 15], "t": [-0.02, 0.0, 0.025]},
+  {"op": "create", "id": "glass", "material": "mat_Glass", "embed": ["mirror"],
+   "gen": {"box": {"size": [0.11, 0.004, 0.035]}}, "r": [0, 0, 15], "t": [-0.0315, -0.039, 0.025]},
+  {"op": "create", "id": "stalk", "material": "grey", "embed": ["mirror"],
+   "gen": {"box": {"size": [0.04, 0.04, 0.02]}}, "r": [0, 0, 15], "t": [-0.08, 0.06, 0.01]},
+  {"op": "create", "id": "shard_a", "material": "black",
+   "gen": {"extrude": {"plane": "xy", "depth": 0.008, "origin": [0, 0, 0.004], "profile": [[0.05, -0.08], [0.1, -0.06], [0.09, -0.02], [0.06, -0.035]]}}},
+  {"op": "create", "id": "shard_b", "material": "grey",
+   "gen": {"extrude": {"plane": "xy", "depth": 0.008, "origin": [0, 0, 0.004], "profile": [[0.06, 0.03], [0.1, 0.05], [0.07, 0.08]]}}}
+]

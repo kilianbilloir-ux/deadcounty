@@ -1,0 +1,10 @@
+// Twig lying along Y, 0.5 m long, forked near its tip, pivot at its middle.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "bark", "color": "#4E3B2C"},
+
+  {"op": "create", "id": "twig", "material": "bark",
+   "gen": {"tube": {"r": 0.02, "r2": 0.008, "seg": 4, "path": [[0, -0.25, 0.02], [0.015, 0.0, 0.018], [0, 0.25, 0.012]]}}},
+  {"op": "create", "id": "fork", "material": "bark", "embed": ["twig"],
+   "gen": {"tube": {"r": 0.01, "r2": 0.006, "seg": 4, "path": [[0.012, 0.05, 0.018], [0.08, 0.2, 0.025]]}}}
+]

@@ -1,0 +1,8 @@
+// Sandbag, 0.56 x 0.42 x 0.26 m, lying along X: a plump burlap pillow.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "burlap", "color": "#857456"},
+
+  {"op": "create", "id": "bag", "material": "burlap",
+   "gen": {"box": {"size": [0.56, 0.42, 0.26]}}, "mods": [{"smooth": {"levels": 2}}], "t": [0, 0, 0.13]}
+]

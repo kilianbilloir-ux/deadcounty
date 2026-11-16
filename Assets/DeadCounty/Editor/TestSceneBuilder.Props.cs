@@ -1,3 +1,4 @@
+using DeadCounty.Audio;
 using UnityEngine;
 
 namespace DeadCounty.EditorTools
@@ -13,7 +14,7 @@ namespace DeadCounty.EditorTools
             var y = burnt ? -0.2f : 0f;
             var dark = burnt ? "CarBurnt" : "CarBlack";
             Model("Modele", car, new Vector3(0f, y, 0f), null, "voiture", burnt ? (AnyColor, "CarBurnt") : ("#7A2420", paint));
-            Solid(car, new Vector3(0f, 0.7f + y, 0f), new Vector3(4.5f, 0.75f, 1.85f));
+            Solid(car, new Vector3(0f, 0.7f + y, 0f), new Vector3(4.5f, 0.75f, 1.85f), Surface.Metal);
             if (doorOpen)
             {
                 // Driver door swung out on its front hinge; the dark opening shows behind it.
@@ -25,18 +26,11 @@ namespace DeadCounty.EditorTools
             return car;
         }
 
-        static void Wheels(Transform vehicle, float x, float z, float radius)
-        {
-            foreach (var (wx, wz) in new[] { (x, z), (x, -z), (-x, z), (-x, -z) })
-                Cylinder("Roue", vehicle, new Vector3(wx, radius, wz), radius, 0.26f, "Tire", Quaternion.Euler(90f, 0f, 0f), solid: false);
-        }
-
         static void PoliceCar(Transform parent, Vector3 pos, float yaw)
         {
             var car = Car(parent, "Voiture_Police", pos, yaw, "CarWhite");
             Box("Portieres", car, new Vector3(-0.1f, 0.72f, 0f), new Vector3(1.8f, 0.5f, 1.87f), "CarBlack", solid: false);
-            Box("Gyrophare_R", car, new Vector3(-0.25f, 1.82f, 0.32f), new Vector3(0.3f, 0.14f, 0.55f), "PoliceRed", solid: false);
-            Box("Gyrophare_B", car, new Vector3(-0.25f, 1.82f, -0.32f), new Vector3(0.3f, 0.14f, 0.55f), "PoliceBlue", solid: false);
+            Model("Gyrophare", car, new Vector3(-0.25f, 1.73f, 0f), null, "gyrophare");
         }
 
         static void Pickup(Transform parent, string name, Vector3 pos, float yaw, string paint, float tilt = 0f)
@@ -44,47 +38,30 @@ namespace DeadCounty.EditorTools
             var truck = Group(parent, name, pos, yaw);
             truck.localRotation *= Quaternion.Euler(tilt, 0f, 0f);
             Model("Modele", truck, Vector3.zero, null, "pickup", ("#7A2420", paint));
-            Solid(truck, new Vector3(0f, 0.75f, 0f), new Vector3(5.3f, 0.7f, 1.95f));
+            Solid(truck, new Vector3(0f, 0.75f, 0f), new Vector3(5.3f, 0.7f, 1.95f), Surface.Metal);
         }
 
         static void Bus(Transform parent, Vector3 pos, float yaw)
         {
             var bus = Group(parent, "Bus_Scolaire_Accidente", pos, yaw);
             bus.localRotation *= Quaternion.Euler(0f, 0f, 7f);
-            Box("Caisse", bus, new Vector3(0f, 1.75f, 0f), new Vector3(11f, 2.5f, 2.5f), "BusYellow");
-            Box("Vitres", bus, new Vector3(-0.4f, 2.3f, 0f), new Vector3(9.4f, 0.75f, 2.52f), "Glass", solid: false);
-            Box("Bandeau", bus, new Vector3(0f, 1.35f, 0f), new Vector3(11.02f, 0.12f, 2.52f), "CarBlack", solid: false);
-            Box("Pare_Brise", bus, new Vector3(5.51f, 2.2f, 0f), new Vector3(0.04f, 1f, 2.2f), "Glass", solid: false);
-            Box("Pare_Choc", bus, new Vector3(5.6f, 0.7f, 0f), new Vector3(0.2f, 0.3f, 2.5f), "CarBlack", solid: false);
-            Wheels(bus, 3.6f, 1.05f, 0.5f);
+            Model("Modele", bus, Vector3.zero, null, "bus");
+            Solid(bus, new Vector3(0f, 1.75f, 0f), new Vector3(11f, 2.5f, 2.5f), Surface.Metal);
         }
 
         static void Tractor(Transform parent, Vector3 pos, float yaw)
         {
             var t = Group(parent, "Tracteur", pos, yaw);
-            Box("Moteur", t, new Vector3(0.9f, 1.15f, 0f), new Vector3(1.9f, 0.85f, 0.85f), "TractorGreen");
-            Box("Corps", t, new Vector3(-0.6f, 1.25f, 0f), new Vector3(1.4f, 1f, 1.1f), "TractorGreen");
-            Box("Cabine", t, new Vector3(-0.7f, 2.35f, 0f), new Vector3(1.2f, 1.2f, 1.05f), "Glass", solid: false);
-            Box("Toit", t, new Vector3(-0.7f, 3f, 0f), new Vector3(1.4f, 0.08f, 1.3f), "TractorGreen", solid: false);
-            Post("Echappement", t, new Vector3(1.4f, 1.55f, 0.25f), 1.3f, 0.05f, "Metal", solid: false);
-            foreach (var z in new[] { -0.85f, 0.85f })
-            {
-                Cylinder("Roue_AR", t, new Vector3(-0.7f, 0.8f, z), 0.8f, 0.45f, "Tire", Quaternion.Euler(90f, 0f, 0f), solid: false);
-                Cylinder("Roue_AV", t, new Vector3(1.4f, 0.45f, z * 0.8f), 0.45f, 0.3f, "Tire", Quaternion.Euler(90f, 0f, 0f), solid: false);
-            }
+            Model("Modele", t, Vector3.zero, null, "tracteur");
+            Solid(t, new Vector3(0.9f, 1.15f, 0f), new Vector3(1.9f, 0.85f, 0.85f), Surface.Metal);
+            Solid(t, new Vector3(-0.6f, 1.25f, 0f), new Vector3(1.4f, 1f, 1.1f), Surface.Metal);
         }
 
         static void Forklift(Transform parent, Vector3 pos, float yaw)
         {
             var f = Group(parent, "Chariot_Elevateur", pos, yaw);
-            Box("Corps", f, new Vector3(0f, 0.75f, 0f), new Vector3(2f, 1.1f, 1.1f), "SignYellow");
-            Box("Toit", f, new Vector3(-0.1f, 2.1f, 0f), new Vector3(1.2f, 0.06f, 1f), "Metal", solid: false);
-            Post("Montant", f, new Vector3(0.45f, 1.3f, 0.45f), 0.8f, 0.04f, "Metal", solid: false);
-            Post("Montant", f, new Vector3(0.45f, 1.3f, -0.45f), 0.8f, 0.04f, "Metal", solid: false);
-            Box("Mat", f, new Vector3(1.1f, 1.3f, 0f), new Vector3(0.12f, 2.6f, 0.9f), "Metal", solid: false);
-            Box("Fourche", f, new Vector3(1.7f, 0.12f, 0.3f), new Vector3(1.1f, 0.05f, 0.12f), "Metal", solid: false);
-            Box("Fourche", f, new Vector3(1.7f, 0.12f, -0.3f), new Vector3(1.1f, 0.05f, 0.12f), "Metal", solid: false);
-            Wheels(f, 0.7f, 0.5f, 0.3f);
+            Model("Modele", f, Vector3.zero, null, "chariot_elevateur");
+            Solid(f, new Vector3(0f, 0.75f, 0f), new Vector3(2f, 1.1f, 1.1f), Surface.Metal);
         }
 
         static void Sawhorse(Transform parent, Vector3 pos, float yaw)
@@ -100,18 +77,24 @@ namespace DeadCounty.EditorTools
         static void Container(Transform parent, string name, Vector3 pos, float yaw, string mat)
         {
             var c = Group(parent, name, pos, yaw);
-            Box("Caisson", c, new Vector3(0f, 1.3f, 0f), new Vector3(6.1f, 2.6f, 2.44f), mat);
-            Box("Portes", c, new Vector3(3.06f, 1.3f, 0f), new Vector3(0.04f, 2.4f, 2.3f), "Metal", solid: false);
+            Model("Modele", c, Vector3.zero, null, "conteneur", ("#7A2420", mat), ("#5C1B18", Shade(mat, -0.25f)));
+            Solid(c, new Vector3(0f, 1.3f, 0f), new Vector3(6.1f, 2.6f, 2.44f), Surface.Metal);
         }
 
         static void HayBale(Transform parent, Vector3 pos, float yaw)
-            => Solid(Model("Botte_Foin", parent, pos, Quaternion.Euler(0f, yaw, 0f), "botte_foin").transform, new Vector3(0f, 0.75f, 0f), new Vector3(1.3f, 1.5f, 1.3f));
+            => Solid(Model("Botte_Foin", parent, pos, Quaternion.Euler(0f, yaw, 0f), "botte_foin").transform, new Vector3(0f, 0.75f, 0f), new Vector3(1.3f, 1.5f, 1.3f), Surface.Grass);
 
         static void Log(Transform parent, Vector3 pos, float yaw)
-            => Cylinder("Tronc_Couche", parent, pos + Vector3.up * 0.3f, 0.3f, 4f, "Trunk", Quaternion.Euler(0f, yaw, 90f));
+            => Solid(Model("Tronc_Couche", parent, pos, Quaternion.Euler(0f, yaw, 0f), "tronc").transform, new Vector3(0f, 0.3f, 0f), new Vector3(4f, 0.54f, 0.54f), Surface.Wood);
 
+        // Stacked by hand: every other pallet sits a little askew.
         static void PalletStack(Transform parent, Vector3 pos, int count)
-            => Box("Palettes", parent, pos + Vector3.up * count * 0.075f, new Vector3(1.2f, count * 0.15f, 1f), "Wood");
+        {
+            var stack = Group(parent, "Palettes", pos);
+            for (var i = 0; i < count; i++)
+                Model("Palette", stack, Vector3.up * i * 0.15f, Quaternion.Euler(0f, i % 2 * 4f - 2f, 0f), "palette");
+            Solid(stack, new Vector3(0f, count * 0.075f, 0f), new Vector3(1.2f, count * 0.15f, 1f), Surface.Wood);
+        }
 
         enum FenceKind { Board, Rail, Chain }
 
@@ -164,8 +147,8 @@ namespace DeadCounty.EditorTools
         static void Shed(Transform parent, Vector3 pos, float yaw, string roof)
         {
             var s = Group(parent, "Abri_Jardin", pos, yaw);
-            Box("Corps", s, new Vector3(0f, 1.15f, 0f), new Vector3(3f, 2.3f, 2.5f), "Wood");
-            Box("Porte", s, new Vector3(0f, 0.95f, -1.26f), new Vector3(1.1f, 1.9f, 0.04f), "WoodDark", solid: false);
+            Model("Modele", s, Vector3.zero, null, "abri_jardin");
+            Solid(s, new Vector3(0f, 1.15f, 0f), new Vector3(3f, 2.3f, 2.5f));
             GableRoof(s, new Vector3(0f, 2.3f, 0f), 3.4f, 2.9f, 0.8f, 0f, new Vector2(1.5f, 1.25f), roof, "Wood", null);
         }
 
@@ -173,7 +156,7 @@ namespace DeadCounty.EditorTools
         {
             var t = Group(parent, "Table_Pique_Nique", pos, yaw);
             Model("Modele", t, Vector3.zero, null, "table_pique_nique");
-            Solid(t, new Vector3(0f, 0.75f, 0f), new Vector3(1.8f, 0.06f, 0.8f));
+            Solid(t, new Vector3(0f, 0.75f, 0f), new Vector3(1.8f, 0.06f, 0.8f), Surface.Wood);
         }
 
         static void Clothesline(Transform parent, Vector3 a, Vector3 b)
@@ -197,10 +180,12 @@ namespace DeadCounty.EditorTools
         static Light Floodlight(Transform parent, Vector3 basePos, Vector3 target)
         {
             var mast = Group(parent, "Projecteur", basePos);
-            Post("Mat", mast, Vector3.zero, 10f, 0.15f, "Metal");
             var head = mast.position + Vector3.up * 10f;
             var rot = Quaternion.LookRotation(target - head);
-            Box("Tete", mast, Vector3.up * 10f, new Vector3(1.2f, 0.7f, 0.3f), "PanelGlow", rot, solid: false);
+            // The yoke on top of the mast turns with the lamp, which tilts in it.
+            Model("Mat", mast, Vector3.zero, Quaternion.Euler(0f, rot.eulerAngles.y, 0f), "mat_projecteur");
+            Solid(mast, new Vector3(0f, 5f, 0f), new Vector3(0.27f, 10f, 0.27f));
+            Model("Tete", mast, Vector3.up * 10f, rot, "projecteur");
             return SpotLight(mast, "Lumiere", Vector3.up * 10f, rot, new Color(0.92f, 0.95f, 1f), 25f, 70f, 75f, true);
         }
     }

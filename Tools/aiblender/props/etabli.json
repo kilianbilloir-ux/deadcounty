@@ -1,0 +1,43 @@
+// Workbench, 2.4 x 0.6 m with its plank top at 0.9 m, facing -Y: four legs, a low shelf, a bench vise at the right
+// front, and at the back a pegboard (0.9 to 1.9 m, front face at y = 0.265) where the scene builder hangs the tools.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#7A5A3C"},
+  {"op": "material", "name": "wood_light", "color": "#8A6A4A"},
+  {"op": "material", "name": "wood_dark", "color": "#4A3828"},
+  {"op": "material", "name": "shelf", "color": "#553D2C"},
+  {"op": "material", "name": "pegboard", "color": "#8C734C"},
+  {"op": "material", "name": "hole", "color": "#3A2E22"},
+  {"op": "material", "name": "iron", "color": "#4D5257"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "legs", "material": "wood_dark",
+   "gen": {"box": {"size": [0.07, 0.07, 0.84]}}, "mods": [{"array": {"count": 2, "step": [2.26, 0, 0]}}, {"array": {"count": 2, "step": [0, 0.46, 0]}}], "t": [0, 0, 0.42]},
+  {"op": "create", "id": "top", "material": "wood",
+   "gen": {"box": {"size": [2.4, 0.6, 0.06]}}, "t": [0, 0, 0.87]},
+  {"op": "create", "id": "planks", "material": "wood_light", "embed": ["top"],
+   "gen": {"box": {"size": [2.38, 0.14, 0.061]}}, "mods": [{"array": {"count": 2, "step": [0, 0.3, 0]}}], "t": [0, 0, 0.87]},
+  {"op": "create", "id": "shelf", "material": "shelf", "embed": ["legs"],
+   "gen": {"box": {"size": [2.3, 0.5, 0.03]}}, "t": [0, 0, 0.2]},
+  {"op": "create", "id": "posts", "material": "wood_dark",
+   "gen": {"box": {"size": [0.07, 0.03, 1.0]}}, "mods": [{"array": {"count": 2, "step": [2.26, 0, 0]}}], "t": [0, 0.28, 1.4]},
+  {"op": "create", "id": "pegboard", "material": "pegboard",
+   "gen": {"box": {"size": [2.19, 0.03, 1.0]}}, "t": [0, 0.28, 1.4]},
+  {"op": "create", "id": "holes", "material": "hole", "embed": ["pegboard"],
+   "gen": {"box": {"size": [0.022, 0.004, 0.022]}}, "mods": [{"array": {"count": 11, "step": [0.19, 0, 0]}}, {"array": {"count": 4, "step": [0, 0, 0.22]}}], "t": [0, 0.2645, 1.42]},
+  {"op": "create", "id": "rack", "material": "wood_dark",
+   "gen": {"box": {"size": [2.4, 0.16, 0.025]}}, "t": [0, 0.22, 1.9125]},
+
+  {"op": "create", "id": "vise_base", "material": "iron",
+   "gen": {"box": {"size": [0.16, 0.14, 0.02]}}, "t": [0.95, -0.1, 0.91]},
+  {"op": "create", "id": "vise_rail", "material": "iron", "embed": ["jaw_fixed", "jaw_moving"],
+   "gen": {"box": {"size": [0.08, 0.22, 0.04]}}, "t": [0.95, -0.15, 0.94]},
+  {"op": "create", "id": "jaw_fixed", "material": "iron",
+   "gen": {"box": {"size": [0.18, 0.05, 0.1]}}, "mods": [{"bevel": {"width": "6mm"}}], "t": [0.95, -0.08, 0.97]},
+  {"op": "create", "id": "jaw_moving", "material": "iron",
+   "gen": {"box": {"size": [0.18, 0.05, 0.08]}}, "mods": [{"bevel": {"width": "6mm"}}], "t": [0.95, -0.2, 0.98]},
+  {"op": "create", "id": "screw", "material": "steel", "embed": ["jaw_moving"],
+   "gen": {"cylinder": {"r": 0.012, "h": 0.1, "seg": 8}}, "r": [90, 0, 0], "t": [0.95, -0.27, 0.98]},
+  {"op": "create", "id": "handle", "material": "steel", "embed": ["screw"],
+   "gen": {"cylinder": {"r": 0.008, "h": 0.2, "seg": 8}}, "r": [0, 90, 0], "t": [0.95, -0.31, 0.98]}
+]

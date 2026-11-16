@@ -22,38 +22,6 @@ namespace DeadCounty.EditorTools
         static void Bit(Transform piece, string name, Vector3 center, Vector3 size, string mat, Quaternion? rot = null)
             => Box(name, piece, center, size, mat, rot, solid: false);
 
-        static void Legs(Transform piece, float width, float depth, float height, float thickness, string mat)
-        {
-            foreach (var x in new[] { -1f, 1f })
-            foreach (var z in new[] { -1f, 1f })
-                Bit(piece, "Pied", new Vector3(x * (width / 2f - thickness), height / 2f, z * (depth / 2f - thickness)), new Vector3(thickness, height, thickness), mat);
-        }
-
-        // Front panel lines and a knob per door, so a block of wood reads as a cabinet. Knobs sit near the top
-        // unless handleY says otherwise (low on wall cabinets, at hand height on a wardrobe).
-        static void Doors(Transform piece, float width, float bottom, float top, float depth, int count, string mat = "WoodDark", float handleY = float.NaN)
-        {
-            if (float.IsNaN(handleY)) handleY = top - 0.12f;
-            var front = -depth / 2f - 0.005f;
-            for (var i = 1; i < count; i++)
-                Bit(piece, "Joint", new Vector3(-width / 2f + width * i / count, (bottom + top) / 2f, front), new Vector3(0.015f, top - bottom - 0.04f, 0.01f), mat);
-            for (var i = 0; i < count; i++)
-            {
-                var x = -width / 2f + width * (i + 0.5f) / count + (count > 1 ? (i % 2 == 0 ? 0.3f : -0.3f) * width / count : 0f);
-                Bit(piece, "Poignee", new Vector3(x, handleY, front - 0.01f), new Vector3(0.03f, 0.1f, 0.025f), "Metal");
-            }
-        }
-
-        static void Drawers(Transform piece, float width, float bottom, float top, float depth, int count)
-        {
-            var front = -depth / 2f - 0.005f;
-            var step = (top - bottom) / count;
-            for (var i = 1; i < count; i++)
-                Bit(piece, "Joint", new Vector3(0f, bottom + step * i, front), new Vector3(width - 0.06f, 0.015f, 0.01f), "WoodDark");
-            for (var i = 0; i < count; i++)
-                Bit(piece, "Poignee", new Vector3(0f, bottom + step * (i + 0.5f), front - 0.01f), new Vector3(0.16f, 0.025f, 0.025f), "Metal");
-        }
-
         static Transform Sofa(Transform parent, string name, Vector3 pos, float yaw, float width, string fabric)
         {
             const float depth = 0.9f;
@@ -85,11 +53,7 @@ namespace DeadCounty.EditorTools
         static Transform TvStand(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Meuble_TV", pos, yaw, new Vector3(1.8f, 0.6f, 0.45f));
-            Bit(p, "Caisson", new Vector3(0f, 0.3f, 0f), new Vector3(1.8f, 0.56f, 0.45f), "Furniture");
-            Doors(p, 1.8f, 0.06f, 0.56f, 0.45f, 2);
-            Bit(p, "Pied_TV", new Vector3(0f, 0.63f, 0.05f), new Vector3(0.3f, 0.06f, 0.2f), "CarBlack");
-            Bit(p, "TV", new Vector3(0f, 0.98f, 0.05f), new Vector3(1.2f, 0.66f, 0.07f), "CarBlack");
-            Bit(p, "Ecran", new Vector3(0f, 0.98f, 0.012f), new Vector3(1.12f, 0.6f, 0.01f), "Glass");
+            Model("Modele", p, Vector3.zero, null, "meuble_tv");
             return p;
         }
 
@@ -97,15 +61,12 @@ namespace DeadCounty.EditorTools
         {
             const float width = 1.4f, height = 2f, depth = 0.38f;
             var p = Piece(parent, "Bibliotheque", pos, yaw, new Vector3(width, height, depth));
-            Bit(p, "Fond", new Vector3(0f, height / 2f, depth / 2f - 0.015f), new Vector3(width, height, 0.03f), "Furniture");
-            foreach (var x in new[] { -1f, 1f })
-                Bit(p, "Montant", new Vector3(x * (width / 2f - 0.02f), height / 2f, 0f), new Vector3(0.04f, height, depth), "Furniture");
+            Model("Modele", p, Vector3.zero, null, "bibliotheque");
             string[] covers = { "SignRed", "ShutterGreen", "Fabric", "CarBeige", "ShutterDark", "Hay" };
-            for (var shelf = 0; shelf < 5; shelf++)
+            // The model's shelves, top shelf aside: centred at y, 3 cm thick.
+            for (var shelf = 0; shelf < 4; shelf++)
             {
                 var y = 0.04f + shelf * 0.48f;
-                Bit(p, "Etagere", new Vector3(0f, y, 0f), new Vector3(width - 0.08f, 0.03f, depth - 0.03f), "Furniture");
-                if (shelf == 4) continue;
                 // Half-emptied shelves: looters went through them.
                 var x = -width / 2f + 0.08f;
                 while (x < width / 2f - 0.12f)
@@ -129,27 +90,17 @@ namespace DeadCounty.EditorTools
         {
             const float depth = 0.6f, height = 0.9f;
             var p = Piece(parent, "Plan_Travail", pos, yaw, new Vector3(length, height, depth));
-            Bit(p, "Caissons", new Vector3(0f, 0.43f, 0.02f), new Vector3(length, 0.86f, depth - 0.04f), "Furniture");
-            Bit(p, "Plinthe", new Vector3(0f, 0.05f, -depth / 2f + 0.06f), new Vector3(length, 0.1f, 0.02f), "WoodDark");
-            Bit(p, "Dessus", new Vector3(0f, height - 0.02f, 0f), new Vector3(length + 0.04f, 0.04f, depth + 0.02f), "Countertop");
-            Doors(p, length, 0.12f, 0.84f, depth, Mathf.Max(2, Mathf.RoundToInt(length / 0.5f)));
-            if (sink)
-            {
-                Bit(p, "Evier", new Vector3(length * 0.2f, height - 0.015f, 0f), new Vector3(0.5f, 0.02f, 0.4f), "MetalLight");
-                Bit(p, "Robinet", new Vector3(length * 0.2f, height + 0.12f, depth / 2f - 0.08f), new Vector3(0.04f, 0.24f, 0.04f), "MetalLight");
-                Bit(p, "Bec", new Vector3(length * 0.2f, height + 0.23f, depth / 2f - 0.16f), new Vector3(0.03f, 0.03f, 0.16f), "MetalLight");
-            }
-            Bit(p, "Placard_Haut", new Vector3(0f, 1.9f, depth / 2f - 0.17f), new Vector3(length, 0.7f, 0.34f), "Furniture");
-            var upper = Group(p, "Portes_Haut", new Vector3(0f, 0f, depth / 2f - 0.17f));
-            Doors(upper, length, 1.56f, 2.24f, 0.34f, Mathf.Max(2, Mathf.RoundToInt(length / 0.5f)), handleY: 1.66f);
-            // Whatever was left on the worktop.
+            // Modelled 3 m long, the sink a fifth of the way along: stretched to the length asked for.
+            Model("Modele", p, Vector3.zero, null, sink ? "plan_travail_evier" : "plan_travail").transform.localScale = new Vector3(length / 3f, 1f, 1f);
+            // Whatever was left on the worktop, or in the sink: its basin, floor at 0.75, is 0.42 m wide before stretching.
             for (var i = rng.Next(2, 5); i > 0; i--)
             {
                 var x = Range(rng, -length / 2f + 0.15f, length / 2f - 0.15f);
+                var bottom = sink && Mathf.Abs(x - length * 0.2f) < 0.21f * length / 3f ? 0.75f : height;
                 if (rng.NextDouble() < 0.5)
-                    Cylinder("Bouteille", p, new Vector3(x, height + 0.12f, Range(rng, -0.1f, 0.15f)), 0.035f, 0.24f, rng.NextDouble() < 0.5 ? "Glass" : "ShutterGreen", solid: false);
+                    Cylinder("Bouteille", p, new Vector3(x, bottom + 0.12f, Range(rng, -0.1f, 0.15f)), 0.035f, 0.24f, rng.NextDouble() < 0.5 ? "Glass" : "ShutterGreen", solid: false);
                 else
-                    Bit(p, "Boite", new Vector3(x, height + 0.08f, Range(rng, -0.1f, 0.15f)), new Vector3(0.12f, 0.16f, 0.08f), "Crate", Quaternion.Euler(0f, Range(rng, -30f, 30f), 0f));
+                    Bit(p, "Boite", new Vector3(x, bottom + 0.08f, Range(rng, -0.1f, 0.15f)), new Vector3(0.12f, 0.16f, 0.08f), "Crate", Quaternion.Euler(0f, Range(rng, -30f, 30f), 0f));
             }
             return p;
         }
@@ -173,11 +124,8 @@ namespace DeadCounty.EditorTools
         {
             const float width = 2.4f, depth = 0.6f, height = 0.9f;
             var p = Piece(parent, "Etabli", pos, yaw, new Vector3(width, height, depth));
-            Bit(p, "Plateau", new Vector3(0f, height - 0.03f, 0f), new Vector3(width, 0.06f, depth), "Wood");
-            Legs(p, width, depth, height - 0.06f, 0.07f, "WoodDark");
-            Bit(p, "Tablette", new Vector3(0f, 0.2f, 0f), new Vector3(width - 0.1f, 0.03f, depth - 0.1f), "WoodDark");
-            Bit(p, "Panneau", new Vector3(0f, height + 0.55f, depth / 2f - 0.02f), new Vector3(width, 0.9f, 0.03f), "Crate");
-            Bit(p, "Etau", new Vector3(width / 2f - 0.25f, height + 0.08f, -0.15f), new Vector3(0.18f, 0.12f, 0.2f), "Metal");
+            Model("Modele", p, Vector3.zero, null, "etabli");
+            // Hung on the model's pegboard, whose face is at z = 0.265.
             for (var i = rng.Next(3, 6); i > 0; i--)
                 Bit(p, "Outil", new Vector3(Range(rng, -width / 2f + 0.2f, width / 2f - 0.2f), height + Range(rng, 0.3f, 0.8f), depth / 2f - 0.05f),
                     new Vector3(Range(rng, 0.04f, 0.08f), Range(rng, 0.2f, 0.35f), 0.03f), rng.NextDouble() < 0.5 ? "Metal" : "SignRed", Quaternion.Euler(0f, 0f, Range(rng, -15f, 15f)));
@@ -188,14 +136,11 @@ namespace DeadCounty.EditorTools
         {
             const float width = 2f, depth = 0.5f, height = 1.8f;
             var p = Piece(parent, "Etagere", pos, yaw, new Vector3(width, height, depth));
-            foreach (var x in new[] { -1f, 1f })
-            foreach (var z in new[] { -1f, 1f })
-                Bit(p, "Montant", new Vector3(x * (width / 2f - 0.02f), height / 2f, z * (depth / 2f - 0.02f)), new Vector3(0.04f, height, 0.04f), "Metal");
-            for (var shelf = 0; shelf < 4; shelf++)
+            Model("Modele", p, Vector3.zero, null, "etagere_metal");
+            // The model's shelves, top shelf aside: their tops at y + 0.015.
+            for (var shelf = 0; shelf < 3; shelf++)
             {
                 var y = 0.1f + shelf * 0.55f;
-                Bit(p, "Plateau", new Vector3(0f, y, 0f), new Vector3(width, 0.03f, depth), "MetalLight");
-                if (shelf == 3) continue;
                 for (var x = -width / 2f + 0.2f; x < width / 2f - 0.15f; x += Range(rng, 0.3f, 0.55f))
                 {
                     if (rng.NextDouble() < 0.35) continue;
@@ -213,16 +158,16 @@ namespace DeadCounty.EditorTools
         {
             const float depth = 0.7f, height = 1.6f;
             var p = Piece(parent, "Rayon", pos, yaw, new Vector3(length, height, depth));
-            Bit(p, "Dos", new Vector3(0f, height / 2f, 0f), new Vector3(length, height, 0.04f), "MetalLight");
-            Bit(p, "Socle", new Vector3(0f, 0.08f, 0f), new Vector3(length, 0.16f, depth), "Metal");
-            Bit(p, "Fronton", new Vector3(0f, height + 0.08f, 0f), new Vector3(length, 0.16f, 0.06f), "SignGreen");
+            // Bays of 1.2 m, stretched a little when the length is not a whole number of them.
+            var bays = Mathf.Max(1, Mathf.RoundToInt(length / 1.2f));
+            for (var i = 0; i < bays; i++)
+                Model("Modele", p, new Vector3(-length / 2f + (i + 0.5f) * length / bays, 0f, 0f), null, "rayon").transform.localScale = new Vector3(length / bays / 1.2f, 1f, 1f);
             string[] goods = { "SignRed", "SignYellow", "SignWhite", "ShutterGreen", "CarBlue", "Crate", "Hay" };
             for (var shelf = 0; shelf < 3; shelf++)
             {
                 var y = 0.16f + shelf * 0.48f;
                 foreach (var side in new[] { -1f, 1f })
                 {
-                    Bit(p, "Tablette", new Vector3(0f, y + 0.02f, side * depth / 4f), new Vector3(length - 0.04f, 0.03f, depth / 2f - 0.03f), "MetalLight");
                     for (var x = -length / 2f + 0.2f; x < length / 2f - 0.2f; x += Range(rng, 0.25f, 0.6f))
                     {
                         if (rng.NextDouble() < 0.45) continue;
@@ -242,21 +187,16 @@ namespace DeadCounty.EditorTools
         {
             const float depth = 0.7f;
             var p = Piece(parent, "Comptoir", pos, yaw, new Vector3(length, 1f, depth));
-            Bit(p, "Caisson", new Vector3(0f, 0.47f, 0f), new Vector3(length, 0.94f, depth), "Furniture");
-            Bit(p, "Dessus", new Vector3(0f, 0.97f, 0f), new Vector3(length + 0.05f, 0.05f, depth + 0.05f), "Countertop");
-            Bit(p, "Tapis", new Vector3(-length / 6f, 1.0f, 0f), new Vector3(length * 0.53f, 0.02f, 0.4f), "CarBlack");
-            Bit(p, "Caisse", new Vector3(length / 2f - 0.5f, 1.1f, 0.05f), new Vector3(0.4f, 0.22f, 0.35f), "Metal");
-            Bit(p, "Tiroir_Caisse", new Vector3(length / 2f - 0.5f, 0.93f, -0.33f), new Vector3(0.36f, 0.1f, 0.3f), "Metal");
+            // The counter, modelled 3 m long, stretches to the length asked for; the register on its top keeps its size.
+            Model("Modele", p, Vector3.zero, null, "comptoir").transform.localScale = new Vector3(length / 3f, 1f, 1f);
+            Model("Caisse", p, new Vector3(length / 2f - 0.5f, 0.995f, 0f), null, "caisse_enregistreuse");
             return p;
         }
 
         static Transform Nightstand(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Table_Chevet", pos, yaw, new Vector3(0.45f, 0.55f, 0.4f));
-            Bit(p, "Caisson", new Vector3(0f, 0.28f, 0f), new Vector3(0.45f, 0.5f, 0.4f), "Furniture");
-            Drawers(p, 0.45f, 0.06f, 0.5f, 0.4f, 2);
-            Cylinder("Pied_Lampe", p, new Vector3(0f, 0.65f, 0.05f), 0.04f, 0.2f, "MetalLight", solid: false);
-            Cylinder("Abat_Jour", p, new Vector3(0f, 0.84f, 0.05f), 0.13f, 0.2f, "Lampshade", solid: false);
+            Model("Modele", p, Vector3.zero, null, "chevet");
             return p;
         }
 
@@ -264,10 +204,7 @@ namespace DeadCounty.EditorTools
         {
             const float width = 1f, height = 2f, depth = 0.6f;
             var p = Piece(parent, "Armoire", pos, yaw, new Vector3(width, height, depth));
-            Bit(p, "Caisse", new Vector3(0f, height / 2f + 0.03f, 0f), new Vector3(width, height - 0.06f, depth), "Furniture");
-            Bit(p, "Corniche", new Vector3(0f, height - 0.02f, -0.01f), new Vector3(width + 0.05f, 0.05f, depth + 0.04f), "WoodDark");
-            Legs(p, width, depth, 0.06f, 0.05f, "WoodDark");
-            Doors(p, width, 0.1f, height - 0.06f, depth, 2, handleY: 1.05f);
+            Model("Modele", p, Vector3.zero, null, "armoire");
             return p;
         }
 
@@ -275,11 +212,7 @@ namespace DeadCounty.EditorTools
         {
             const float width = 1.2f, height = 0.9f, depth = 0.45f;
             var p = Piece(parent, "Commode", pos, yaw, new Vector3(width, height, depth));
-            Bit(p, "Caisse", new Vector3(0f, height / 2f + 0.03f, 0f), new Vector3(width, height - 0.06f, depth), "Furniture");
-            Legs(p, width, depth, 0.06f, 0.05f, "WoodDark");
-            Drawers(p, width, 0.08f, height - 0.04f, depth, 3);
-            // One drawer left pulled out.
-            Bit(p, "Tiroir_Ouvert", new Vector3(0f, 0.6f, -depth / 2f - 0.14f), new Vector3(width - 0.1f, 0.24f, 0.3f), "Furniture");
+            Model("Modele", p, Vector3.zero, null, "commode");
             return p;
         }
 
@@ -303,22 +236,19 @@ namespace DeadCounty.EditorTools
         {
             const float width = 1f, depth = 0.5f;
             var p = Piece(parent, "Meuble_SdB", pos, yaw, new Vector3(width, 0.9f, depth));
-            Bit(p, "Caisson", new Vector3(0f, 0.43f, 0f), new Vector3(width, 0.86f, depth), "Porcelain");
-            Doors(p, width, 0.08f, 0.82f, depth, 2, "MetalLight");
-            Bit(p, "Vasque", new Vector3(0f, 0.88f, 0f), new Vector3(width + 0.04f, 0.04f, depth + 0.02f), "Countertop");
-            Bit(p, "Robinet", new Vector3(0f, 1f, depth / 2f - 0.07f), new Vector3(0.04f, 0.2f, 0.04f), "MetalLight");
-            Bit(p, "Miroir", new Vector3(0f, 1.6f, depth / 2f - 0.02f), new Vector3(0.7f, 0.8f, 0.02f), "Glass");
+            Model("Modele", p, Vector3.zero, null, "meuble_sdb");
             return p;
         }
 
+        // Modelled 3 x 2 m, stretched to the size asked for.
         static void Rug(Transform parent, Vector3 pos, float yaw, Vector2 size, string mat)
-            => Box("Tapis", parent, pos + Vector3.up * 0.105f, new Vector3(size.x, 0.01f, size.y), mat, Quaternion.Euler(0f, yaw, 0f), solid: false);
+            => Model("Tapis", parent, pos + Vector3.up * 0.1f, Quaternion.Euler(0f, yaw, 0f), "tapis", ("#6B4A3C", mat), ("#5B3F33", Shade(mat, -0.15f)), ("#8A6E5E", Shade(mat, 0.25f)))
+                .transform.localScale = new Vector3(size.x / 3f, 1f, size.y / 2f);
 
         static void CeilingLamp(Transform parent, Vector3 roomCenter)
         {
             var lamp = Group(parent, "Plafonnier", new Vector3(roomCenter.x, WallHeight, roomCenter.z));
-            Bit(lamp, "Fil", new Vector3(0f, -0.25f, 0f), new Vector3(0.015f, 0.5f, 0.015f), "Strap");
-            Cylinder("Abat_Jour", lamp, new Vector3(0f, -0.58f, 0f), 0.22f, 0.18f, "Lampshade", solid: false);
+            Model("Modele", lamp, Vector3.zero, null, "plafonnier");
         }
 
         static void Frame(Transform parent, Vector3 pos, float yaw, Vector2 size, string picture)

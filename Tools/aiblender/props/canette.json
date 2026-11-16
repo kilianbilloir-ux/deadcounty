@@ -1,0 +1,11 @@
+// Drink can, 0.066 x 0.13 m, with its necked steel top. The body colour #A8322A is repainted by the scene builder.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "body", "color": "#A8322A"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "body", "material": "body",
+   "gen": {"revolve": {"axis": "z", "seg": 8, "profile": [[0, 0.008], [0.034, 0.008], [0.034, 0.113], [0, 0.113]]}}},
+  {"op": "create", "id": "ends", "material": "steel", "embed": ["body"],
+   "gen": {"revolve": {"axis": "z", "seg": 8, "profile": [[0, 0], [0.028, 0], [0.033, 0.008], [0.033, 0.113], [0.026, 0.128], [0, 0.13]]}}}
+]

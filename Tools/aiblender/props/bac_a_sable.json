@@ -1,0 +1,33 @@
+// Sandbox, 2.6 x 2.6 x 0.3 m: four timber boards with a seat board across each corner, the sand heaped in the middle,
+// a forgotten red bucket and a yellow spade.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#7A5A3C"},
+  {"op": "material", "name": "wood_light", "color": "#8C6A48"},
+  {"op": "material", "name": "sand", "color": "#C7A860"},
+  {"op": "material", "name": "sand_dark", "color": "#B39550"},
+  {"op": "material", "name": "red", "color": "#A8322A"},
+  {"op": "material", "name": "yellow", "color": "#D8B030"},
+
+  {"op": "create", "id": "sand", "material": "sand_dark",
+   "gen": {"box": {"size": [2.4, 2.4, 0.2]}}, "t": [0, 0, 0.1]},
+  {"op": "create", "id": "heap", "material": "sand", "embed": ["sand"],
+   "gen": {"revolve": {"axis": "z", "seg": 8, "profile": [[0, 0.19], [0.8, 0.19], [0.45, 0.27], [0, 0.3]]}}},
+  {"op": "create", "id": "boards_x", "material": "wood", "embed": ["sand"],
+   "gen": {"box": {"size": [2.6, 0.1, 0.3]}}, "mods": [{"array": {"count": 2, "step": [0, 2.5, 0]}}], "t": [0, 0, 0.15]},
+  {"op": "create", "id": "boards_y", "material": "wood", "embed": ["sand", "boards_x"],
+   "gen": {"box": {"size": [0.1, 2.4, 0.3]}}, "mods": [{"array": {"count": 2, "step": [2.5, 0, 0]}}], "t": [0, 0, 0.15]},
+  {"op": "create", "id": "seat", "material": "wood_light", "embed": ["boards_x", "boards_y"],
+   "gen": {"extrude": {"plane": "xy", "depth": 0.03, "origin": [0, 0, 0.315],
+     "profile": [[0.85, 1.3], [1.3, 1.3], [1.3, 0.85]]}}},
+  {"op": "create", "id": "seat_2", "material": "wood_light", "mirror_of": "seat", "embed": ["boards_x", "boards_y"]},
+  {"op": "create", "id": "seat_3", "material": "wood_light", "mirror_of": {"src": "seat", "plane": {"axis": "y", "at": 0}}, "embed": ["boards_x", "boards_y"]},
+  {"op": "create", "id": "seat_4", "material": "wood_light", "mirror_of": {"src": "seat_2", "plane": {"axis": "y", "at": 0}}, "embed": ["boards_x", "boards_y"]},
+  {"op": "create", "id": "bucket", "material": "red", "embed": ["sand"],
+   "gen": {"revolve": {"axis": "z", "seg": 8, "origin": [-0.75, -0.75, 0],
+     "profile": [[0, 0.19], [0.07, 0.19], [0.09, 0.36], [0.08, 0.36], [0.065, 0.21], [0, 0.21]]}}},
+  {"op": "create", "id": "spade", "material": "yellow", "embed": ["sand"],
+   "gen": {"tube": {"r": 0.012, "seg": 4, "path": [[0.65, -0.75, 0.2], [0.9, -0.7, 0.21]]}}},
+  {"op": "create", "id": "blade", "material": "yellow", "embed": ["spade", "sand"],
+   "gen": {"box": {"size": [0.12, 0.09, 0.012]}}, "t": [0.6, -0.76, 0.2]}
+]

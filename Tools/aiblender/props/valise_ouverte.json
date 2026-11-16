@@ -1,0 +1,39 @@
+// Open suitcase, 0.7 x 0.95 x 0.17 m: the base tray (handle toward -Y) full of folded clothes, the lid thrown back
+// flat on the ground along +Y, a blue shirt spilling over the front edge. The shell colour #7A4C3A is repainted by
+// the scene builder.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "shell", "color": "#7A4C3A"},
+  {"op": "material", "name": "lining", "color": "#3A3E42"},
+  {"op": "material", "name": "strap", "color": "#2A2A2A"},
+  {"op": "material", "name": "linen", "color": "#B8B2A4"},
+  {"op": "material", "name": "shirt", "color": "#48566A"},
+  {"op": "material", "name": "white", "color": "#CFCAC0"},
+
+  {"op": "create", "id": "tray", "material": "shell",
+   "gen": {"box": {"size": [0.7, 0.45, 0.12], "radius": 0.03, "seg": 4}}, "t": [0, 0, 0.06],
+   "mods": [{"boolean": {"op": "difference", "with": ["tray_cut"]}}]},
+  {"op": "create", "id": "tray_cut", "gen": {"box": {"size": [0.66, 0.41, 0.12]}}, "t": [0, 0, 0.14]},
+  {"op": "create", "id": "tray_floor", "material": "lining", "embed": ["tray"],
+   "gen": {"box": {"size": [0.66, 0.41, 0.02]}}, "t": [0, 0, 0.08]},
+  {"op": "create", "id": "lid", "material": "shell",
+   "gen": {"box": {"size": [0.7, 0.45, 0.1], "radius": 0.03, "seg": 4}}, "t": [0, 0.455, 0.05],
+   "mods": [{"boolean": {"op": "difference", "with": ["lid_cut"]}}]},
+  {"op": "create", "id": "lid_cut", "gen": {"box": {"size": [0.66, 0.41, 0.1]}}, "t": [0, 0.455, 0.12]},
+  {"op": "create", "id": "lid_floor", "material": "lining", "embed": ["lid"],
+   "gen": {"box": {"size": [0.66, 0.41, 0.02]}}, "t": [0, 0.455, 0.06]},
+  {"op": "create", "id": "hinge", "material": "strap", "embed": ["tray", "lid"],
+   "gen": {"box": {"size": [0.6, 0.03, 0.03]}}, "t": [0, 0.228, 0.03]},
+  {"op": "create", "id": "handle", "material": "strap", "embed": ["tray"],
+   "gen": {"tube": {"r": 0.012, "seg": 8, "bend": 0.025, "path": [[-0.08, -0.22, 0.07], [-0.08, -0.255, 0.07], [0.08, -0.255, 0.07], [0.08, -0.22, 0.07]]}}},
+
+  {"op": "create", "id": "folded", "material": "linen", "embed": ["tray_floor", "tray"],
+   "gen": {"box": {"size": [0.36, 0.28, 0.07]}}, "mods": [{"bevel": {"width": "1cm"}}], "r": [0, 0, 8], "t": [-0.13, 0.03, 0.12]},
+  {"op": "create", "id": "towel", "material": "white", "embed": ["tray_floor", "folded"],
+   "gen": {"box": {"size": [0.24, 0.3, 0.05]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0.19, 0.02, 0.11]},
+  {"op": "create", "id": "shirt", "material": "shirt", "embed": ["tray", "folded", "towel"],
+   "gen": {"extrude": {"plane": "yz", "depth": 0.3, "origin": [0.05, 0, 0],
+     "profile": [[0.05, 0.155], [-0.2, 0.135], [-0.25, 0.12], [-0.3, 0.04], [-0.42, 0.0], [-0.42, 0.015], [-0.31, 0.055], [-0.26, 0.135], [-0.2, 0.15], [0.05, 0.17]]}}},
+  {"op": "create", "id": "sock", "material": "linen", "embed": ["lid_floor", "lid"],
+   "gen": {"box": {"size": [0.22, 0.08, 0.03]}}, "r": [0, 0, -25], "t": [0.1, 0.5, 0.085]}
+]

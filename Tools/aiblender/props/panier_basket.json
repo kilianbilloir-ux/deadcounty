@@ -1,0 +1,31 @@
+// Basketball hoop, 1.8 x 1.6 x 3.95 m, origin at the foot of its post, the court toward +Y: a steel post on a base
+// plate, an arm out to a white backboard with a red target square, the red rim and its net.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "steel", "color": "#4D5257"},
+  {"op": "material", "name": "white", "color": "#E6E6E0"},
+  {"op": "material", "name": "red", "color": "#A8322A"},
+  {"op": "material", "name": "net", "color": "#CFCAC0"},
+
+  {"op": "create", "id": "plate", "material": "steel",
+   "gen": {"box": {"size": [0.3, 0.3, 0.02]}}, "t": [0, 0, 0.01]},
+  {"op": "create", "id": "post", "material": "steel", "embed": ["plate"],
+   "gen": {"tube": {"r": 0.07, "seg": 8, "bend": 0.3, "path": [[0, 0, 0.01], [0, 0, 3.15], [0, 0.6, 3.15]]}}},
+  {"op": "create", "id": "arm", "material": "steel", "embed": ["post"],
+   "gen": {"box": {"size": [0.07, 0.5, 0.07]}}, "t": [0, 0.73, 3.15]},
+  {"op": "create", "id": "brace", "material": "steel", "embed": ["post", "arm"],
+   "gen": {"tube": {"r": 0.03, "seg": 8, "path": [[0, 0.02, 2.55], [0, 0.95, 3.12]]}}},
+  {"op": "create", "id": "board", "material": "white", "embed": ["arm", "brace"],
+   "gen": {"box": {"size": [1.8, 0.05, 1.05]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, 1.0, 3.4]},
+  {"op": "create", "id": "square_h", "material": "red", "embed": ["board"],
+   "gen": {"box": {"size": [0.6, 0.006, 0.035]}}, "mods": [{"array": {"count": 2, "step": [0, 0, 0.365]}}], "t": [0, 1.027, 3.3]},
+  {"op": "create", "id": "square_v", "material": "red", "embed": ["board", "square_h"],
+   "gen": {"box": {"size": [0.035, 0.006, 0.4]}}, "mods": [{"array": {"count": 2, "step": [0.565, 0, 0]}}], "t": [0, 1.027, 3.3]},
+  {"op": "create", "id": "bracket", "material": "red", "embed": ["board"],
+   "gen": {"box": {"size": [0.12, 0.08, 0.04]}}, "t": [0, 1.06, 3.05]},
+  {"op": "create", "id": "rim", "material": "red", "embed": ["bracket"],
+   "gen": {"torus": {"R": 0.23, "r": 0.015, "seg": 12}}, "t": [0, 1.32, 3.05]},
+  {"op": "create", "id": "net", "material": "net", "embed": ["rim", "bracket"],
+   "gen": {"revolve": {"axis": "z", "seg": 12, "origin": [0, 1.32, 0],
+     "profile": [[0.215, 3.05], [0.225, 3.05], [0.155, 2.65], [0.145, 2.65]]}}}
+]

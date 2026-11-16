@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DeadCounty.Audio;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -180,11 +181,15 @@ namespace DeadCounty.EditorTools
         }
 
         // What a model made of one mesh leaves out: the block the player, the camera and the NavMesh run into.
-        static void Solid(Transform parent, Vector3 center, Vector3 size)
+        // `surface` is what it sounds like underfoot, for the blocks one can stand on.
+        static void Solid(Transform parent, Vector3 center, Vector3 size, Surface? surface = null)
         {
             var collider = parent.gameObject.AddComponent<BoxCollider>();
             collider.center = center;
             collider.size = size;
+            if (!surface.HasValue) return;
+            if (!parent.TryGetComponent<GroundSurfaceTag>(out var tag)) tag = parent.gameObject.AddComponent<GroundSurfaceTag>();
+            tag.surface = surface.Value;
         }
     }
 }

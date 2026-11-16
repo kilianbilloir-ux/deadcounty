@@ -87,8 +87,9 @@ namespace DeadCounty.EditorTools
         {
             var radius = Range(rng, 0.2f, 0.35f);
             var height = Range(rng, 0.25f, 0.5f);
-            Cylinder("Souche", parent, ground + Vector3.up * height / 2f, radius, height, "Trunk", Quaternion.Euler(Range(rng, -4f, 4f), 0f, Range(rng, -4f, 4f)), solid: false);
-            Cylinder("Coupe", parent, ground + Vector3.up * (height + 0.005f), radius * 0.9f, 0.01f, "Crate", solid: false);
+            var stump = Model("Souche", parent, ground, Quaternion.Euler(Range(rng, -4f, 4f), 0f, Range(rng, -4f, 4f)), "souche");
+            // The model's trunk is 0.275 m in radius and 0.375 m high.
+            stump.transform.localScale = new Vector3(radius / 0.275f, height / 0.375f, radius / 0.275f);
         }
 
         // A dead branch on the ground with a twig or two.
@@ -96,10 +97,10 @@ namespace DeadCounty.EditorTools
         {
             var b = Group(parent, "Branche", ground, Range(rng, 0f, 360f));
             var length = Range(rng, 1.2f, 2.4f);
-            Box("Bois", b, new Vector3(0f, 0.05f, 0f), new Vector3(0.08f, 0.08f, length), "Trunk", Quaternion.Euler(0f, 0f, Range(rng, -10f, 10f)), solid: false);
+            // The model is 1.8 m long; the roll turns its crook a little.
+            Model("Bois", b, Vector3.zero, Quaternion.Euler(0f, 0f, Range(rng, -10f, 10f)), "branche").transform.localScale = new Vector3(1f, 1f, length / 1.8f);
             for (var i = rng.Next(1, 3); i > 0; i--)
-                Box("Rameau", b, new Vector3(0.15f, 0.04f, Range(rng, -length / 3f, length / 3f)), new Vector3(0.04f, 0.04f, 0.5f), "Trunk",
-                    Quaternion.Euler(0f, Range(rng, 30f, 60f) * (i % 2 == 0 ? 1f : -1f), 0f), solid: false);
+                Model("Rameau", b, new Vector3(0.15f, 0f, Range(rng, -length / 3f, length / 3f)), Quaternion.Euler(0f, Range(rng, 30f, 60f) * (i % 2 == 0 ? 1f : -1f), 0f), "rameau");
         }
 
         // Grass blades with a few coloured heads; submesh 0 the leaves, 1 the flowers.
