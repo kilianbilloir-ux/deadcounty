@@ -1,0 +1,22 @@
+// Road barrier, 2.0 x 0.55 x 1.06 m: a red and white striped board on two A-frame legs.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "red", "color": "#A8322A"},
+  {"op": "material", "name": "white", "color": "#E6E6E0"},
+  {"op": "material", "name": "wood", "color": "#C9C4B6"},
+
+  {"op": "create", "id": "board", "material": "white",
+   "gen": {"box": {"size": [2.0, 0.05, 0.22]}}, "t": [0, 0, 0.95]},
+  {"op": "create", "id": "stripes", "material": "red", "embed": ["board"],
+   "gen": {"extrude": {"plane": "xz", "depth": 0.056, "profile": [[-0.96, 0.84], [-0.8, 0.84], [-0.68, 1.06], [-0.84, 1.06]]}},
+   "mods": [{"array": {"count": 6, "step": [0.33, 0, 0]}}]},
+  {"op": "create", "id": "leg_lf", "material": "wood", "embed": ["board", "stripes"],
+   "gen": {"box": {"size": [0.07, 0.04, 1.08]}}, "r": [-14, 0, 0], "t": [-0.8, -0.13, 0.5288]},
+  {"op": "create", "id": "leg_lb", "material": "wood", "embed": ["board", "leg_lf", "stripes"],
+   "gen": {"box": {"size": [0.07, 0.04, 1.08]}}, "r": [14, 0, 0], "t": [-0.8, 0.13, 0.5288]},
+  {"op": "create", "id": "tie_l", "material": "wood", "embed": ["leg_lf", "leg_lb"],
+   "gen": {"box": {"size": [0.03, 0.38, 0.06]}}, "t": [-0.8, 0, 0.35]},
+  {"op": "create", "id": "leg_rf", "material": "wood", "mirror_of": "leg_lf", "embed": ["board", "stripes"]},
+  {"op": "create", "id": "leg_rb", "material": "wood", "mirror_of": "leg_lb", "embed": ["board", "leg_rf", "stripes"]},
+  {"op": "create", "id": "tie_r", "material": "wood", "mirror_of": "tie_l", "embed": ["leg_rf", "leg_rb"]}
+]

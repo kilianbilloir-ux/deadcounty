@@ -38,7 +38,7 @@ namespace DeadCounty.Tests
         public IEnumerator ADroppedItemIsDrawnWithItsModel()
         {
             Assert.That(water.WorldModel, Is.Not.Null, "the builder gives every item a ground model");
-            Assert.That(lying.transform.Find("Bouteille"), Is.Not.Null, "a bottle of water must look like one");
+            Assert.That(lying.GetComponentInChildren<MeshFilter>().sharedMesh.name, Is.EqualTo("SM_eau"), "a bottle of water must look like one");
             Assert.That(lying.GetComponent<BoxCollider>(), Is.Not.Null, "the interaction raycasts need a collider");
             yield return null;
         }

@@ -44,7 +44,8 @@ namespace DeadCounty.EditorTools
             changed |= AssignCues(new SerializedObject(player.GetComponent<PlayerActionAudio>()),
                 ("rummage", Catalog.Rummage), ("pickup", Catalog.Pickup), ("eat", Catalog.Eat), ("drink", Catalog.Drink),
                 ("bandage", Catalog.Bandage), ("drop", Catalog.Drop), ("flashlightClick", Catalog.Flashlight), ("bed", Catalog.Bed),
-                ("swing", Catalog.Swing), ("strike", Catalog.Strike));
+                ("swing", Catalog.Swing), ("strike", Catalog.Strike), ("shove", Catalog.Shove), ("stomp", Catalog.Stomp),
+                ("kill", Catalog.Kill), ("effort", Catalog.Effort));
             return changed;
         }
 

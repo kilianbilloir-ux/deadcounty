@@ -1,0 +1,22 @@
+// Street lamp, 6.6 m: an octagonal mast on a flared base, an arm curving out along +Y to a cobra head whose lens
+// glows (mat_LampGlow).
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "steel", "color": "#4D5257"},
+  {"op": "material", "name": "steel_dark", "color": "#3A3E42"},
+  {"op": "material", "name": "mat_LampGlow", "color": "#D4B976"},
+
+  {"op": "create", "id": "mast", "material": "steel",
+   "gen": {"revolve": {"axis": "z", "seg": 8,
+     "profile": [[0, 0], [0.2, 0], [0.2, 0.06], [0.14, 0.1], [0.12, 0.9], [0.1, 1.0], [0.08, 6.5], [0, 6.5]]}}},
+  {"op": "create", "id": "hatch", "material": "steel_dark", "embed": ["mast"],
+   "gen": {"box": {"size": [0.1, 0.03, 0.3]}}, "t": [0, -0.115, 0.6]},
+  {"op": "create", "id": "arm", "material": "steel", "embed": ["mast"],
+   "gen": {"tube": {"r": 0.045, "seg": 8, "bend": 0.5, "path": [[0, 0, 5.9], [0, 0, 6.5], [0, 1.5, 6.5]]}}},
+  {"op": "create", "id": "head", "material": "steel_dark", "embed": ["arm"],
+   "gen": {"extrude": {"plane": "yz", "depth": 0.34,
+     "profile": [[1.35, 6.42], [2.0, 6.34], [2.05, 6.4], [1.95, 6.52], [1.4, 6.58]]}},
+   "mods": [{"bevel": {"width": "2cm"}}]},
+  {"op": "create", "id": "lens", "material": "mat_LampGlow", "embed": ["head"],
+   "gen": {"box": {"size": [0.26, 0.5, 0.05]}}, "r": [-7, 0, 0], "t": [0, 1.7, 6.36]}
+]

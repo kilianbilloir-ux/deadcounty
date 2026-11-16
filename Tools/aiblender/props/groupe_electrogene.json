@@ -1,0 +1,33 @@
+// Portable generator, 1.1 x 0.7 x 1.0 m, controls at the front (-Y): a yellow engine housing on two skids inside a
+// black tube frame, a steel fuel tank on top with its cap, a control panel with sockets, an exhaust on the +X end.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "yellow", "color": "#D8B030"},
+  {"op": "material", "name": "yellow_dark", "color": "#B8952A"},
+  {"op": "material", "name": "frame", "color": "#2A2B2E"},
+  {"op": "material", "name": "steel", "color": "#4D5257"},
+  {"op": "material", "name": "panel", "color": "#33373B"},
+  {"op": "material", "name": "socket", "color": "#E08A33"},
+
+  {"op": "create", "id": "skids", "material": "frame",
+   "gen": {"box": {"size": [1.1, 0.06, 0.05]}}, "mods": [{"array": {"count": 2, "step": [0, 0.6, 0]}}], "t": [0, 0, 0.025]},
+  {"op": "create", "id": "housing", "material": "yellow", "embed": ["skids"],
+   "gen": {"box": {"size": [0.94, 0.6, 0.7]}}, "mods": [{"bevel": {"width": "3cm"}}], "t": [0, 0, 0.39]},
+  {"op": "create", "id": "frame_l", "material": "frame", "embed": ["skids", "housing"],
+   "gen": {"tube": {"r": 0.02, "seg": 8, "bend": 0.08, "path": [[-0.53, -0.3, 0.04], [-0.53, -0.3, 0.98], [-0.53, 0.3, 0.98], [-0.53, 0.3, 0.04]]}}},
+  {"op": "create", "id": "frame_r", "material": "frame", "mirror_of": "frame_l", "embed": ["skids", "housing"]},
+  {"op": "create", "id": "top_rails", "material": "frame", "embed": ["frame_l", "frame_r"],
+   "gen": {"cylinder": {"r": 0.02, "h": 1.06, "seg": 8}}, "r": [0, 90, 0], "mods": [{"array": {"count": 2, "step": [0, 0.6, 0]}}], "t": [0, 0, 0.94]},
+  {"op": "create", "id": "tank", "material": "steel", "embed": ["housing"],
+   "gen": {"box": {"size": [0.6, 0.5, 0.22]}}, "mods": [{"bevel": {"width": "4cm"}}], "t": [-0.05, 0, 0.83]},
+  {"op": "create", "id": "fuel_cap", "material": "panel", "embed": ["tank"],
+   "gen": {"cylinder": {"r": 0.05, "h": 0.04, "seg": 8}}, "t": [-0.2, 0.1, 0.95]},
+  {"op": "create", "id": "panel", "material": "panel", "embed": ["housing"],
+   "gen": {"box": {"size": [0.36, 0.02, 0.24]}}, "t": [-0.2, -0.305, 0.5]},
+  {"op": "create", "id": "sockets", "material": "socket", "embed": ["panel"],
+   "gen": {"cylinder": {"r": 0.03, "h": 0.02, "seg": 8}}, "r": [90, 0, 0], "mods": [{"array": {"count": 3, "step": [0.1, 0, 0]}}], "t": [-0.2, -0.318, 0.46]},
+  {"op": "create", "id": "vents", "material": "yellow_dark", "embed": ["housing"],
+   "gen": {"box": {"size": [0.04, 0.02, 0.36]}}, "mods": [{"array": {"count": 5, "step": [0.07, 0, 0]}}], "t": [0.22, -0.305, 0.42]},
+  {"op": "create", "id": "exhaust", "material": "steel", "embed": ["housing"],
+   "gen": {"cylinder": {"r": 0.06, "h": 0.12, "seg": 8}}, "r": [0, 90, 0], "t": [0.52, 0.12, 0.6]}
+]

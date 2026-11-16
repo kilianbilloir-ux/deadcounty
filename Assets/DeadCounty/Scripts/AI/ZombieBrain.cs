@@ -118,6 +118,9 @@ namespace DeadCounty.AI
                     case ZombieState.Stagger:
                         UpdateStagger(p);
                         break;
+                    case ZombieState.Down:
+                        UpdateDown(p);
+                        break;
                 }
             }
             WriteCommands(p, ref c);
@@ -271,6 +274,9 @@ namespace DeadCounty.AI
                     break;
                 case ZombieState.Stagger:
                     WriteStagger(ref c);
+                    break;
+                case ZombieState.Down:
+                    WriteDown(ref c);
                     break;
             }
         }

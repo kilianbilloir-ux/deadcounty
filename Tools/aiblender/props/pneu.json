@@ -1,0 +1,13 @@
+// Car tyre lying flat, 0.66 x 0.22 m: rounded shoulders, a tread groove round the crown, the open bead inside.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "tire", "color": "#151515"},
+  {"op": "material", "name": "wall", "color": "#262626"},
+
+  {"op": "create", "id": "tire", "material": "tire",
+   "gen": {"revolve": {"axis": "z", "seg": 12,
+     "profile": [[0.2, 0], [0.29, 0], [0.33, 0.04], [0.33, 0.085], [0.32, 0.095], [0.32, 0.125], [0.33, 0.135], [0.33, 0.18],
+                 [0.29, 0.22], [0.2, 0.22], [0.19, 0.2], [0.19, 0.02]]}}},
+  {"op": "create", "id": "sidewalls", "material": "wall", "embed": ["tire"],
+   "gen": {"revolve": {"axis": "z", "seg": 12, "profile": [[0.21, 0.215], [0.28, 0.215], [0.28, 0.225], [0.21, 0.225]]}}}
+]

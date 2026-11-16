@@ -94,6 +94,13 @@ namespace DeadCounty.AI
         [Tooltip("Aware zombies this close to the dead target feed on it; farther ones go back to wandering.")]
         public float FeedRadius;
 
+        [Header("Knockdown")]
+        [Tooltip("Lying still on the ground after a fall, before getting up.")]
+        public float DownTime;
+        public float DownTimeJitter;
+        [Tooltip("From the ground back on its feet; still on the ground for the blows meanwhile.")]
+        public float RiseTime;
+
         [Header("Pose")]
         [Tooltip("Per zombie spine hunch range (deg).")]
         public float HunchMin;
@@ -160,6 +167,10 @@ namespace DeadCounty.AI
             CallCooldown = 5f,
 
             FeedRadius = 3f,
+
+            DownTime = 2.6f,
+            DownTimeJitter = 0.15f,
+            RiseTime = 1.1f,
 
             HunchMin = 8f,
             HunchMax = 18f,

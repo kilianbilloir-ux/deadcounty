@@ -1,0 +1,33 @@
+// Propane exchange cage, 1.6 x 0.8 x 1.5 m, front (-Y) barred: a steel frame with three shelves, four white
+// cylinders on each of the two lower ones, a red plate over the bars.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "frame", "color": "#9AA0A4"},
+  {"op": "material", "name": "bars", "color": "#4D5257"},
+  {"op": "material", "name": "white", "color": "#E6E6E0"},
+  {"op": "material", "name": "collar", "color": "#B8B8B2"},
+  {"op": "material", "name": "valve", "color": "#2E4766"},
+  {"op": "material", "name": "red", "color": "#A8322A"},
+
+  {"op": "create", "id": "posts", "material": "frame",
+   "gen": {"box": {"size": [0.04, 0.04, 1.5]}},
+   "mods": [{"array": {"count": 2, "step": [1.56, 0, 0]}}, {"array": {"count": 2, "step": [0, 0.76, 0]}}], "t": [0, 0, 0.75]},
+  {"op": "create", "id": "shelves", "material": "frame", "embed": ["posts"],
+   "gen": {"box": {"size": [1.6, 0.8, 0.03]}}, "mods": [{"array": {"count": 3, "step": [0, 0, 0.715]}}], "t": [0, 0, 0.765]},
+  {"op": "create", "id": "bottles", "material": "white",
+   "gen": {"revolve": {"axis": "z", "seg": 12, "origin": [-0.555, 0, 0.065],
+     "profile": [[0, 0], [0.15, 0], [0.15, 0.4], [0.11, 0.47], [0, 0.49]]}},
+   "mods": [{"array": {"count": 4, "step": [0.37, 0, 0]}}, {"array": {"count": 2, "step": [0, 0, 0.715]}}]},
+  {"op": "create", "id": "collars", "material": "collar", "embed": ["bottles"],
+   "gen": {"revolve": {"axis": "z", "seg": 8, "origin": [-0.555, 0, 0.065], "profile": [[0, 0.47], [0.075, 0.47], [0.075, 0.53], [0, 0.53]]}},
+   "mods": [{"array": {"count": 4, "step": [0.37, 0, 0]}}, {"array": {"count": 2, "step": [0, 0, 0.715]}}]},
+  {"op": "create", "id": "valves", "material": "valve", "embed": ["collars"],
+   "gen": {"revolve": {"axis": "z", "seg": 8, "origin": [-0.555, 0, 0.065], "profile": [[0, 0.52], [0.035, 0.52], [0.035, 0.6], [0, 0.6]]}},
+   "mods": [{"array": {"count": 4, "step": [0.37, 0, 0]}}, {"array": {"count": 2, "step": [0, 0, 0.715]}}]},
+  {"op": "create", "id": "bars", "material": "bars", "embed": ["shelves"],
+   "gen": {"box": {"size": [0.016, 0.016, 1.45]}}, "mods": [{"array": {"count": 11, "step": [0.14, 0, 0]}}], "t": [0, -0.405, 0.75]},
+  {"op": "create", "id": "rails", "material": "bars", "embed": ["bars", "posts"],
+   "gen": {"box": {"size": [1.56, 0.016, 0.03]}}, "mods": [{"array": {"count": 2, "step": [0, 0, 0.7]}}], "t": [0, -0.42, 0.75]},
+  {"op": "create", "id": "plate", "material": "red", "embed": ["bars"],
+   "gen": {"box": {"size": [0.6, 0.012, 0.16]}}, "t": [0, -0.418, 1.36]}
+]

@@ -1,4 +1,6 @@
+using DeadCounty.Audio;
 using DeadCounty.Combat;
+using DeadCounty.UI;
 using UnityEngine;
 
 namespace DeadCounty.Items
@@ -27,6 +29,10 @@ namespace DeadCounty.Items
 
         [Tooltip("Swing of the item once in hand; read for the Weapon category only.")]
         public WeaponStats Weapon;
+        [Tooltip("Heard as the weapon cuts the air; without one, the generic swing.")]
+        public SoundCue SwingSound;
+        [Tooltip("Heard where the weapon lands; without one, the generic blow.")]
+        public SoundCue HitSound;
 
         [Tooltip("Model shown when the item lies on the ground, pivot on the ground with a collider on its root; a weapon lies along +Z with its grip at the pivot. Without one the item drops as a plain box.")]
         public GameObject WorldModel;
@@ -34,16 +40,18 @@ namespace DeadCounty.Items
         [Tooltip("Picture of the item in the inventory and the pickup feed, rendered from the WorldModel by the scene builder.")]
         public Texture2D Icon;
 
+        // DisplayName in the language of the game.
+        public string LocalizedName => Loc.T(DisplayName);
         public bool Usable => !string.IsNullOrEmpty(UseVerb);
         public bool IsWeapon => Category == ItemCategory.Weapon;
 
-        public static string CategoryName(ItemCategory category) => category switch
+        public static string CategoryName(ItemCategory category) => Loc.T(category switch
         {
             ItemCategory.Food => "Nourriture",
             ItemCategory.Drink => "Boisson",
             ItemCategory.Medical => "Soin",
             ItemCategory.Weapon => "Arme",
             _ => "Équipement",
-        };
+        });
     }
 }

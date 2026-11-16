@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Woodpecker
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 1a49a6d05124942b9943b9ca59a0e27a, type: 3}
+  - {fileID: 8300000, guid: 772a23f0e316e441cad1150568d3bf31, type: 3}
+  - {fileID: 8300000, guid: 26b34d6ff272341a5a7f9f16a38be0e4, type: 3}
+  volume: 0.3
+  pitch: {x: 0.96, y: 1.04}
+  channel: 1
+  minDistance: 80
+  maxDistance: 300
+  voices: 1

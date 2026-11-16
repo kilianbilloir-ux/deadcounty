@@ -32,5 +32,8 @@ MonoBehaviour:
     NoiseRadius: 0
     Stagger: 0
     Knockback: 0
+    Knockdown: 0
+  SwingSound: {fileID: 0}
+  HitSound: {fileID: 0}
   WorldModel: {fileID: 3323791285674276107, guid: 0a8276169bc514ca4aba588ff1b2f0e8, type: 3}
   Icon: {fileID: 2800000, guid: 2ab04c455dcd140e18de37072ce11e7b, type: 3}

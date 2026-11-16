@@ -1,0 +1,22 @@
+// Crowbar, 760 mm, lying along +Y with the grip at the origin: an octagonal bar, a gooseneck ending in a split
+// claw, a chisel at the other end. Red paint worn to bare steel at both working ends.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "paint", "color": "#8E2A22"},
+  {"op": "material", "name": "bare", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "bar", "material": "paint",
+   "gen": {"tube": {"r": 11, "seg": 8, "bend": 45, "unit": "mm",
+     "path": [[0, -60, 11], [0, 520, 11], [0, 585, 60], [0, 560, 112]]}}},
+  {"op": "create", "id": "claw_l", "material": "bare", "embed": ["bar"],
+   "gen": {"loft": {"unit": "mm", "path": [[-7, 562, 106], [-7, 540, 128], [-8, 505, 138]],
+     "sections": [{"at": 0, "profile": [[-6, -9], [6, -9], [6, 9], [-6, 9]]},
+                  {"at": 1, "profile": [[-5, -7], [5, -7], [5, 7], [-5, 7]]},
+                  {"at": 2, "profile": [[-4, -1.5], [4, -1.5], [4, 1.5], [-4, 1.5]]}]}}},
+  {"op": "create", "id": "claw_r", "material": "bare", "mirror_of": "claw_l", "embed": ["bar"]},
+  {"op": "create", "id": "chisel", "material": "bare", "embed": ["bar"],
+   "gen": {"loft": {"axis": "y", "origin": [0, 0, 11], "unit": "mm",
+     "sections": [{"at": -150, "profile": [[-17, -1.5], [17, -1.5], [17, 1.5], [-17, 1.5]]},
+                  {"at": -100, "profile": [[-14, -6], [14, -6], [14, 6], [-14, 6]]},
+                  {"at": -55, "profile": [[-9, -9], [9, -9], [9, 9], [-9, 9]]}]}}}
+]

@@ -32,5 +32,8 @@ MonoBehaviour:
     NoiseRadius: 7
     Stagger: 0.9
     Knockback: 0.5
+    Knockdown: 0.35
+  SwingSound: {fileID: 11400000, guid: 499354889013f413d9d190724b5c1397, type: 2}
+  HitSound: {fileID: 11400000, guid: 17bb7d2d3a0444d0faa73512b73c3da6, type: 2}
   WorldModel: {fileID: 8441430489331911859, guid: b018aea753f4642e281310a0802fc0af, type: 3}
   Icon: {fileID: 2800000, guid: c9ee8ffe944cd45b38999fb2e68adbd2, type: 3}

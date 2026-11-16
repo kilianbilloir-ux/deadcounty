@@ -1,0 +1,32 @@
+// Trash can knocked over, 1.3 x 0.9 x 0.6 m: the ribbed body on its side with its open mouth toward +X, the lid
+// rolled off beside it, rubbish spilling out of the mouth.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "body", "color": "#3E5444"},
+  {"op": "material", "name": "inside", "color": "#2C3B30"},
+  {"op": "material", "name": "metal", "color": "#4D5257"},
+  {"op": "material", "name": "paper", "color": "#B9B2A2"},
+  {"op": "material", "name": "card", "color": "#8C734C"},
+  {"op": "material", "name": "bag", "color": "#1C1D20"},
+
+  {"op": "create", "id": "can", "material": "body",
+   "gen": {"revolve": {"axis": "x", "seg": 12, "origin": [-0.43, 0, 0.3],
+     "profile": [[0, 0], [0.25, 0], [0.26, 0.04], [0.27, 0.3], [0.285, 0.32], [0.275, 0.34], [0.285, 0.6], [0.3, 0.62],
+                 [0.29, 0.64], [0.3, 0.86], [0.28, 0.86], [0.27, 0.64], [0.265, 0.34], [0.245, 0.04], [0, 0.04]]}}},
+  {"op": "create", "id": "bottom", "material": "metal", "embed": ["can"],
+   "gen": {"cylinder": {"r": 0.22, "h": 0.02, "seg": 12}}, "r": [0, 90, 0], "t": [-0.44, 0, 0.3]},
+  {"op": "create", "id": "handle_l", "material": "metal", "embed": ["can"],
+   "gen": {"tube": {"r": 0.012, "seg": 8, "bend": 0.03, "path": [[0.31, -0.29, 0.3], [0.31, -0.34, 0.3], [0.17, -0.34, 0.3], [0.17, -0.28, 0.3]]}}},
+  {"op": "create", "id": "handle_r", "material": "metal", "mirror_of": {"src": "handle_l", "plane": {"axis": "y", "at": 0}}, "embed": ["can"]},
+  {"op": "create", "id": "bag", "material": "bag", "embed": ["can"],
+   "gen": {"box": {"size": [0.4, 0.36, 0.3]}}, "mods": [{"bevel": {"width": "6cm"}}], "r": [0, 0, 18], "t": [0.36, -0.04, 0.17]},
+  {"op": "create", "id": "box", "material": "card", "embed": ["bag"],
+   "gen": {"box": {"size": [0.3, 0.22, 0.06]}}, "r": [0, 0, -30], "t": [0.66, -0.2, 0.03]},
+  {"op": "create", "id": "papers", "material": "paper", "embed": ["box", "bag"],
+   "gen": {"box": {"size": [0.2, 0.28, 0.01]}}, "mods": [{"array": {"count": 2, "step": [0.18, 0.12, 0]}}], "r": [0, 0, 40], "t": [0.62, 0.02, 0.005]},
+  {"op": "create", "id": "lid", "material": "body", "embed": ["papers"],
+   "gen": {"revolve": {"axis": "z", "seg": 12, "origin": [0.66, 0.52, 0],
+     "profile": [[0, 0], [0.315, 0], [0.315, 0.06], [0.2, 0.12], [0, 0.13]]}}},
+  {"op": "create", "id": "knob", "material": "metal", "embed": ["lid"],
+   "gen": {"tube": {"r": 0.012, "seg": 8, "bend": 0.03, "path": [[0.59, 0.52, 0.115], [0.59, 0.52, 0.16], [0.73, 0.52, 0.16], [0.73, 0.52, 0.115]]}}}
+]

@@ -1,3 +1,4 @@
+using DeadCounty.Audio;
 using UnityEngine;
 
 namespace DeadCounty.EditorTools
@@ -73,27 +74,29 @@ namespace DeadCounty.EditorTools
             const float floor = 0.25f;
             const float radius = 2.75f;
             var b = Group(green, "Kiosque");
-            Cylinder("Soubassement", b, new Vector3(0f, 0.06f, 0f), 3.2f, 0.12f, "Concrete");
-            Cylinder("Estrade", b, new Vector3(0f, floor / 2f, 0f), 3f, floor, "Wood");
+            Model("Modele", b, Vector3.zero, null, "kiosque");
+            // The base and the deck are octagons: each is the union of four boxes, two of them turned by 45 degrees.
+            var turned = Group(b, "Kiosque_45", null, 45f);
+            foreach (var (apothem, height) in new[] { (2.956f, 0.12f), (2.772f, floor) })
+            foreach (var frame in new[] { b, turned })
+            {
+                var side = apothem * 2f * Mathf.Tan(22.5f * Mathf.Deg2Rad);
+                Solid(frame, new Vector3(0f, height / 2f, 0f), new Vector3(apothem * 2f, height, side), Surface.Wood);
+                Solid(frame, new Vector3(0f, height / 2f, 0f), new Vector3(side, height, apothem * 2f), Surface.Wood);
+            }
             var posts = new Vector3[8];
             for (var i = 0; i < 8; i++)
             {
                 var angle = (22.5f + i * 45f) * Mathf.Deg2Rad;
                 posts[i] = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius + Vector3.up * floor;
-                Post("Poteau", b, posts[i], 2.6f, 0.07f, "Trim");
+                Solid(b, posts[i] + Vector3.up * 1.3f, new Vector3(0.126f, 2.6f, 0.126f));
             }
             for (var i = 0; i < 8; i += 2)
             {
                 var from = posts[i];
                 var to = posts[(i + 1) % 8];
-                var along = Quaternion.LookRotation(to - from);
-                var length = Vector3.Distance(from, to);
-                Box("Rambarde", b, (from + to) / 2f + Vector3.up * 0.9f, new Vector3(0.07f, 0.07f, length), "Trim", along);
-                Box("Lisse", b, (from + to) / 2f + Vector3.up * 0.45f, new Vector3(0.04f, 0.5f, length), "Trim", along, solid: false);
+                TiltedSolid(b, "Rambarde", (from + to) / 2f + Vector3.up * 0.9f, Quaternion.LookRotation(to - from), new Vector3(0.07f, 0.07f, Vector3.Distance(from, to)));
             }
-            Cylinder("Corniche", b, new Vector3(0f, floor + 2.62f, 0f), 3.25f, 0.14f, "Trim", solid: false);
-            MeshObject("Toit", b, ConeMesh(8), new Vector3(0f, floor + 2.69f, 0f), Quaternion.Euler(0f, 22.5f, 0f), new Vector3(3.5f, 1.5f, 3.5f), new[] { "RoofDark" }, false);
-            Post("Fleche", b, new Vector3(0f, floor + 4.1f, 0f), 0.7f, 0.03f, "Metal", solid: false);
         }
 
         // Swings with one seat hanging by a single chain, a slide, a seesaw and a sandbox on wood chips.
@@ -102,37 +105,30 @@ namespace DeadCounty.EditorTools
             Box("Copeaux", p, new Vector3(0f, 0.02f, 0f), new Vector3(9.4f, 0.04f, 10f), "Dirt", solid: false);
 
             var swings = Group(p, "Balancoire", new Vector3(-2f, 0f, 2.6f));
+            Model("Modele", swings, Vector3.zero, null, "balancoire");
             foreach (var x in new[] { -1.7f, 1.7f })
             foreach (var lean in new[] { -1f, 1f })
-                Box("Pied", swings, new Vector3(x, 1.12f, lean * 0.42f), new Vector3(0.08f, 2.4f, 0.08f), "Metal", Quaternion.Euler(-lean * 20f, 0f, 0f));
-            Box("Traverse", swings, new Vector3(0f, 2.25f, 0f), new Vector3(3.6f, 0.09f, 0.09f), "Metal", solid: false);
-            foreach (var side in new[] { -0.22f, 0.22f })
-                Box("Chaine", swings, new Vector3(-0.75f + side, 1.4f, 0f), new Vector3(0.02f, 1.7f, 0.02f), "MetalLight", solid: false);
-            Box("Siege", swings, new Vector3(-0.75f, 0.55f, 0f), new Vector3(0.5f, 0.04f, 0.2f), "CarBlack", solid: false);
-            Box("Chaine", swings, new Vector3(0.53f, 1.4f, 0f), new Vector3(0.02f, 1.7f, 0.02f), "MetalLight", solid: false);
-            Box("Siege_Casse", swings, new Vector3(0.6f, 0.33f, 0f), new Vector3(0.5f, 0.04f, 0.2f), "CarBlack", Quaternion.Euler(0f, 0f, 78f), solid: false);
+                TiltedSolid(swings, "Pied", new Vector3(x, 1.12f, lean * 0.42f), Quaternion.Euler(-lean * 20f, 0f, 0f), new Vector3(0.08f, 2.4f, 0.08f));
 
             var slide = Group(p, "Toboggan", new Vector3(2.4f, 0f, -2.6f));
-            Box("Plateforme", slide, new Vector3(0f, 1.4f, 0f), new Vector3(1f, 0.08f, 1f), "Wood");
-            foreach (var x in new[] { -0.45f, 0.45f })
-            foreach (var z in new[] { -0.45f, 0.45f })
-                Box("Montant", slide, new Vector3(x, 1.05f, z), new Vector3(0.08f, 2.1f, 0.08f), "Wood", solid: false);
-            for (var step = 1; step <= 4; step++)
-                Box("Echelon", slide, new Vector3(0f, step * 0.3f, -0.5f), new Vector3(0.82f, 0.04f, 0.06f), "Metal", solid: false);
-            var chute = Quaternion.Euler(27.5f, 0f, 0f);
-            Box("Glissiere", slide, new Vector3(0f, 0.76f, 1.75f), new Vector3(0.7f, 0.05f, 2.85f), "MetalLight", chute);
-            foreach (var x in new[] { -0.36f, 0.36f })
-                Box("Rebord", slide, new Vector3(x, 0.84f, 1.75f), new Vector3(0.04f, 0.2f, 2.85f), "SignRed", chute, solid: false);
+            Model("Modele", slide, Vector3.zero, null, "toboggan");
+            Solid(slide, new Vector3(0f, 1.4f, 0f), new Vector3(1f, 0.08f, 1f), Surface.Wood);
+            TiltedSolid(slide, "Glissiere", new Vector3(0f, 0.76f, 1.75f), Quaternion.Euler(27.5f, 0f, 0f), new Vector3(0.7f, 0.05f, 2.85f), Surface.Metal);
 
             var seesaw = Group(p, "Bascule", new Vector3(-2.6f, 0f, -2.8f), 25f);
-            Box("Pivot", seesaw, new Vector3(0f, 0.25f, 0f), new Vector3(0.3f, 0.5f, 0.4f), "Metal");
-            Box("Planche", seesaw, new Vector3(0f, 0.54f, 0f), new Vector3(0.25f, 0.06f, 3f), "SignYellow", Quaternion.Euler(12f, 0f, 0f), solid: false);
+            Model("Modele", seesaw, Vector3.zero, null, "bascule");
+            Solid(seesaw, new Vector3(0f, 0.25f, 0f), new Vector3(0.3f, 0.5f, 0.4f));
 
             var sandbox = Group(p, "Bac_A_Sable", new Vector3(2.6f, 0f, 2.8f));
-            Box("Sable", sandbox, new Vector3(0f, 0.1f, 0f), new Vector3(2.4f, 0.2f, 2.4f), "Hay", solid: false);
-            foreach (var (x, z, size) in new[] { (0f, 1.25f, new Vector3(2.6f, 0.3f, 0.1f)), (0f, -1.25f, new Vector3(2.6f, 0.3f, 0.1f)),
-                         (1.25f, 0f, new Vector3(0.1f, 0.3f, 2.6f)), (-1.25f, 0f, new Vector3(0.1f, 0.3f, 2.6f)) })
-                Box("Bordure", sandbox, new Vector3(x, 0.15f, z), size, "Wood", solid: false);
+            Model("Modele", sandbox, Vector3.zero, null, "bac_a_sable");
+        }
+
+        // The collider of a part set at an angle, on a child turned like the part.
+        static void TiltedSolid(Transform parent, string name, Vector3 center, Quaternion rotation, Vector3 size, Surface? surface = null)
+        {
+            var holder = Group(parent, name, center);
+            holder.localRotation = rotation;
+            Solid(holder, Vector3.zero, size, surface);
         }
 
         // Half court: the hoop stands on the south baseline, a ball left where it stopped rolling, a bat beside it.
@@ -152,10 +148,7 @@ namespace DeadCounty.EditorTools
                 Line(new Vector3(x, 0f, -halfLength + 2.5f), new Vector3(line, 0.01f, 4.8f));
             Line(new Vector3(0f, 0f, -halfLength + 4.9f), new Vector3(3.67f, 0.01f, line));
 
-            Post("Poteau", c, new Vector3(0f, 0f, -halfLength - 0.4f), 3.2f, 0.07f, "Metal");
-            Box("Bras", c, new Vector3(0f, 3.15f, -halfLength + 0.1f), new Vector3(0.07f, 0.07f, 1f), "Metal", solid: false);
-            Box("Panneau", c, new Vector3(0f, 3.4f, -halfLength + 0.6f), new Vector3(1.8f, 1.05f, 0.05f), "SignWhite", solid: false);
-            Cylinder("Cercle", c, new Vector3(0f, 3.05f, -halfLength + 0.88f), 0.23f, 0.03f, "SignRed", solid: false);
+            Solid(Model("Panier", c, new Vector3(0f, 0f, -halfLength - 0.4f), null, "panier_basket").transform, new Vector3(0f, 1.6f, 0f), new Vector3(0.126f, 3.2f, 0.126f));
             Primitive(PrimitiveType.Sphere, "Ballon", c, new Vector3(2.3f, 0.16f, 0.8f), Vector3.one * 0.24f, "Obstacle", null, false);
             PlaceItem(c, "IT_Batte", new Vector3(-2.6f, 0.04f, 1.6f), 35f);
         }
@@ -168,29 +161,22 @@ namespace DeadCounty.EditorTools
             Cot(ward, new Vector3(0.9f, 0f, 0.1f), -6f, bloody: true);
 
             var stores = Tent(t, "Tente_Materiel", new Vector3(2.6f, 0f, 1.6f), 90f);
-            Box("Table", stores, new Vector3(0f, 0.75f, -0.6f), new Vector3(1.6f, 0.04f, 0.7f), "MetalLight");
-            foreach (var x in new[] { -0.7f, 0.7f })
-                Box("Pied_Table", stores, new Vector3(x, 0.37f, -0.6f), new Vector3(0.04f, 0.74f, 0.6f), "Metal", solid: false);
-            Box("Trousse", stores, new Vector3(-0.3f, 0.87f, -0.6f), new Vector3(0.4f, 0.2f, 0.28f), "SignWhite", solid: false);
-            Box("Croix", stores, new Vector3(-0.3f, 0.975f, -0.6f), new Vector3(0.2f, 0.01f, 0.06f), "SignRed", solid: false);
-            Box("Croix", stores, new Vector3(-0.3f, 0.975f, -0.6f), new Vector3(0.06f, 0.01f, 0.2f), "SignRed", solid: false);
-            Box("Caisse", stores, new Vector3(1.1f, 0.3f, 0.7f), new Vector3(0.6f, 0.6f, 0.6f), "Crate");
-            Box("Caisse", stores, new Vector3(1.15f, 0.85f, 0.75f), new Vector3(0.5f, 0.5f, 0.5f), "Crate", Quaternion.Euler(0f, 18f, 0f), solid: false);
-            Box("Caisse", stores, new Vector3(-1.1f, 0.3f, 0.8f), new Vector3(0.7f, 0.6f, 0.5f), "FabricOlive");
+            Solid(Model("Table", stores, new Vector3(0f, 0f, -0.6f), null, "table_soins").transform, new Vector3(0f, 0.75f, 0f), new Vector3(1.6f, 0.04f, 0.7f));
+            Solid(Model("Caisse", stores, new Vector3(1.1f, 0f, 0.7f), null, "caisse_bois").transform, new Vector3(0f, 0.3f, 0f), new Vector3(0.6f, 0.6f, 0.6f), Surface.Wood);
+            // The same 0.6 m crate, scaled to the 0.5 m one stacked on it.
+            Model("Caisse", stores, new Vector3(1.15f, 0.6f, 0.75f), Quaternion.Euler(0f, 18f, 0f), "caisse_bois").transform.localScale = Vector3.one * (0.5f / 0.6f);
+            Solid(Model("Caisse", stores, new Vector3(-1.1f, 0f, 0.8f), null, "caisse_armee").transform, new Vector3(0f, 0.3f, 0f), new Vector3(0.7f, 0.6f, 0.5f), Surface.Wood);
 
             var bags = Group(t, "Housses_Mortuaires", new Vector3(-2.5f, 0f, 3.2f));
             for (var i = 0; i < 4; i++)
-                Box("Housse", bags, new Vector3(i * 0.85f - 1.3f, 0.14f, Range(rng, -0.1f, 0.1f)), new Vector3(0.6f, 0.28f, 1.9f), "CarBlack", Quaternion.Euler(0f, Range(rng, -6f, 6f), 0f), solid: false);
+                Model("Housse", bags, new Vector3(i * 0.85f - 1.3f, 0f, Range(rng, -0.1f, 0.1f)), Quaternion.Euler(0f, Range(rng, -6f, 6f), 0f), "housse_mortuaire");
             SandbagWall(t, new Vector3(-0.5f, 0f, 5.2f), 6f, rng);
 
             var board = Group(t, "Panneau_Triage", new Vector3(4.2f, 0f, 5.4f));
-            foreach (var x in new[] { -0.8f, 0.8f })
-                Post("Pied", board, new Vector3(x, 0f, 0f), 2f, 0.04f, "Wood", solid: false);
-            Box("Planche", board, new Vector3(0f, 1.6f, 0f), new Vector3(1.9f, 0.7f, 0.05f), "SignWhite", solid: false);
+            Model("Modele", board, Vector3.zero, null, "panneau_triage");
             Label(board, "TRIAGE", new Vector3(0f, 1.6f, 0.03f), Vector3.forward, 0.055f, "SignRed");
 
-            Box("Groupe_Electrogene", t, new Vector3(4.4f, 0.4f, -4.6f), new Vector3(1.1f, 0.8f, 0.7f), "SignYellow");
-            Box("Reservoir", t, new Vector3(4.4f, 0.9f, -4.6f), new Vector3(0.6f, 0.2f, 0.5f), "Metal", solid: false);
+            Solid(Model("Groupe_Electrogene", t, new Vector3(4.4f, 0f, -4.6f), null, "groupe_electrogene").transform, new Vector3(0f, 0.4f, 0f), new Vector3(1.1f, 0.8f, 0.7f));
             BuiltLamps.Add(Floodlight(t, new Vector3(5.2f, 0f, -5.6f), t.position + new Vector3(-1f, 0f, 0f)));
             Barrel(t, new Vector3(3.2f, 0f, -5.4f), "SignRed");
             Barrel(t, new Vector3(-4.6f, 0f, -5.2f), "CarBlue");
@@ -202,37 +188,25 @@ namespace DeadCounty.EditorTools
         // Ridge tent open at both ends, its ridge along local X.
         static Transform Tent(Transform parent, string name, Vector3 pos, float yaw)
         {
-            const float eave = 1.7f;
             var tent = Group(parent, name, pos, yaw);
-            foreach (var x in new[] { -2f, 2f })
-            {
-                Post("Mat", tent, new Vector3(x, 0f, 0f), eave + 1f, 0.04f, "WoodDark", solid: false);
-                foreach (var z in new[] { -1.6f, 1.6f })
-                    Post("Piquet", tent, new Vector3(x, 0f, z), eave, 0.035f, "WoodDark", solid: false);
-            }
-            MeshObject("Toile", tent, RoofMesh(), new Vector3(0f, eave, 0f), Quaternion.identity, new Vector3(4.3f, 1f, 3.5f), new[] { "FabricOlive" }, false);
-            foreach (var z in new[] { -1.62f, 1.62f })
-                Box("Pan", tent, new Vector3(0f, eave / 2f + 0.3f, z), new Vector3(4.2f, eave - 0.6f, 0.03f), "FabricOlive", solid: false);
+            Model("Modele", tent, Vector3.zero, null, "tente");
             return tent;
         }
 
         static void Cot(Transform parent, Vector3 pos, float yaw, bool bloody)
         {
             var cot = Group(parent, "Lit_De_Camp", pos, yaw);
-            Box("Toile", cot, new Vector3(0f, 0.42f, 0f), new Vector3(0.7f, 0.04f, 1.9f), "Linen");
-            foreach (var z in new[] { -0.8f, 0.8f })
-                Box("Pietement", cot, new Vector3(0f, 0.2f, z), new Vector3(0.7f, 0.4f, 0.04f), "Metal", solid: false);
-            Box("Couverture", cot, new Vector3(0f, 0.45f, -0.4f), new Vector3(0.72f, 0.03f, 1f), "FabricOlive", solid: false);
+            Model("Modele", cot, Vector3.zero, null, "lit_de_camp");
+            Solid(cot, new Vector3(0f, 0.42f, 0f), new Vector3(0.7f, 0.04f, 1.9f));
             if (bloody) Box("Tache", cot, new Vector3(0.05f, 0.445f, 0.45f), new Vector3(0.4f, 0.01f, 0.5f), "Blood", solid: false);
         }
 
         static void Memorial(Transform parent, Vector3 pos)
         {
             var m = Group(parent, "Monument", pos);
-            Box("Socle", m, new Vector3(0f, 0.2f, 0f), new Vector3(1.4f, 0.4f, 1.4f), "Concrete");
-            Box("Stele", m, new Vector3(0f, 1.4f, 0f), new Vector3(0.7f, 2f, 0.7f), "Headstone");
-            Box("Plaque", m, new Vector3(0f, 1.1f, 0.36f), new Vector3(0.45f, 0.6f, 0.02f), "Metal", solid: false);
-            MeshObject("Pointe", m, ConeMesh(4), new Vector3(0f, 2.4f, 0f), Quaternion.Euler(0f, 45f, 0f), new Vector3(0.5f, 0.5f, 0.5f), new[] { "Headstone" }, false);
+            Model("Modele", m, Vector3.zero, null, "monument");
+            Solid(m, new Vector3(0f, 0.2f, 0f), new Vector3(1.4f, 0.4f, 1.4f), Surface.Concrete);
+            Solid(m, new Vector3(0f, 1.4f, 0f), new Vector3(0.7f, 2f, 0.7f), Surface.Concrete);
         }
     }
 }

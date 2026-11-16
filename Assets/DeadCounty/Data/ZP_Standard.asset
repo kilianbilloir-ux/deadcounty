@@ -62,6 +62,9 @@ MonoBehaviour:
     CallRadius: 10
     CallCooldown: 5
     FeedRadius: 3
+    DownTime: 2.6
+    DownTimeJitter: 0.15
+    RiseTime: 1.1
     HunchMin: 8
     HunchMax: 18
     HeadRollMax: 10

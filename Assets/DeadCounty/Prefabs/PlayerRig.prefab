@@ -3105,6 +3105,7 @@ GameObject:
   - component: {fileID: 1735016780315068882}
   - component: {fileID: 7729205633923639746}
   - component: {fileID: 7783617582736071195}
+  - component: {fileID: 4027303286550069599}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -3198,6 +3199,7 @@ MonoBehaviour:
   standingHeight: 1.8
   crouchHeight: 1.1
   heightChangeSpeed: 6
+  seatedCameraHeight: 0.62
   crouchNoise: 1
   walkNoise: 3
   runNoise: 8
@@ -3270,10 +3272,11 @@ MonoBehaviour:
     SprintDrainPerSecond: 20
     JumpCost: 10
     MinToJump: 10
-    RegenDelay: 1
-    IdleRegenPerSecond: 25
-    WalkRegenPerSecond: 18
-    ExhaustionRecoverThreshold: 40
+    RegenDelay: 2
+    IdleRegenPerSecond: 2
+    WalkRegenPerSecond: 1
+    RestRegenPerSecond: 6
+    ExhaustionRecoverThreshold: 25
 --- !u!114 &6684348859937068969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3503,6 +3506,10 @@ MonoBehaviour:
   bed: {fileID: 11400000, guid: 37b8504341d5b4ad19370c6899d63695, type: 2}
   swing: {fileID: 11400000, guid: 58347639acbb2405cb7c125cdc480d81, type: 2}
   strike: {fileID: 11400000, guid: 8b4376b4994864f77947255e1f8d5120, type: 2}
+  shove: {fileID: 11400000, guid: c34919ded17784a50a840a347b16cc8f, type: 2}
+  stomp: {fileID: 11400000, guid: b8151d1af315e45d280f7cafc2fddc55, type: 2}
+  kill: {fileID: 11400000, guid: 7745041428ed744c19f9e6fabadbbe48, type: 2}
+  effort: {fileID: 11400000, guid: b27d402f83aab420886056122c5c33ef, type: 2}
 --- !u!114 &7729205633923639746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3555,7 +3562,33 @@ MonoBehaviour:
     NoiseRadius: 2
     Stagger: 1.1
     Knockback: 0.9
+    Knockdown: 0.5
+  stomp:
+    Damage: 13
+    Reach: 1
+    HalfAngle: 45
+    MaxTargets: 1
+    Windup: 0.3
+    Recovery: 0.4
+    StaminaCost: 7
+    NoiseRadius: 4
+    Stagger: 0
+    Knockback: 0
+    Knockdown: 0
   surpriseFactor: 2
+  groundFactor: 2
+--- !u!114 &4027303286550069599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4734863590371900342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbfb356164b1b4d269c088b3b7576a0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Player.PlayerRest
 --- !u!1 &4754230077652693509
 GameObject:
   m_ObjectHideFlags: 0

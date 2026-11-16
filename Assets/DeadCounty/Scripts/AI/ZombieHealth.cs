@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DeadCounty.AI
 {
-    // ZombieAgent reels on Damaged, falls on Died and restores the pool in ResetToSpawn.
+    // ZombieAgent reels or falls on Damaged, dies on Died and restores the pool in ResetToSpawn.
     [DisallowMultipleComponent]
     public class ZombieHealth : MonoBehaviour
     {
@@ -16,6 +16,8 @@ namespace DeadCounty.AI
         // Seconds of stagger and metres of knockback the last blow carried.
         public float LastStagger { get; private set; }
         public float LastKnockback { get; private set; }
+        // Whether the last blow felled the zombie, or kept it on the ground.
+        public bool LastKnockdown { get; private set; }
 
         public event Action<ZombieHealth> Damaged;
         public event Action<ZombieHealth> Died;
@@ -24,13 +26,14 @@ namespace DeadCounty.AI
 
         // Returns true when the damage was applied, false once dead.
         // !(damage > 0) rejects NaN, where <= would let it through.
-        public bool ApplyDamage(float damage, Vector3 source, float stagger = 0f, float knockback = 0f)
+        public bool ApplyDamage(float damage, Vector3 source, float stagger = 0f, float knockback = 0f, bool knockdown = false)
         {
             if (!(damage > 0f) || !IsAlive) return false;
             var killed = Pool.Apply(damage);
             LastHitSource = source;
             LastStagger = stagger;
             LastKnockback = knockback;
+            LastKnockdown = knockdown;
             Damaged?.Invoke(this);
             if (killed) Died?.Invoke(this);
             return true;

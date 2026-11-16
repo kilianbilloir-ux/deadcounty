@@ -24,22 +24,27 @@ namespace DeadCounty.Audio
         const float BangIntervalMax = 0.9f;
         // Zombies set off by the same call answer it one after the other, not on the same frame.
         const float AnswerDelayMax = 0.4f;
-        // The body reaches the ground this long after the blow that kills.
+        // The body reaches the ground this long after the blow that kills or fells it.
         const float FallDelay = 0.45f;
         const float DeathPitch = 0.85f;
+        // Bites on a body: the head is down over it, a little ahead of the feet.
+        const float ChewIntervalMin = 1.1f;
+        const float ChewIntervalMax = 2.4f;
+        const float ChewHeight = 0.6f;
+        const float ChewReach = 0.5f;
         // Ahead of the pooled one-shots (128) when Unity runs out of real voices: the attack telegraph must play.
         const int VoicePriority = 64;
 
         static readonly VoiceLimiter<ZombieAudio> Voices = new(ZombieVocals.MaxVoices);
 
         [Header("Voice")]
-        [SerializeField] SoundCue moan, breath, alert, sniff, growl, call, windup, frustrated;
+        [SerializeField] SoundCue moan, breath, alert, sniff, growl, call, windup, frustrated, rise;
         [Header("Attack")]
         [SerializeField] SoundCue whoosh, hit, miss;
         [Header("Struck")]
         [SerializeField] SoundCue hurt, death, fall;
         [Header("Body")]
-        [SerializeField] SoundCue stepSoft, stepHard, stepGravel, dragSoft, dragHard, doorBang;
+        [SerializeField] SoundCue stepSoft, stepHard, stepGravel, dragSoft, dragHard, doorBang, feed;
 
         ZombieAgent agent;
         ProceduralHumanoidAnimator animator;
@@ -49,7 +54,7 @@ namespace DeadCounty.Audio
         System.Random random;
         SoundCue speaking;
         AttackPhase lastPhase;
-        float nextVocal, nextBang, answerAt = float.PositiveInfinity, fallAt = float.PositiveInfinity;
+        float nextVocal, nextBang, nextChew, answerAt = float.PositiveInfinity, fallAt = float.PositiveInfinity;
         bool leftPlanted, rightPlanted;
 
         public bool IsSpeaking => Voices.IsSpeaking(this, Time.time);
@@ -73,6 +78,8 @@ namespace DeadCounty.Audio
             AIEvents.Strike += OnStrike;
             GameSettings.Changed += OnSettingsChanged;
             health.Damaged += OnDamaged;
+            agent.Felled += OnFelled;
+            agent.GettingUp += OnGettingUp;
             nextVocal = Time.time + ZombieVocals.FirstDelay(random);
         }
 
@@ -82,6 +89,8 @@ namespace DeadCounty.Audio
             AIEvents.Strike -= OnStrike;
             GameSettings.Changed -= OnSettingsChanged;
             health.Damaged -= OnDamaged;
+            agent.Felled -= OnFelled;
+            agent.GettingUp -= OnGettingUp;
             fallAt = float.PositiveInfinity;
             Silence();
         }
@@ -118,6 +127,7 @@ namespace DeadCounty.Audio
             }
             if (animator != null && agent.Lod == ZombieLod.Near) Footsteps(distance);
             BangOnDoor(now, distance);
+            Chew(now, distance);
         }
 
         void OnTransition(ZombieTransitionEvent e)
@@ -173,11 +183,18 @@ namespace DeadCounty.Audio
             var at = transform.position + Vector3.up * ChestHeight;
             if (health.IsAlive)
             {
-                OneShot(hurt, at, distance, 1f, identity.Pitch);
+                OneShot(hurt, at, distance, 1f, identity.Pitch, OwnClip(hurt));
                 return;
             }
-            OneShot(death, at, distance, 1f, identity.Pitch * DeathPitch);
+            OneShot(death, at, distance, 1f, identity.Pitch * DeathPitch, OwnClip(death));
             fallAt = Time.time + FallDelay;
+        }
+
+        void OnFelled() => fallAt = Time.time + FallDelay;
+
+        void OnGettingUp()
+        {
+            if (agent.Lod != ZombieLod.Dormant) Speak(ZombieVocal.Rise, DistanceToListener());
         }
 
         void OnSettingsChanged()
@@ -189,7 +206,7 @@ namespace DeadCounty.Audio
         {
             var cue = Cue(vocal);
             if (cue == null || cue.clips == null || cue.clips.Length == 0 || distance > cue.maxDistance) return;
-            var clip = cue.clips[identity.PickClip(cue.clips.Length, random)];
+            var clip = OwnClip(cue);
             if (clip == null) return;
             var pitch = (vocal == ZombieVocal.Windup ? identity.TelegraphPitch : identity.Pitch) * cue.RandomPitch();
             var now = Time.time;
@@ -201,6 +218,10 @@ namespace DeadCounty.Audio
             voice.Play();
             speaking = cue;
         }
+
+        // The zombie's own voice among the cue's clips.
+        AudioClip OwnClip(SoundCue cue)
+            => cue != null && cue.clips is { Length: > 0 } ? cue.clips[identity.PickClip(cue.clips.Length, cue.voices, random)] : null;
 
         void Silence()
         {
@@ -245,9 +266,22 @@ namespace DeadCounty.Audio
             OneShot(doorBang, door.Doorway.Center + Vector3.up * BangHeight, distance);
         }
 
-        static void OneShot(SoundCue cue, Vector3 position, float distance, float volume = 1f, float pitch = 1f)
+        // Feeding on a body: a bite now and then, between the growls.
+        void Chew(float now, float distance)
         {
-            if (cue != null && distance <= cue.maxDistance) Sfx.Play(cue, position, volume, pitch);
+            if (agent.State != ZombieState.Feed)
+            {
+                nextChew = now;
+                return;
+            }
+            if (now < nextChew) return;
+            nextChew = now + Mathf.Lerp(ChewIntervalMin, ChewIntervalMax, (float)random.NextDouble());
+            OneShot(feed, transform.position + transform.forward * ChewReach + Vector3.up * ChewHeight, distance);
+        }
+
+        static void OneShot(SoundCue cue, Vector3 position, float distance, float volume = 1f, float pitch = 1f, AudioClip clip = null)
+        {
+            if (cue != null && distance <= cue.maxDistance) Sfx.Play(cue, position, volume, pitch, clip);
         }
 
         // Planar distance to the zombies' target, the player the camera follows: the same measure as the LOD tiers.
@@ -270,7 +304,8 @@ namespace DeadCounty.Audio
             ZombieVocal.Growl => growl,
             ZombieVocal.Call => call,
             ZombieVocal.Windup => windup,
-            _ => frustrated,
+            ZombieVocal.Frustrated => frustrated,
+            _ => rise,
         };
 
         // Domain reload is disabled on entering Play mode: voices of the previous session must be dropped by hand.

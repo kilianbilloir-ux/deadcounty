@@ -1,0 +1,21 @@
+// Floodlight lamp, 1.2 x 0.3 x 0.7 m, origin at its centre on the pivot it tilts about (X), lighting toward +Y: a
+// grey housing with a visor and cooling fins, six glowing panels (mat_PanelGlow), pivot pins for the mast's yoke.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "settings", "ground": false},
+  {"op": "material", "name": "housing", "color": "#4D5257"},
+  {"op": "material", "name": "dark", "color": "#2A2D30"},
+  {"op": "material", "name": "mat_PanelGlow", "color": "#E8EEF2"},
+
+  {"op": "create", "id": "housing", "material": "housing",
+   "gen": {"box": {"size": [1.2, 0.22, 0.7]}}, "mods": [{"bevel": {"width": "2cm"}}], "t": [0, 0.01, 0]},
+  {"op": "create", "id": "panels", "material": "mat_PanelGlow", "embed": ["housing"],
+   "gen": {"box": {"size": [0.34, 0.02, 0.27]}}, "mods": [{"array": {"count": 3, "step": [0.38, 0, 0]}}, {"array": {"count": 2, "step": [0, 0, 0.31]}}],
+   "t": [0, 0.12, -0.01]},
+  {"op": "create", "id": "visor", "material": "dark", "embed": ["housing", "panels"],
+   "gen": {"box": {"size": [1.2, 0.16, 0.03]}}, "r": [-12, 0, 0], "t": [0, 0.16, 0.345]},
+  {"op": "create", "id": "fins", "material": "dark", "embed": ["housing"],
+   "gen": {"box": {"size": [0.03, 0.08, 0.6]}}, "mods": [{"array": {"count": 9, "step": [0.13, 0, 0]}}], "t": [0, -0.13, 0]},
+  {"op": "create", "id": "pins", "material": "dark", "embed": ["housing"],
+   "gen": {"cylinder": {"r": 0.05, "h": 1.32, "seg": 8}}, "r": [0, 90, 0], "t": [0, 0, 0]}
+]

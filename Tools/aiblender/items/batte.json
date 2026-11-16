@@ -1,0 +1,22 @@
+// Baseball bat, 840 mm, lying along +Y with the grip at the origin: knob, taped handle, taper, barrel with a
+// maker's ring.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "ash", "color": "#B98F5E"},
+  {"op": "material", "name": "ash_dark", "color": "#8C6A44"},
+  {"op": "material", "name": "tape", "color": "#2A2A2A"},
+
+  {"op": "create", "id": "bat", "material": "ash",
+   "gen": {"revolve": {"axis": "y", "origin": [0, 0, 33], "seg": 12, "unit": "mm",
+     "profile": [[0, -90], [20, -90], [25, -84], [25, -76], [14, -66], [13, 110], [15, 250], [21, 400],
+                 [30, 520], [33, 600], [33, 720], [29, 742], [18, 750], [0, 750]]}}},
+  {"op": "create", "id": "tape", "material": "tape", "embed": ["bat"],
+   "gen": {"revolve": {"axis": "y", "origin": [0, 0, 33], "seg": 12, "unit": "mm",
+     "profile": [[0, -64], [15.5, -64], [15, 105], [0, 105]]}}},
+  {"op": "create", "id": "ring", "material": "ash_dark", "embed": ["bat"],
+   "gen": {"revolve": {"axis": "y", "origin": [0, 0, 33], "seg": 12, "unit": "mm",
+     "profile": [[0, 470], [28.2, 470], [31.4, 530], [0, 530]]}}},
+  {"op": "create", "id": "cap", "material": "ash_dark", "embed": ["bat"],
+   "gen": {"revolve": {"axis": "y", "origin": [0, 0, 33], "seg": 12, "unit": "mm",
+     "profile": [[0, 740], [29.6, 740], [18.6, 751], [0, 751]]}}}
+]

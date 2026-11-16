@@ -11,16 +11,22 @@ namespace DeadCounty.EditorTools
     public static partial class TestSceneBuilder
     {
         // Calls are placed nearer than their cue's minDistance, so the rolloff never touches them: their distance is
-        // in the clip. Distant events average one every five minutes between the three of them.
+        // in the clip. Distant events average one every three minutes between the five of them.
         static readonly (string cue, Activity activity, float interval, Vector2 distance, Vector2 height, float quietStart)[] AmbienceCalls =
         {
             ("Ambience/Bird", Activity.Birds, 8f, new(12f, 35f), new(3f, 9f), 2f),
             ("Ambience/Crow", Activity.Day, 50f, new(30f, 55f), new(6f, 14f), 20f),
+            ("Ambience/Woodpecker", Activity.Day, 110f, new(20f, 45f), new(4f, 10f), 40f),
+            ("Ambience/Cow", Activity.Day, 140f, new(45f, 70f), new(0f, 2f), 60f),
             ("Ambience/Owl", Activity.Night, 45f, new(25f, 50f), new(5f, 10f), 10f),
+            ("Ambience/Coyote", Activity.Night, 160f, new(50f, 70f), new(0f, 3f), 45f),
             ("Ambience/Dog", Activity.MostlyNight, 90f, new(40f, 60f), new(0f, 2f), 30f),
+            ("Ambience/Shutter", Activity.Always, 240f, new(20f, 40f), new(2f, 6f), 75f),
             ("Ambience/DistantScream", Activity.Always, 900f, new(40f, 60f), new(0f, 4f), 120f),
             ("Ambience/DistantAlarm", Activity.Always, 1000f, new(40f, 60f), new(0f, 2f), 150f),
             ("Ambience/DistantShot", Activity.Always, 700f, new(40f, 60f), new(0f, 3f), 90f),
+            ("Ambience/DistantHorde", Activity.MostlyNight, 900f, new(40f, 60f), new(0f, 2f), 180f),
+            ("Ambience/DistantGlass", Activity.Always, 1000f, new(40f, 60f), new(0f, 3f), 200f),
         };
 
         static readonly (string field, string cue)[] InterfaceCues =
@@ -43,6 +49,13 @@ namespace DeadCounty.EditorTools
             CueAsset("Ambience/DistantScream", ambience, 2, Variants(DistantRecipes.Scream), 0.3f, 0.04f, 200f, 500f);
             CueAsset("Ambience/DistantAlarm", ambience, 2, Variants(DistantRecipes.CarAlarm), 0.22f, 0.02f, 200f, 500f);
             CueAsset("Ambience/DistantShot", ambience, 2, Variants(DistantRecipes.Gunshot), 0.4f, 0.04f, 200f, 500f);
+            // Recorded only: without their takes these calls stay silent.
+            CueAsset("Ambience/Woodpecker", ambience, 0, null, 0.3f, 0.04f, 80f, 300f);
+            CueAsset("Ambience/Cow", ambience, 0, null, 0.3f, 0.05f, 150f, 400f);
+            CueAsset("Ambience/Coyote", ambience, 0, null, 0.3f, 0.04f, 150f, 400f);
+            CueAsset("Ambience/Shutter", ambience, 0, null, 0.3f, 0.06f, 80f, 300f);
+            CueAsset("Ambience/DistantHorde", ambience, 0, null, 0.3f, 0.03f, 200f, 500f);
+            CueAsset("Ambience/DistantGlass", ambience, 0, null, 0.3f, 0.04f, 200f, 500f);
 
             // Kept in tune: TitleMusic pitches the bell to the drone's notes itself.
             CueAsset("Music/TitleDrone", SoundChannel.Music, 1, InterfaceRecipes.TitleDrone, 0.5f, 0f);

@@ -21,3 +21,4 @@ MonoBehaviour:
   channel: 0
   minDistance: 1
   maxDistance: 18
+  voices: 1

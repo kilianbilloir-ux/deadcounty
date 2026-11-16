@@ -16,10 +16,10 @@ namespace DeadCounty.Audio
         static int cursor;
         static bool subscribed;
 
-        // Pooled 3D one-shot; null when the cue has no clip.
-        public static AudioSource Play(SoundCue cue, Vector3 position, float volumeScale = 1f, float pitchScale = 1f)
+        // Pooled 3D one-shot of `clip`, or of a clip the cue picks; null when the cue has no clip.
+        public static AudioSource Play(SoundCue cue, Vector3 position, float volumeScale = 1f, float pitchScale = 1f, AudioClip clip = null)
         {
-            var source = Start(cue, position, volumeScale, pitchScale);
+            var source = Start(cue, position, volumeScale, pitchScale, clip);
             if (source != null) source.spatialBlend = 1f;
             return source;
         }
@@ -27,7 +27,7 @@ namespace DeadCounty.Audio
         // Pooled non-spatial one-shot: interface, music stingers, the player's own body.
         public static AudioSource Play2D(SoundCue cue, float volumeScale = 1f)
         {
-            var source = Start(cue, Vector3.zero, volumeScale, 1f);
+            var source = Start(cue, Vector3.zero, volumeScale, 1f, null);
             if (source != null) source.spatialBlend = 0f;
             return source;
         }
@@ -55,10 +55,10 @@ namespace DeadCounty.Audio
             _ => 1f,
         };
 
-        static AudioSource Start(SoundCue cue, Vector3 position, float volumeScale, float pitchScale)
+        static AudioSource Start(SoundCue cue, Vector3 position, float volumeScale, float pitchScale, AudioClip clip)
         {
             if (cue == null) return null;
-            var clip = cue.Pick();
+            if (clip == null) clip = cue.Pick();
             if (clip == null) return null;
             var source = NextVoice();
             source.transform.position = position;

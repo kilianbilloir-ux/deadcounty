@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DeadCounty.Player;
+using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
 
@@ -22,8 +23,8 @@ namespace DeadCounty.Items
         public ItemDefinition Item => item;
         public int Count => count;
 
-        public override string DisplayName => count > 1 ? $"{item.DisplayName} ×{count}" : item.DisplayName;
-        public override string Action => "Ramasser";
+        public override string DisplayName => count > 1 ? $"{item.LocalizedName} ×{count}" : item.LocalizedName;
+        public override string Action => Loc.T("Ramasser");
         public override Vector3 PromptPoint => transform.position + Vector3.up * PromptHeight;
 
         void Awake()

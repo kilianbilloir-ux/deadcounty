@@ -36,3 +36,6 @@ sysinfo.txt
 
 /[Aa]ssets/[Ss]creenshots/
 /[Aa]ssets/[Ss]creenshots.meta
+
+# aiblender scene state
+.aiblender/

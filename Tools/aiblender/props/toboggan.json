@@ -1,0 +1,30 @@
+// Slide, 1 x 3.6 x 2.1 m: a wooden tower with a platform at 1.4 m, a steel ladder on the -Y side, a steel chute with
+// red side walls running down toward +Y onto a short run-out.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#7A5A3C"},
+  {"op": "material", "name": "wood_light", "color": "#8C6A48"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+  {"op": "material", "name": "rung", "color": "#4D5257"},
+  {"op": "material", "name": "red", "color": "#A8322A"},
+
+  {"op": "create", "id": "posts", "material": "wood",
+   "gen": {"box": {"size": [0.08, 0.08, 2.1]}},
+   "mods": [{"array": {"count": 2, "step": [0.9, 0, 0]}}, {"array": {"count": 2, "step": [0, 0.9, 0]}}], "t": [0, 0, 1.05]},
+  {"op": "create", "id": "platform", "material": "wood_light", "embed": ["posts"],
+   "gen": {"box": {"size": [1.0, 1.0, 0.08]}}, "t": [0, 0, 1.4]},
+  {"op": "create", "id": "guards", "material": "wood", "embed": ["posts"],
+   "gen": {"box": {"size": [0.05, 0.84, 0.07]}},
+   "mods": [{"array": {"count": 2, "step": [0.9, 0, 0]}}, {"array": {"count": 2, "step": [0, 0, 0.3]}}], "t": [0, 0, 1.85]},
+  {"op": "create", "id": "rungs", "material": "rung", "embed": ["posts"],
+   "gen": {"box": {"size": [0.84, 0.05, 0.04]}}, "mods": [{"array": {"count": 4, "step": [0, 0, 0.3]}}], "t": [0, -0.47, 0.75]},
+  {"op": "create", "id": "chute", "material": "steel", "embed": ["platform"],
+   "gen": {"extrude": {"plane": "yz", "depth": 0.62,
+     "profile": [[0.48, 1.44], [2.75, 0.28], [3.05, 0.25], [3.05, 0.2], [2.74, 0.23], [0.48, 1.39]]}}},
+  {"op": "create", "id": "wall_l", "material": "red", "embed": ["chute", "platform"],
+   "gen": {"extrude": {"plane": "yz", "depth": 0.05, "origin": [-0.335, 0, 0],
+     "profile": [[0.48, 1.38], [0.48, 1.62], [2.8, 0.44], [3.05, 0.43], [3.05, 0.2], [2.74, 0.22]]}}},
+  {"op": "create", "id": "wall_r", "material": "red", "mirror_of": "wall_l", "embed": ["chute", "platform"]},
+  {"op": "create", "id": "chute_legs", "material": "rung", "embed": ["chute"],
+   "gen": {"box": {"size": [0.05, 0.05, 0.22]}}, "mods": [{"array": {"count": 2, "step": [0.5, 0, 0]}}], "t": [0, 2.9, 0.11]}
+]

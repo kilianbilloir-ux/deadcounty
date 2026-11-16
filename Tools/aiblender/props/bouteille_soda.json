@@ -1,0 +1,15 @@
+// Soda bottle, 0.07 x 0.24 m: body, shoulder, neck and cap. The body colour #A8322A is repainted by the scene builder.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "body", "color": "#A8322A"},
+  {"op": "material", "name": "label", "color": "#E6E6E0"},
+  {"op": "material", "name": "cap", "color": "#33373B"},
+
+  {"op": "create", "id": "body", "material": "body",
+   "gen": {"revolve": {"axis": "z", "seg": 8,
+     "profile": [[0, 0], [0.035, 0], [0.035, 0.14], [0.014, 0.195], [0.014, 0.225], [0, 0.225]]}}},
+  {"op": "create", "id": "label", "material": "label", "embed": ["body"],
+   "gen": {"revolve": {"axis": "z", "seg": 8, "profile": [[0.03, 0.06], [0.037, 0.06], [0.037, 0.11], [0.03, 0.11]]}}},
+  {"op": "create", "id": "cap", "material": "cap", "embed": ["body"],
+   "gen": {"cylinder": {"r": 0.016, "h": 0.02, "seg": 8}}, "t": [0, 0, 0.23]}
+]

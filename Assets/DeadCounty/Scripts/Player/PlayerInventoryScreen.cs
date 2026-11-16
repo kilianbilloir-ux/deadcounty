@@ -23,7 +23,6 @@ namespace DeadCounty.Player
         const float LowNeed = 0.2f;
         // Hunger, thirst, health, bleeding and capacity: all an item can do.
         const int EffectCount = 5;
-        static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
 
         ThirdPersonController controller;
         PlayerHealth health;
@@ -101,11 +100,13 @@ namespace DeadCounty.Player
             fatigueWord = Find<Label>(root, "stat-fatigue-word");
             var hints = Find<VisualElement>(root, "inventory-hints");
             useHint = new KeyHint(hints);
-            dropHint = new KeyHint(hints, "Jeter");
-            sortHint = new KeyHint(hints, "Trier");
-            closeHint = new KeyHint(hints, "Fermer");
+            dropHint = new KeyHint(hints);
+            sortHint = new KeyHint(hints);
+            closeHint = new KeyHint(hints);
+            Translate(GameSettings.Language);
             ShowKeys();
             InputPrompts.KeysChanged += ShowKeys;
+            GameSettings.LanguageChanged += Translate;
             sortName = Find<Label>(root, "sort-name");
             sortCategory = Find<Label>(root, "sort-category");
             sortWeight = Find<Label>(root, "sort-weight");
@@ -123,6 +124,16 @@ namespace DeadCounty.Player
             if (inventory != null && inventory.Items != null) inventory.Items.Changed -= MarkDirty;
             if (inventory != null) inventory.WeaponChanged -= MarkDirty;
             InputPrompts.KeysChanged -= ShowKeys;
+            GameSettings.LanguageChanged -= Translate;
+        }
+
+        // The rows and the detail are rewritten the next time the screen is drawn.
+        void Translate(Language _)
+        {
+            dropHint.SetLabel(Loc.T("Jeter"));
+            sortHint.SetLabel(Loc.T("Trier"));
+            closeHint.SetLabel(Loc.T("Fermer"));
+            MarkDirty();
         }
 
         void ShowKeys()
@@ -219,10 +230,10 @@ namespace DeadCounty.Player
                 if (!shown) continue;
                 var stack = sorted[i];
                 var labels = row.Query<Label>().ToList();
-                var itemName = stack.Count > 1 ? $"{stack.Item.DisplayName} ×{stack.Count}" : stack.Item.DisplayName;
-                labels[0].text = stack.Item == inventory.Weapon ? $"{itemName} (en main)" : itemName;
+                var itemName = stack.Count > 1 ? $"{stack.Item.LocalizedName} ×{stack.Count}" : stack.Item.LocalizedName;
+                labels[0].text = stack.Item == inventory.Weapon ? Loc.T("{0} (en main)", itemName) : itemName;
                 labels[1].text = ItemDefinition.CategoryName(stack.Item.Category);
-                labels[2].text = $"{stack.Weight.ToString("0.##", French)} kg";
+                labels[2].text = $"{stack.Weight.ToString("0.##", Loc.Numbers)} kg";
                 row[0].style.backgroundImage = Picture(stack.Item);
                 row.EnableInClassList("item-row--selected", i == selected);
             }
@@ -230,7 +241,7 @@ namespace DeadCounty.Player
             empty.style.display = sorted.Count == 0 ? DisplayStyle.Flex : DisplayStyle.None;
 
             var items = inventory.Items;
-            weight.text = $"{items.Weight.ToString("0.0", French)} / {items.Capacity.ToString("0.#", French)} kg";
+            weight.text = $"{items.Weight.ToString("0.0", Loc.Numbers)} / {items.Capacity.ToString("0.#", Loc.Numbers)} kg";
             weight.EnableInClassList("inventory-weight--over", items.Overloaded);
             capacityFill.style.width = Length.Percent(Mathf.Clamp01(items.Weight / items.Capacity) * 100f);
             capacityFill.EnableInClassList("capacity-fill--over", items.Overloaded);
@@ -270,7 +281,7 @@ namespace DeadCounty.Player
 
         int Compare(ItemStack a, ItemStack b)
         {
-            var byName = French.CompareInfo.Compare(a.Item.DisplayName, b.Item.DisplayName, CompareOptions.IgnoreCase);
+            var byName = Loc.Numbers.CompareInfo.Compare(a.Item.LocalizedName, b.Item.LocalizedName, CompareOptions.IgnoreCase);
             return Sort switch
             {
                 SortMode.Category when a.Item.Category != b.Item.Category => a.Item.Category.CompareTo(b.Item.Category),
@@ -306,19 +317,20 @@ namespace DeadCounty.Player
             detail.style.visibility = item != null ? Visibility.Visible : Visibility.Hidden;
             if (item == null) return;
             detailIcon.style.backgroundImage = Picture(item);
-            detailName.text = item.DisplayName;
-            detailMeta.text = $"{ItemDefinition.CategoryName(item.Category)} · {item.Weight.ToString("0.##", French)} kg";
+            detailName.text = item.LocalizedName;
+            detailMeta.text = $"{ItemDefinition.CategoryName(item.Category)} · {item.Weight.ToString("0.##", Loc.Numbers)} kg";
             var shown = 0;
-            if (item.Hunger > 0f) Gain(ref shown, "Faim", model.Hunger, item.Hunger);
-            if (item.Thirst > 0f) Gain(ref shown, "Soif", model.Thirst, item.Thirst);
-            if (item.Health > 0f) Gain(ref shown, "Santé", pool.Normalized, item.Health / pool.Max);
-            if (item.StopsBleeding) Effect(ref shown, "Saignement", health.Bleeding ? "En cours → arrêté" : "Aucun", health.Bleeding);
-            if (item.CapacityBonus > 0f) Effect(ref shown, "Capacité", $"+{item.CapacityBonus.ToString("0.#", French)} kg", true);
+            if (item.Hunger > 0f) Gain(ref shown, Loc.T("Faim"), model.Hunger, item.Hunger);
+            if (item.Thirst > 0f) Gain(ref shown, Loc.T("Soif"), model.Thirst, item.Thirst);
+            if (item.Health > 0f) Gain(ref shown, Loc.T("Santé"), pool.Normalized, item.Health / pool.Max);
+            if (item.StopsBleeding) Effect(ref shown, Loc.T("Saignement"), Loc.T(health.Bleeding ? "En cours → arrêté" : "Aucun"), health.Bleeding);
+            if (item.CapacityBonus > 0f) Effect(ref shown, Loc.T("Capacité"), $"+{item.CapacityBonus.ToString("0.#", Loc.Numbers)} kg", true);
             if (item.IsWeapon)
             {
-                Effect(ref shown, "Dégâts", item.Weapon.Damage.ToString("0", French), true);
-                Effect(ref shown, "Portée", $"{item.Weapon.Reach.ToString("0.#", French)} m", true);
-                Effect(ref shown, "Endurance", $"−{item.Weapon.StaminaCost.ToString("0", French)} par coup", true);
+                Effect(ref shown, Loc.T("Dégâts"), item.Weapon.Damage.ToString("0", Loc.Numbers), true);
+                Effect(ref shown, Loc.T("Portée"), $"{item.Weapon.Reach.ToString("0.#", Loc.Numbers)} m", true);
+                Effect(ref shown, Loc.T("Renverse"), Loc.T("{0} de face", Loc.Percent(Percent(item.Weapon.Knockdown))), true);
+                Effect(ref shown, Loc.T("Endurance"), Loc.T("−{0} par coup", item.Weapon.StaminaCost.ToString("0", Loc.Numbers)), true);
             }
             for (var i = shown; i < EffectCount; i++) effects[i].style.display = DisplayStyle.None;
         }
@@ -328,7 +340,7 @@ namespace DeadCounty.Player
         {
             var before = Percent(now);
             var after = Percent(Mathf.Min(now + gain, 1f));
-            Effect(ref shown, label, $"{before}\u00A0% → {after}\u00A0%", after > before);
+            Effect(ref shown, label, $"{Loc.Percent(before)} → {Loc.Percent(after)}", after > before);
         }
 
         void Effect(ref int shown, string label, string value, bool useful)
@@ -347,12 +359,12 @@ namespace DeadCounty.Player
         {
             var model = needs.Model;
             var healthValue = health.Pool.Normalized;
-            Stat(healthFill, healthWord, healthValue, healthValue <= LowHealth, healthValue >= 0.7f ? "Bonne" : healthValue > LowHealth ? "Blessé" : "Grave");
+            Stat(healthFill, healthWord, healthValue, healthValue <= LowHealth, Loc.T(healthValue >= 0.7f ? "Bonne" : healthValue > LowHealth ? "Blessé" : "Grave"));
             var staminaModel = stamina.Model;
-            Stat(staminaFill, staminaWord, staminaModel.Normalized, staminaModel.Exhausted, staminaModel.Exhausted ? "À bout de souffle" : "");
-            Stat(hungerFill, hungerWord, model.Hunger, model.Hunger <= LowNeed, Word(model.Hunger, "Rassasié", "Petit creux", "Affamé"));
-            Stat(thirstFill, thirstWord, model.Thirst, model.Thirst <= LowNeed, Word(model.Thirst, "Désaltéré", "Gorge sèche", "Assoiffé"));
-            Stat(fatigueFill, fatigueWord, model.Fatigue, model.Fatigue <= LowNeed, Word(model.Fatigue, "Reposé", "Fatigué", "Épuisé"));
+            Stat(staminaFill, staminaWord, staminaModel.Normalized, staminaModel.Exhausted, staminaModel.Exhausted ? Loc.T("À bout de souffle") : "");
+            Stat(hungerFill, hungerWord, model.Hunger, model.Hunger <= LowNeed, Word(model.Hunger, Loc.T("Rassasié"), Loc.T("Petit creux"), Loc.T("Affamé")));
+            Stat(thirstFill, thirstWord, model.Thirst, model.Thirst <= LowNeed, Word(model.Thirst, Loc.T("Désaltéré"), Loc.T("Gorge sèche"), Loc.T("Assoiffé")));
+            Stat(fatigueFill, fatigueWord, model.Fatigue, model.Fatigue <= LowNeed, Word(model.Fatigue, Loc.T("Reposé"), Loc.T("Fatigué"), Loc.T("Épuisé")));
             if ((Percent(model.Hunger), Percent(model.Thirst), Percent(healthValue), health.Bleeding) != detailState) ShowDetail(Selected);
         }
 

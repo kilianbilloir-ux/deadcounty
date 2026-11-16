@@ -1,0 +1,33 @@
+// Altar dressing for a 3 x 1 m altar 1 m high (origin at the foot of its centre, front -Y): a linen top cloth, a
+// frontal with a gold cross hanging down the front, two brass candlesticks whose flames glow (mat_LampGlow).
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "settings", "ground": false},
+  {"op": "material", "name": "linen", "color": "#B8B2A4"},
+  {"op": "material", "name": "linen_light", "color": "#CFCAC0"},
+  {"op": "material", "name": "gold", "color": "#D8B030"},
+  {"op": "material", "name": "brass", "color": "#A88A3A"},
+  {"op": "material", "name": "wax", "color": "#E6E6E0"},
+  {"op": "material", "name": "mat_LampGlow", "color": "#D4B976"},
+
+  {"op": "create", "id": "cloth", "material": "linen_light",
+   "gen": {"box": {"size": [2.6, 1.02, 0.012]}}, "t": [0, 0, 1.006]},
+  {"op": "create", "id": "frontal", "material": "linen", "embed": ["cloth"],
+   "gen": {"box": {"size": [2.4, 0.012, 0.42]}}, "t": [0, -0.516, 0.8]},
+  {"op": "create", "id": "fringe", "material": "gold", "embed": ["frontal"],
+   "gen": {"box": {"size": [2.4, 0.016, 0.04]}}, "t": [0, -0.516, 0.61]},
+  {"op": "create", "id": "cross", "material": "gold", "embed": ["frontal"],
+   "gen": {"extrude": {"plane": "xz", "depth": 0.016, "origin": [0, -0.516, 0],
+     "profile": [[-0.025, 0.66], [0.025, 0.66], [0.025, 0.82], [0.08, 0.82], [0.08, 0.87], [0.025, 0.87], [0.025, 0.95],
+                 [-0.025, 0.95], [-0.025, 0.87], [-0.08, 0.87], [-0.08, 0.82], [-0.025, 0.82]]}}},
+  {"op": "create", "id": "stick_l", "material": "brass",
+   "gen": {"revolve": {"axis": "z", "seg": 8, "origin": [-1.1, 0.1, 1.012],
+     "profile": [[0, 0], [0.07, 0], [0.07, 0.015], [0.022, 0.04], [0.016, 0.12], [0.045, 0.14], [0.045, 0.16], [0, 0.16]]}}},
+  {"op": "create", "id": "candle_l", "material": "wax", "embed": ["stick_l"],
+   "gen": {"cylinder": {"r": 0.03, "h": 0.28, "seg": 8}}, "t": [-1.1, 0.1, 1.31]},
+  {"op": "create", "id": "flame_l", "material": "mat_LampGlow", "embed": ["candle_l"],
+   "gen": {"cylinder": {"r1": 0.016, "r2": 0.002, "h": 0.06, "seg": 4}}, "t": [-1.1, 0.1, 1.475]},
+  {"op": "create", "id": "stick_r", "material": "brass", "mirror_of": "stick_l"},
+  {"op": "create", "id": "candle_r", "material": "wax", "mirror_of": "candle_l", "embed": ["stick_r"]},
+  {"op": "create", "id": "flame_r", "material": "mat_LampGlow", "mirror_of": "flame_l", "embed": ["candle_r"]}
+]

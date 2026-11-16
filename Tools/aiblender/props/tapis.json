@@ -1,0 +1,19 @@
+// Rug, 3.0 x 2.0 m and 13 mm thick: a border, a darker field with a diamond medallion, fringes on the short ends.
+// The scene builder stretches it to the size asked for and repaints #6B4A3C, #5B3F33 and #8A6E5E from its colour.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "border", "color": "#6B4A3C"},
+  {"op": "material", "name": "field", "color": "#5B3F33"},
+  {"op": "material", "name": "medallion", "color": "#8A6E5E"},
+  {"op": "material", "name": "fringe", "color": "#B8B2A4"},
+
+  {"op": "create", "id": "rug", "material": "border",
+   "gen": {"box": {"size": [3.0, 2.0, 0.009]}}, "t": [0, 0, 0.0045]},
+  {"op": "create", "id": "field", "material": "field",
+   "gen": {"box": {"size": [2.6, 1.6, 0.002]}}, "t": [0, 0, 0.01]},
+  {"op": "create", "id": "medallion", "material": "medallion",
+   "gen": {"box": {"size": [0.6, 0.6, 0.002]}}, "r": [0, 0, 45], "t": [0, 0, 0.012]},
+  {"op": "create", "id": "fringe", "material": "fringe", "embed": ["rug"],
+   "gen": {"box": {"size": [0.1, 0.03, 0.004]}}, "mods": [{"array": {"count": 19, "step": [0, 0.1, 0]}}], "t": [-1.53, 0, 0.002]},
+  {"op": "create", "id": "fringe_r", "material": "fringe", "mirror_of": "fringe", "embed": ["rug"]}
+]

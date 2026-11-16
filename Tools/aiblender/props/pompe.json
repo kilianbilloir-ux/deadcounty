@@ -1,0 +1,36 @@
+// Fuel pump, 0.56 x 0.74 x 1.65 m, the same on both faces (-Y and +Y): a red cabinet on a plinth, a white head with
+// a dark display and three grade buttons, a nozzle in its holster and its hose looping down.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "red", "color": "#A8322A"},
+  {"op": "material", "name": "white", "color": "#E6E6E0"},
+  {"op": "material", "name": "dark", "color": "#1C1D20"},
+  {"op": "material", "name": "yellow", "color": "#D8B030"},
+  {"op": "material", "name": "steel", "color": "#4D5257"},
+  {"op": "material", "name": "hose", "color": "#2A2A2A"},
+
+  {"op": "create", "id": "plinth", "material": "steel",
+   "gen": {"box": {"size": [0.54, 0.72, 0.1]}}, "t": [0, 0, 0.05]},
+  {"op": "create", "id": "body", "material": "red", "embed": ["plinth"],
+   "gen": {"box": {"size": [0.48, 0.66, 1.12]}}, "mods": [{"bevel": {"width": "2cm"}}], "t": [0, 0, 0.64]},
+  {"op": "create", "id": "head", "material": "white", "embed": ["body"],
+   "gen": {"box": {"size": [0.52, 0.7, 0.4]}}, "mods": [{"bevel": {"width": "2cm"}}], "t": [0, 0, 1.39]},
+  {"op": "create", "id": "cap", "material": "red", "embed": ["head"],
+   "gen": {"box": {"size": [0.56, 0.74, 0.07]}}, "mods": [{"bevel": {"width": "1.5cm"}}], "t": [0, 0, 1.615]},
+  {"op": "create", "id": "screen_f", "material": "dark", "embed": ["head"],
+   "gen": {"box": {"size": [0.34, 0.02, 0.16]}}, "t": [0, -0.35, 1.44]},
+  {"op": "create", "id": "buttons_f", "material": "yellow", "embed": ["head"],
+   "gen": {"box": {"size": [0.07, 0.025, 0.04]}}, "mods": [{"array": {"count": 3, "step": [0.12, 0, 0]}}], "t": [0, -0.35, 1.28]},
+  {"op": "create", "id": "holster_f", "material": "dark", "embed": ["body"],
+   "gen": {"box": {"size": [0.1, 0.07, 0.16]}}, "t": [0.13, -0.355, 1.0]},
+  {"op": "create", "id": "nozzle_f", "material": "steel", "embed": ["holster_f"],
+   "gen": {"tube": {"r": 0.022, "seg": 8, "bend": 0.03, "path": [[0.13, -0.38, 0.9], [0.13, -0.43, 1.02], [0.13, -0.43, 1.12]]}}},
+  {"op": "create", "id": "hose_f", "material": "hose", "embed": ["nozzle_f", "body"],
+   "gen": {"tube": {"r": 0.018, "seg": 8, "smooth": true,
+     "path": [[0.13, -0.43, 1.12], [0.14, -0.47, 0.8], [0.05, -0.45, 0.42], [-0.12, -0.4, 0.5], [-0.16, -0.32, 0.85]]}}},
+  {"op": "create", "id": "screen_b", "material": "dark", "mirror_of": {"src": "screen_f", "plane": {"axis": "y", "at": 0}}, "embed": ["head"]},
+  {"op": "create", "id": "buttons_b", "material": "yellow", "mirror_of": {"src": "buttons_f", "plane": {"axis": "y", "at": 0}}, "embed": ["head"]},
+  {"op": "create", "id": "holster_b", "material": "dark", "mirror_of": {"src": "holster_f", "plane": {"axis": "y", "at": 0}}, "embed": ["body"]},
+  {"op": "create", "id": "nozzle_b", "material": "steel", "mirror_of": {"src": "nozzle_f", "plane": {"axis": "y", "at": 0}}, "embed": ["holster_b"]},
+  {"op": "create", "id": "hose_b", "material": "hose", "mirror_of": {"src": "hose_f", "plane": {"axis": "y", "at": 0}}, "embed": ["nozzle_b", "body"]}
+]

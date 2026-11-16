@@ -68,5 +68,26 @@ namespace DeadCounty.Tests
         {
             Assert.That(Select(Weapon(), new Vector3(0f, 0f, -0.2f)), Has.Length.EqualTo(1));
         }
+
+        [Test]
+        public void ABlowFellsAtItsChanceAndTwiceAsOftenFromBehind()
+        {
+            Assert.That(MeleeResolver.Fells(0.35f, false, 0.34f), Is.True);
+            Assert.That(MeleeResolver.Fells(0.35f, false, 0.36f), Is.False);
+            Assert.That(MeleeResolver.Fells(0.35f, true, 0.69f), Is.True);
+            Assert.That(MeleeResolver.Fells(0.35f, true, 0.71f), Is.False);
+            Assert.That(MeleeResolver.Fells(0.5f, true, 1f), Is.True, "a certain fall failed on the top roll");
+            Assert.That(MeleeResolver.Fells(0f, true, 0f), Is.False, "a blow that never fells did");
+        }
+
+        [Test]
+        public void TheAttackerIsBehindATargetFacingAway()
+        {
+            var target = new Vector3(0f, 0f, 1f);
+            Assert.That(MeleeResolver.FromBehind(Vector3.zero, target, Vector3.forward), Is.True);
+            Assert.That(MeleeResolver.FromBehind(Vector3.zero, target, Vector3.back), Is.False);
+            Assert.That(MeleeResolver.FromBehind(Vector3.zero, target, new Vector3(1f, 0f, 0.2f)), Is.True);
+            Assert.That(MeleeResolver.FromBehind(Vector3.zero, target, new Vector3(1f, 0f, -0.2f)), Is.False);
+        }
     }
 }

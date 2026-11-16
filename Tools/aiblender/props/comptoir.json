@@ -1,0 +1,43 @@
+// Checkout counter, 3.0 x 0.7 x 1.0 m, cashier side at the front (-Y): a carcass with an open shelf on the cashier
+// side and panels on the customer side, a worktop (top at 0.995 m), a conveyor belt over the left half and a lane
+// light post (2.04 m) at the right end. The register is its own model; the scene builder stretches this one along X.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "body", "color": "#6A4E3A"},
+  {"op": "material", "name": "panel", "color": "#7A5C46"},
+  {"op": "material", "name": "plinth", "color": "#4A3828"},
+  {"op": "material", "name": "worktop", "color": "#B5AFA2"},
+  {"op": "material", "name": "belt", "color": "#26272A"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+  {"op": "material", "name": "sign", "color": "#E6E6E0"},
+  {"op": "material", "name": "sign_red", "color": "#A8322A"},
+
+  {"op": "create", "id": "plinth", "material": "plinth",
+   "gen": {"box": {"size": [3.0, 0.6, 0.08]}}, "t": [0, 0, 0.04]},
+  {"op": "create", "id": "body", "material": "body",
+   "gen": {"box": {"size": [3.0, 0.66, 0.865]}}, "t": [0, 0, 0.5125],
+   "mods": [{"boolean": {"op": "difference", "with": ["niche"]}}]},
+  {"op": "create", "id": "niche", "gen": {"box": {"size": [2.0, 0.4, 0.56]}}, "t": [-0.4, -0.3, 0.5]},
+  {"op": "create", "id": "niche_shelf", "material": "body", "embed": ["body"],
+   "gen": {"box": {"size": [2.02, 0.23, 0.02]}}, "t": [-0.4, -0.215, 0.5]},
+  {"op": "create", "id": "panels", "material": "panel", "embed": ["body"],
+   "gen": {"box": {"size": [0.56, 0.02, 0.66]}}, "mods": [{"bevel": {"width": "8mm"}}, {"array": {"count": 5, "step": [0.6, 0, 0]}}], "t": [0, 0.335, 0.52]},
+  {"op": "create", "id": "worktop", "material": "worktop",
+   "gen": {"box": {"size": [3.05, 0.75, 0.05]}}, "mods": [{"bevel": {"width": "8mm"}}], "t": [0, 0, 0.97]},
+
+  {"op": "create", "id": "belt_frame", "material": "steel",
+   "gen": {"box": {"size": [1.65, 0.46, 0.025]}}, "t": [-0.5, 0, 1.0075]},
+  {"op": "create", "id": "belt", "material": "belt", "embed": ["belt_frame"],
+   "gen": {"box": {"size": [1.59, 0.4, 0.027]}}, "t": [-0.5, 0, 1.009]},
+  {"op": "create", "id": "rollers", "material": "steel", "embed": ["belt", "belt_frame"],
+   "gen": {"cylinder": {"r": 0.018, "h": 0.4, "seg": 8}}, "r": [90, 0, 0], "mods": [{"array": {"count": 2, "step": [1.59, 0, 0]}}], "t": [-0.5, 0, 1.012]},
+  {"op": "create", "id": "divider", "material": "sign_red",
+   "gen": {"box": {"size": [0.04, 0.32, 0.04]}}, "t": [-0.15, 0, 1.0425]},
+
+  {"op": "create", "id": "pole", "material": "steel",
+   "gen": {"cylinder": {"r": 0.02, "h": 0.9, "seg": 8}}, "t": [1.42, 0.3, 1.445]},
+  {"op": "create", "id": "lane_light", "material": "sign", "embed": ["pole"],
+   "gen": {"box": {"size": [0.22, 0.08, 0.2]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [1.42, 0.3, 1.94]},
+  {"op": "create", "id": "lane_band", "material": "sign_red", "embed": ["lane_light"],
+   "gen": {"box": {"size": [0.224, 0.084, 0.05]}}, "t": [1.42, 0.3, 1.97]}
+]

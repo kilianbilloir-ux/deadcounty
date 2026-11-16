@@ -18,8 +18,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d0c451149462042ee8bc9e9a7aa86e6e, type: 3}
   - {fileID: 8300000, guid: d32bce12fdb524a289029e2dc259a285, type: 3}
   - {fileID: 8300000, guid: 90dde1c8e8dd84db694e9a789d8030c8, type: 3}
+  - {fileID: 8300000, guid: a0eb82bc79a784260be63c598ef3bb2a, type: 3}
+  - {fileID: 8300000, guid: 478bb5bb5654d4fcc93d5dc3e8014f07, type: 3}
+  - {fileID: 8300000, guid: 706484a2507744794baf5a6284cc33ed, type: 3}
   volume: 0.7
   pitch: {x: 0.96, y: 1.04}
   channel: 0
   minDistance: 2
   maxDistance: 28
+  voices: 4
