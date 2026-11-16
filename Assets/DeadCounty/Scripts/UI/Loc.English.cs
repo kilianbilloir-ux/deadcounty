@@ -114,6 +114,11 @@ namespace DeadCounty.UI
             ["Ramasser"] = "Pick up",
             ["Porte"] = "Door",
             ["Ouvrir"] = "Open",
+            ["S'asseoir"] = "Sit down",
+            ["Banc"] = "Bench",
+            ["Banc d'église"] = "Pew",
+            ["Canapé"] = "Sofa",
+            ["Fauteuil"] = "Armchair",
             ["Lit"] = "Bed",
             ["Lit (pas fatigué)"] = "Bed (not tired)",
             ["Dormir"] = "Sleep",
@@ -171,6 +176,7 @@ namespace DeadCounty.UI
             ["Sauter"] = "Jump",
             ["Frapper"] = "Attack",
             ["Interagir"] = "Interact",
+            ["Se reposer"] = "Rest",
             ["Lampe torche"] = "Flashlight",
             ["Inventaire"] = "Inventory",
             ["Jeter un objet"] = "Drop item",
@@ -187,6 +193,8 @@ namespace DeadCounty.UI
                 = "You have a weapon in hand: {0} to strike. Every swing costs stamina and can be heard. A zombie that has not noticed you takes double damage.",
             ["Un zombie est à terre. {0} sur lui pour frapper au sol : le coup fait le double et le maintient au sol. Sinon, il se relève au bout de quelques secondes."]
                 = "A zombie is down. {0} on it to strike it on the ground: the blow deals double damage and keeps it down. Otherwise it gets back up after a few seconds.",
+            ["Vous êtes à bout de souffle. L'endurance remonte lentement : asseyez-vous par terre ({0}) ou sur un banc pour récupérer bien plus vite."]
+                = "You are out of breath. Stamina comes back slowly: sit down on the ground ({0}) or on a bench to recover much faster.",
             ["La nuit tombe. Les zombies voient moins loin, mais une lampe allumée ({0}) se voit de très loin."]
                 = "Night is falling. Zombies do not see as far, but a flashlight that is on ({0}) shows from very far away.",
         };

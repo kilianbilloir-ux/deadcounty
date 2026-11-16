@@ -19,7 +19,7 @@ namespace DeadCounty.Player
         const float NeedShownBelow = 0.5f;
         const float ZombieNoticeRange = 25f;
         const string SeenPrefix = "dc.tip.";
-        const string Search = "search", Need = "need", Zombie = "zombie", Night = "night", Weapon = "weapon", Felled = "felled";
+        const string Search = "search", Need = "need", Zombie = "zombie", Night = "night", Weapon = "weapon", Felled = "felled", Rest = "rest";
         // A zombie felled this close was most likely felled by the player.
         const float FelledNoticeRange = 4f;
 
@@ -31,6 +31,7 @@ namespace DeadCounty.Player
         PlayerInteractor interactor;
         PlayerSleep sleep;
         PlayerInventory inventory;
+        PlayerStamina stamina;
         ThirdPersonController controller;
         DayNightDirector director;
         VisualElement panel;
@@ -48,6 +49,7 @@ namespace DeadCounty.Player
             interactor = Require<PlayerInteractor>();
             sleep = Require<PlayerSleep>();
             inventory = Require<PlayerInventory>();
+            stamina = Require<PlayerStamina>();
             controller = Require<ThirdPersonController>();
             director = FindAnyObjectByType<DayNightDirector>();
         }
@@ -104,6 +106,7 @@ namespace DeadCounty.Player
                 Check(Zombie, zombieNoticed);
                 Check(Weapon, inventory.Weapon != null);
                 Check(Felled, zombieFelled);
+                Check(Rest, stamina.Model.Exhausted);
                 Check(Night, director != null && (director.Hour >= DayNightModel.DuskStart || director.Hour < DayNightModel.DawnStart));
             }
             else
@@ -156,6 +159,7 @@ namespace DeadCounty.Player
             Zombie => Loc.T("Un zombie vous a remarqué. En marchant, vous allez plus vite que lui : éloignez-vous et sortez de sa vue. Accroupi ({0}), vous êtes plus discret.", Key("Player/Crouch")),
             Weapon => Loc.T("Vous avez une arme en main : {0} pour frapper. Chaque coup coûte de l'endurance et s'entend. Un zombie qui ne vous a pas remarqué encaisse le double.", Key("Player/Attack")),
             Felled => Loc.T("Un zombie est à terre. {0} sur lui pour frapper au sol : le coup fait le double et le maintient au sol. Sinon, il se relève au bout de quelques secondes.", Key("Player/Attack")),
+            Rest => Loc.T("Vous êtes à bout de souffle. L'endurance remonte lentement : asseyez-vous par terre ({0}) ou sur un banc pour récupérer bien plus vite.", Key("Player/Rest")),
             Night => Loc.T("La nuit tombe. Les zombies voient moins loin, mais une lampe allumée ({0}) se voit de très loin.", Key("Player/Flashlight")),
             _ => throw new ArgumentOutOfRangeException(nameof(id), id, "unknown tip"),
         };

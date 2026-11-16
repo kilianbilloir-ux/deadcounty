@@ -7,13 +7,16 @@ namespace DeadCounty.Player
     // Body language on top of the procedural gait.
     [RequireComponent(typeof(ThirdPersonController), typeof(PlayerInteractor), typeof(PlayerHealth))]
     [RequireComponent(typeof(PlayerStamina), typeof(ProceduralHumanoidAnimator), typeof(PlayerLoadout))]
-    [RequireComponent(typeof(PlayerCombat))]
+    [RequireComponent(typeof(PlayerCombat), typeof(PlayerRest))]
     public class PlayerPoseDriver : MonoBehaviour
     {
         const float ReachTime = 0.45f;
         const float FlinchAngle = 16f;
         const float FlinchRecoveryTime = 0.35f;
         const float LimpBelow = 0.25f;
+        const float SeatLean = -5f;
+        const float GroundHunch = 16f;
+        const float GroundArms = 0.3f;
 
         ThirdPersonController controller;
         PlayerInteractor interactor;
@@ -22,6 +25,7 @@ namespace DeadCounty.Player
         ProceduralHumanoidAnimator animator;
         PlayerLoadout loadout;
         PlayerCombat combat;
+        PlayerRest rest;
         float flinchPitch, flinchRoll;
 
         void Awake()
@@ -33,6 +37,7 @@ namespace DeadCounty.Player
             animator = GetComponent<ProceduralHumanoidAnimator>();
             loadout = GetComponent<PlayerLoadout>();
             combat = GetComponent<PlayerCombat>();
+            rest = GetComponent<PlayerRest>();
         }
 
         void OnEnable() => health.Damaged += OnDamaged;
@@ -104,6 +109,14 @@ namespace DeadCounty.Player
             else if (Time.time - interactor.LastUseTime < ReachTime)
             {
                 pose.Reach = 1f;
+            }
+            if (rest.Seated)
+            {
+                // Leaning back on a seat; on the ground, hunched over the knees with the arms resting on them.
+                pose.Sit = 1f;
+                pose.SitHeight = rest.HipHeight;
+                pose.Hunch += rest.OnSeat ? SeatLean : GroundHunch;
+                if (!rest.OnSeat) pose.ArmsForward = Mathf.Max(pose.ArmsForward, GroundArms);
             }
             var swing = combat.Swing;
             if (swing.Busy) Strike(ref pose, swing.Phase == SwingPhase.Windup, swing.Progress, combat.Weapon == null, combat.Ground);
