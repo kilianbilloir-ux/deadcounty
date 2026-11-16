@@ -79,7 +79,8 @@ namespace DeadCounty.Player
 
         void Update()
         {
-            var free = health.IsAlive && controller.Controllable && !interactor.Busy;
+            // Seated, the attack button gets the player up (PlayerRest) and nothing more.
+            var free = health.IsAlive && controller.Controllable && !controller.Seated && !interactor.Busy;
             // The click that closes a menu or takes the cursor back is not an attack.
             var locked = Cursor.lockState;
             if (free && wasFree && locked == lastLock && attack.WasPressedThisFrame()) pressedAt = Time.time;

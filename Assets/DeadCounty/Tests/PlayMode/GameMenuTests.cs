@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
+using DeadCounty.Core;
 using DeadCounty.Player;
 using DeadCounty.UI;
 using NUnit.Framework;
@@ -77,6 +78,38 @@ namespace DeadCounty.Tests
             Assert.That(controller.MenuOpen, Is.False);
             Assert.That(Root.Q("title").style.display.value, Is.EqualTo(DisplayStyle.None));
             Assert.That(titleCamera.GetComponent<CinemachineCamera>().enabled, Is.False, "the view must go back to the player camera");
+        }
+
+        [UnityTest]
+        public IEnumerator TheTitleShowsFirstLightThenTheSunRisesToTheHourOfTheGame()
+        {
+            var sky = new GameObject("TestDayNight");
+            sky.SetActive(false);
+            var sun = sky.AddComponent<Light>();
+            sun.type = LightType.Directional;
+            var clock = sky.AddComponent<DayNightDirector>();
+            clock.Configure(sun, 11f, DayNightModel.DayLengthSeconds);
+            sky.SetActive(true);
+            try
+            {
+                yield return ShowTitle();
+                var title = titleCamera.GetComponent<TitleScreen>();
+                yield return null;
+                Assert.That(clock.Hour, Is.EqualTo(title.TitleHour), "the sky behind the title is not at first light");
+                Assert.That(WorldLighting.NightFactor, Is.InRange(0.2f, 0.6f), "first light is neither night nor day");
+
+                yield return Press(Key.Enter);
+                yield return new WaitForSeconds(title.SunriseSeconds * 0.5f);
+                Assert.That(clock.Hour, Is.InRange(title.TitleHour + 0.5f, 10.5f), "the sun does not climb while the view goes back to the player");
+                yield return new WaitForSeconds(title.SunriseSeconds * 0.5f + 0.3f);
+                Assert.That(clock.Hour, Is.EqualTo(11f).Within(0.05f), "the game does not start at its own hour");
+                Assert.That(clock.Day, Is.EqualTo(1));
+                Assert.That(WorldLighting.NightFactor, Is.Zero);
+            }
+            finally
+            {
+                Object.Destroy(sky);
+            }
         }
 
         [UnityTest]

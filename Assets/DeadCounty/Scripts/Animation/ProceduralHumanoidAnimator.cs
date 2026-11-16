@@ -40,6 +40,12 @@ namespace DeadCounty.Animation
         const float StompLift = 0.38f;
         const float StompReturnLift = 0.05f;
         const float StompLean = 14f;
+        // Sitting: how far in front of the hips the feet rest (m), on a seat of SitSeatHeight or higher and on the
+        // ground, where the legs stretch out more.
+        const float SitSeatReach = 0.38f;
+        const float SitGroundReach = 0.52f;
+        const float SitSeatHeight = 0.6f;
+        const float SitGroundHeight = 0.2f;
         // Turning faster than PivotStartRate (deg/s) the body starts to pivot instead of following a curve: at
         // PivotFullRate the feet hold back only PivotFoothold of the turn and the body leans only that share. A
         // foothold kept still under a quarter-turn snap ends up crossed and trailing far behind.
@@ -239,6 +245,10 @@ namespace DeadCounty.Animation
             StompFoot(pose.Stomp, out var stompForward, out var stompLift);
             right.Forward += stompForward;
             right.Lift += stompLift;
+            // Sitting, both feet rest out in front and the knees fold between them and the hips.
+            var sitReach = Mathf.Lerp(SitGroundReach, SitSeatReach, Mathf.InverseLerp(SitGroundHeight, SitSeatHeight, pose.SitHeight)) * pose.Sit;
+            left.Forward += sitReach;
+            right.Forward += sitReach;
             LeftFootPlanted = leftPhase < leftDuty;
             RightFootPlanted = rightPhase < rightDuty;
             // Boot pitch of each foot, for tests measuring slip while the boot is flat.
@@ -254,7 +264,7 @@ namespace DeadCounty.Animation
             rightFootOffset = Mathf.Lerp(rightFootOffset, rays ? GroundOffset(rightHip, right.Forward - hipForward) : 0f, blend);
 
             // Feeding lowers the hips like a crouch.
-            var baseHip = Mathf.Lerp(standingHipHeight, crouchHipHeight, Mathf.Max(crouch, pose.Feed));
+            var baseHip = Mathf.Lerp(Mathf.Lerp(standingHipHeight, crouchHipHeight, Mathf.Max(crouch, pose.Feed)), pose.SitHeight, pose.Sit);
             var support = Mathf.Max(left.Support, right.Support);
             var runOffset = support > 0f ? -g.RunBob * support : g.RunBob * 0.5f;
             bob = Mathf.Lerp(bob, runOffset * runness * moving, 1f - Mathf.Exp(-25f * dt));
@@ -266,7 +276,7 @@ namespace DeadCounty.Animation
 
             // Standing, the weight settles on one leg and stays there a while before crossing to the other.
             var cross = Mathf.Sin((clock + IdlePhase) * 2f * Mathf.PI / g.IdleShiftPeriod);
-            var settle = cross * (1.5f - 0.5f * cross * cross) * still * (1f - crouch) * (1f - air);
+            var settle = cross * (1.5f - 0.5f * cross * cross) * still * (1f - crouch) * (1f - air) * (1f - pose.Sit);
             var stance = 1f - g.RunSwayDrop * runness;
             var sway = g.WalkSway * (right.Support - left.Support) * stance * moving + g.IdleShift * settle;
             var pelvisRoll = -g.PelvisRoll * (left.Support - right.Support) * stance * moving * (limping ? limp.PelvisRollScale : 1f)
@@ -380,6 +390,9 @@ namespace DeadCounty.Animation
             pose.LookWeight = Mathf.Lerp(pose.LookWeight, target.LookWeight, k);
             pose.Lunge = Mathf.Lerp(pose.Lunge, target.Lunge, k);
             pose.Feed = Mathf.Lerp(pose.Feed, target.Feed, k);
+            pose.Sit = Mathf.Lerp(pose.Sit, target.Sit, k);
+            // Kept while getting up, so the hips rise from the seat they were on.
+            if (target.Sit > 0f) pose.SitHeight = target.SitHeight;
             // A hand goes out faster than a posture changes.
             var handBlend = 1f - Mathf.Exp(-dt / (0.4f * gait.PoseSmoothTime));
             pose.Reach = Mathf.Lerp(pose.Reach, target.Reach, handBlend);
