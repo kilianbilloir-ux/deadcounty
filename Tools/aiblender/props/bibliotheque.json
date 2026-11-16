@@ -1,0 +1,20 @@
+// Bookcase, 1.4 x 0.38 x 2.0 m, open at the front (-Y): two sides, a back, five shelves 0.48 m apart (their tops at
+// 0.055 + n x 0.48 m, where the scene builder stands the books), a plinth and a top board.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#6A4E3A"},
+  {"op": "material", "name": "wood_back", "color": "#553D2C"},
+  {"op": "material", "name": "wood_dark", "color": "#4A3828"},
+
+  {"op": "create", "id": "side_l", "material": "wood",
+   "gen": {"box": {"size": [0.04, 0.38, 1.975]}}, "t": [-0.68, 0, 0.9875]},
+  {"op": "create", "id": "side_r", "material": "wood", "mirror_of": "side_l"},
+  {"op": "create", "id": "back", "material": "wood_back",
+   "gen": {"box": {"size": [1.32, 0.02, 1.975]}}, "t": [0, 0.18, 0.9875]},
+  {"op": "create", "id": "shelves", "material": "wood",
+   "gen": {"box": {"size": [1.32, 0.36, 0.03]}}, "mods": [{"array": {"count": 5, "step": [0, 0, 0.48]}}], "t": [0, -0.01, 1.0]},
+  {"op": "create", "id": "plinth", "material": "wood_dark",
+   "gen": {"box": {"size": [1.32, 0.02, 0.025]}}, "t": [0, -0.17, 0.0125]},
+  {"op": "create", "id": "top", "material": "wood_dark",
+   "gen": {"box": {"size": [1.42, 0.4, 0.025]}}, "mods": [{"bevel": {"width": "6mm"}}], "t": [0, -0.005, 1.9875]}
+]

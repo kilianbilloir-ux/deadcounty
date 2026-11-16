@@ -1,0 +1,19 @@
+// Rolled gauze bandage, 60 mm wide, lying on its side with a loose end on the ground and a safety pin.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "gauze", "color": "#D9D4C6"},
+  {"op": "material", "name": "gauze_shade", "color": "#B8B2A4"},
+  {"op": "material", "name": "pin", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "roll", "material": "gauze",
+   "gen": {"revolve": {"axis": "x", "origin": [0, 0, 35], "seg": 12, "unit": "mm",
+     "profile": [[8, -30], [33, -30], [35, -27], [35, 27], [33, 30], [8, 30]]}}},
+  {"op": "create", "id": "core", "material": "gauze_shade", "embed": ["roll"],
+   "gen": {"revolve": {"axis": "x", "origin": [0, 0, 35], "seg": 12, "unit": "mm",
+     "profile": [[0, -29], [26, -30.4], [26, 30.4], [0, 29]]}}},
+  {"op": "create", "id": "end", "material": "gauze", "embed": ["roll"],
+   "gen": {"extrude": {"plane": "yz", "depth": 58, "unit": "mm",
+     "profile": [[-10, 0], [-95, 0], [-95, 2], [-30, 2], [-12, 6], [0, 2.5]]}}},
+  {"op": "create", "id": "pin", "material": "pin", "embed": ["roll"],
+   "gen": {"box": {"size": ["26mm", "2mm", "5mm"]}}, "r": [20, 0, 0], "t": [0, "-33.5mm", "46mm"]}
+]

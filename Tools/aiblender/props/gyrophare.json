@@ -1,0 +1,20 @@
+// Police light bar, 0.3 x 1.2 x 0.15 m, origin under its middle: red lens on the +Y half, blue on the -Y half
+// (mat_PoliceRed, mat_PoliceBlue, which glow), a white centre module, on a black base with end caps.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "base", "color": "#1C1D20"},
+  {"op": "material", "name": "white", "color": "#E6E6E0"},
+  {"op": "material", "name": "mat_PoliceRed", "color": "#C8261E"},
+  {"op": "material", "name": "mat_PoliceBlue", "color": "#1E4FC8"},
+
+  {"op": "create", "id": "base", "material": "base",
+   "gen": {"box": {"size": [0.3, 1.2, 0.04]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, 0, 0.02]},
+  {"op": "create", "id": "red", "material": "mat_PoliceRed", "embed": ["base"],
+   "gen": {"box": {"size": [0.26, 0.46, 0.11]}}, "mods": [{"bevel": {"width": "3cm"}}], "t": [0, 0.31, 0.09]},
+  {"op": "create", "id": "blue", "material": "mat_PoliceBlue", "mirror_of": {"src": "red", "plane": {"axis": "y", "at": 0}}, "embed": ["base"]},
+  {"op": "create", "id": "centre", "material": "white", "embed": ["base", "red", "blue"],
+   "gen": {"box": {"size": [0.24, 0.18, 0.09]}}, "mods": [{"bevel": {"width": "2cm"}}], "t": [0, 0, 0.08]},
+  {"op": "create", "id": "cap_l", "material": "base", "embed": ["base", "red"],
+   "gen": {"box": {"size": [0.28, 0.05, 0.12]}}, "mods": [{"bevel": {"width": "2cm"}}], "t": [0, 0.565, 0.08]},
+  {"op": "create", "id": "cap_r", "material": "base", "mirror_of": {"src": "cap_l", "plane": {"axis": "y", "at": 0}}, "embed": ["base", "blue"]}
+]

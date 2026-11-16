@@ -215,7 +215,7 @@ namespace DeadCounty.Audio
         // On a free emitter around the listener; with all three busy the call is skipped.
         void Play(Call call)
         {
-            if (call.cue == null) return;
+            if (call.cue == null || call.cue.clips is not { Length: > 0 }) return;
             Voice emitter = null;
             foreach (var e in emitters)
                 if (!e.Source.isPlaying)

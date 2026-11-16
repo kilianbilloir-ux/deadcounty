@@ -42,10 +42,14 @@ namespace DeadCounty.EditorTools
             BuiltLamps.Clear();
             DoorSpots.Clear();
             ConfigureProject();
+            // Before the items: weapons carry their own sounds.
+            EnsureSounds();
+            EnsureModels();
             var items = EnsureItems();
             EnsureItemModels(items);
+            // The icons are rendered from these models further down: their colours must be in the palette by then.
+            FinishModels();
             EnsureLootTables(items);
-            EnsureSounds();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             EnsureItemIcons(items);
@@ -78,6 +82,7 @@ namespace DeadCounty.EditorTools
             BakeNavMesh(env.gameObject);
             BuildDoors();
             BuildZombies();
+            FinishModels();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings();

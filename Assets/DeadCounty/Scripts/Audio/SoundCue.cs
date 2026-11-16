@@ -16,6 +16,8 @@ namespace DeadCounty.Audio
         public SoundChannel channel = SoundChannel.Effects;
         public float minDistance = 1f;
         public float maxDistance = 25f;
+        [Tooltip("The clips come in this many equal runs, one per voice: a zombie keeps to its own run.")]
+        [Min(1)] public int voices = 1;
 
         [NonSerialized] int last = -1;
 

@@ -21,7 +21,6 @@ namespace DeadCounty.Player
         VisualElement sleepScreen;
         Label bleeding, hungry, thirsty, tired, encumbered, clock, sleepTime;
         float sleepOpacity;
-        bool tiredShowsExhausted;
 
         void Awake()
         {
@@ -66,11 +65,9 @@ namespace DeadCounty.Player
             Show(hungry, alive && model.Hunger <= LowNeed);
             Show(thirsty, alive && model.Thirst <= LowNeed);
             Show(tired, alive && model.Fatigue <= LowNeed);
-            if (model.Exhausted != tiredShowsExhausted)
-            {
-                tiredShowsExhausted = model.Exhausted;
-                tired.text = tiredShowsExhausted ? "ÉPUISÉ" : "FATIGUÉ";
-            }
+            // Compared with what is shown, not with the last state: the language may have changed too.
+            var tiredWord = Loc.T(model.Exhausted ? "ÉPUISÉ" : "FATIGUÉ");
+            if (tired.text != tiredWord) tired.text = tiredWord;
             Show(encumbered, alive && inventory.Items.Overloaded);
 
             // Real time: game time runs 20 times faster in bed.

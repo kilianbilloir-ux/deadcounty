@@ -1,0 +1,22 @@
+// Fridge-freezer, 0.7 x 0.7 x 1.8 m, doors at the front (-Y): a freezer door over a taller fridge door, two bar
+// handles, a grille at the foot.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "enamel", "color": "#E8E8E4"},
+  {"op": "material", "name": "enamel_shade", "color": "#D2D2CC"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+  {"op": "material", "name": "dark", "color": "#33373B"},
+
+  {"op": "create", "id": "cabinet", "material": "enamel_shade",
+   "gen": {"box": {"size": [0.7, 0.64, 1.8]}}, "t": [0, 0.03, 0.9]},
+  {"op": "create", "id": "door_low", "material": "enamel", "embed": ["cabinet"],
+   "gen": {"box": {"size": [0.69, 0.07, 1.1]}}, "mods": [{"bevel": {"width": "1.5cm"}}], "t": [0, -0.315, 0.66]},
+  {"op": "create", "id": "door_top", "material": "enamel", "embed": ["cabinet"],
+   "gen": {"box": {"size": [0.69, 0.07, 0.55]}}, "mods": [{"bevel": {"width": "1.5cm"}}], "t": [0, -0.315, 1.51]},
+  {"op": "create", "id": "grille", "material": "dark", "embed": ["cabinet"],
+   "gen": {"box": {"size": [0.66, 0.03, 0.08]}}, "t": [0, -0.3, 0.05]},
+  {"op": "create", "id": "handle_low", "material": "steel", "embed": ["door_low"],
+   "gen": {"tube": {"r": 0.012, "seg": 8, "bend": 0.03, "path": [[0.28, -0.345, 0.82], [0.28, -0.39, 0.82], [0.28, -0.39, 1.14], [0.28, -0.345, 1.14]]}}},
+  {"op": "create", "id": "handle_top", "material": "steel", "embed": ["door_top"],
+   "gen": {"tube": {"r": 0.012, "seg": 8, "bend": 0.03, "path": [[0.28, -0.345, 1.29], [0.28, -0.39, 1.29], [0.28, -0.39, 1.55], [0.28, -0.345, 1.55]]}}}
+]

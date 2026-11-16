@@ -1,0 +1,17 @@
+// Full black trash bag, 0.6 x 0.55 x 0.62 m: a lumpy body narrowing to a twisted neck, closed by a yellow tie.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "bag", "color": "#1C1D20"},
+  {"op": "material", "name": "tie", "color": "#D8B030"},
+
+  {"op": "create", "id": "bag", "material": "bag",
+   "gen": {"blob": {"balls": [{"at": [0, 0, 0.2], "r": 0.25}, {"at": [0.08, 0.05, 0.16], "r": 0.2}, {"at": [-0.07, -0.05, 0.18], "r": 0.2},
+                              {"at": [0.01, 0.0, 0.36], "r": 0.19}],
+                    "sticks": [{"from": [0.01, 0, 0.42], "to": [0.02, 0.01, 0.58], "r": 0.05, "r2": 0.03},
+                               {"from": [0.02, 0.01, 0.58], "to": [0.09, 0.03, 0.65], "r": 0.03, "r2": 0.02},
+                               {"from": [0.02, 0.01, 0.58], "to": [-0.05, -0.01, 0.64], "r": 0.03, "r2": 0.02}],
+                    "blend": 0.06, "res": 0.03, "tol": 0.014}},
+   "place": {"anchor": "bottom", "to": "ground"}},
+  {"op": "create", "id": "tie", "material": "tie", "embed": ["bag"],
+   "gen": {"cylinder": {"r": 0.075, "h": 0.03, "seg": 8}}, "t": [0.017, 0.007, 0.6]}
+]

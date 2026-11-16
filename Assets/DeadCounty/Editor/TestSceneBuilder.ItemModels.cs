@@ -8,20 +8,28 @@ using Object = UnityEngine.Object;
 
 namespace DeadCounty.EditorTools
 {
-    // Rebuilt in place on every build, which keeps the GUIDs the item assets and the scene point to. Pivot on the
-    // ground, one box collider on the root for the interaction raycasts. A weapon lies along +Z with its grip at the
-    // pivot, which is how the hand takes it.
+    // Rebuilt in place on every build, which keeps the GUIDs the item assets and the scene point to. One aiblender
+    // model each, pivot on the ground, one box collider on the root for the interaction raycasts. A weapon lies
+    // along +Z with its grip at the pivot, which is how the hand takes it.
     public static partial class TestSceneBuilder
     {
         const string ItemModelDir = "Assets/DeadCounty/Prefabs/Items";
 
         static readonly string[] FoodItems = { "IT_Haricots", "IT_Tomates", "IT_Soupe", "IT_Mais", "IT_PetitsPois", "IT_Thon", "IT_Sardines" };
 
-        // Label colour of each tall can, so they tell apart on the ground.
-        static readonly Dictionary<string, string> CanLabels = new()
+        // Model of each item (Tools/aiblender/items) and the colours repainted: the tall cans are one model.
+        static readonly Dictionary<string, (string Model, (string, string)[] Swaps)> ItemModelSpecs = new()
         {
-            ["IT_Haricots"] = "Brick", ["IT_Tomates"] = "SignRed", ["IT_Soupe"] = "SignYellow",
-            ["IT_Mais"] = "Hay", ["IT_PetitsPois"] = "ShutterGreen",
+            ["IT_Haricots"] = ("conserve", new (string, string)[0]),
+            ["IT_Tomates"] = ("conserve", new[] { ("#7A4636", "SignRed") }),
+            ["IT_Soupe"] = ("conserve", new[] { ("#7A4636", "SignYellow"), ("#C9B79A", "Brick") }),
+            ["IT_Mais"] = ("conserve", new[] { ("#7A4636", "Hay"), ("#C9B79A", "ShutterGreen") }),
+            ["IT_PetitsPois"] = ("conserve", new[] { ("#7A4636", "ShutterGreen") }),
+            ["IT_Thon"] = ("thon", new (string, string)[0]), ["IT_Sardines"] = ("sardines", new (string, string)[0]),
+            ["IT_Eau"] = ("eau", new (string, string)[0]), ["IT_Soda"] = ("soda", new (string, string)[0]),
+            ["IT_Bandage"] = ("bandage", new (string, string)[0]), ["IT_SacADos"] = ("sac_a_dos", new (string, string)[0]),
+            ["IT_Batte"] = ("batte", new (string, string)[0]), ["IT_PiedDeBiche"] = ("pied_de_biche", new (string, string)[0]),
+            ["IT_Couteau"] = ("couteau", new (string, string)[0]),
         };
 
         static Dictionary<string, ItemDefinition> Items;
@@ -32,86 +40,15 @@ namespace DeadCounty.EditorTools
             Directory.CreateDirectory(ItemModelDir);
             foreach (var (file, item) in items)
             {
+                if (!ItemModelSpecs.TryGetValue(file, out var spec)) throw new InvalidOperationException($"No ground model for {file}");
                 var root = new GameObject($"PF_{file}");
-                BuildItemModel(root.transform, file);
+                Model("Modele", root.transform, Vector3.zero, null, spec.Model, spec.Swaps);
                 FitCollider(root);
                 var prefab = PrefabUtility.SaveAsPrefabAsset(root, $"{ItemModelDir}/PF_{file}.prefab");
                 Object.DestroyImmediate(root);
                 item.WorldModel = prefab;
                 EditorUtility.SetDirty(item);
             }
-        }
-
-        static void BuildItemModel(Transform m, string file)
-        {
-            switch (file)
-            {
-                case var can when CanLabels.TryGetValue(can, out var label):
-                    Can(m, 0.04f, 0.11f, label);
-                    break;
-                case "IT_Thon":
-                    Can(m, 0.045f, 0.035f, "CarBlue");
-                    break;
-                case "IT_Sardines":
-                    Box("Boite", m, new Vector3(0f, 0.0125f, 0f), new Vector3(0.11f, 0.025f, 0.07f), "MetalLight", solid: false);
-                    Box("Etiquette", m, new Vector3(0f, 0.026f, 0f), new Vector3(0.1f, 0.002f, 0.06f), "SignYellow", solid: false);
-                    Box("Anneau", m, new Vector3(0.045f, 0.028f, 0f), new Vector3(0.015f, 0.003f, 0.02f), "Metal", solid: false);
-                    break;
-                case "IT_Eau":
-                    Cylinder("Bouteille", m, new Vector3(0f, 0.1f, 0f), 0.035f, 0.2f, "Water", solid: false);
-                    Cylinder("Etiquette", m, new Vector3(0f, 0.1f, 0f), 0.0355f, 0.06f, "SignWhite", solid: false);
-                    Cylinder("Goulot", m, new Vector3(0f, 0.215f, 0f), 0.015f, 0.03f, "Water", solid: false);
-                    Cylinder("Bouchon", m, new Vector3(0f, 0.237f, 0f), 0.017f, 0.015f, "CarBlue", solid: false);
-                    break;
-                case "IT_Soda":
-                    Cylinder("Canette", m, new Vector3(0f, 0.06f, 0f), 0.033f, 0.12f, "SignRed", solid: false);
-                    Cylinder("Bande", m, new Vector3(0f, 0.07f, 0f), 0.0335f, 0.03f, "SignWhite", solid: false);
-                    Cylinder("Dessus", m, new Vector3(0f, 0.122f, 0f), 0.03f, 0.004f, "MetalLight", solid: false);
-                    break;
-                case "IT_Bandage":
-                    Cylinder("Rouleau", m, new Vector3(0f, 0.035f, 0f), 0.035f, 0.06f, "Linen", Quaternion.Euler(0f, 0f, 90f), solid: false);
-                    Box("Bout", m, new Vector3(0f, 0.001f, 0.06f), new Vector3(0.05f, 0.002f, 0.06f), "Linen", solid: false);
-                    break;
-                case "IT_SacADos":
-                    Box("Sac", m, new Vector3(0f, 0.21f, 0f), new Vector3(0.32f, 0.42f, 0.18f), "Backpack", solid: false);
-                    Box("Rabat", m, new Vector3(0f, 0.38f, -0.005f), new Vector3(0.31f, 0.12f, 0.19f), "BackpackDark", solid: false);
-                    Box("Poche", m, new Vector3(0f, 0.14f, -0.11f), new Vector3(0.24f, 0.16f, 0.05f), "BackpackDark", solid: false);
-                    // Distinct names: saving over the prefab matches children by name and would swap twins on each build.
-                    foreach (var (x, name) in new[] { (-0.08f, "Bretelle_G"), (0.08f, "Bretelle_D") })
-                        Box(name, m, new Vector3(x, 0.22f, 0.1f), new Vector3(0.05f, 0.36f, 0.02f), "Strap", solid: false);
-                    Box("Poignee", m, new Vector3(0f, 0.44f, 0.04f), new Vector3(0.08f, 0.03f, 0.03f), "Strap", solid: false);
-                    break;
-                case "IT_Batte":
-                    Lying("Pommeau", m, 0.032f, -0.06f, 0.024f, 0.025f, "Wood");
-                    Lying("Manche", m, 0.032f, 0.125f, 0.017f, 0.35f, "Wood");
-                    Lying("Ruban", m, 0.032f, 0.07f, 0.019f, 0.16f, "Strap");
-                    Lying("Col", m, 0.032f, 0.375f, 0.024f, 0.15f, "Wood");
-                    Lying("Fut", m, 0.032f, 0.595f, 0.032f, 0.29f, "Wood");
-                    break;
-                case "IT_PiedDeBiche":
-                    Box("Barre", m, new Vector3(0f, 0.012f, 0.24f), new Vector3(0.022f, 0.022f, 0.62f), "CarRed", solid: false);
-                    Box("Griffe", m, new Vector3(0f, 0.04f, 0.575f), new Vector3(0.022f, 0.022f, 0.1f), "CarRed", Quaternion.Euler(-50f, 0f, 0f), solid: false);
-                    Box("Biseau", m, new Vector3(0f, 0.006f, -0.09f), new Vector3(0.03f, 0.008f, 0.06f), "MetalLight", solid: false);
-                    break;
-                case "IT_Couteau":
-                    Box("Manche", m, new Vector3(0f, 0.011f, 0f), new Vector3(0.026f, 0.02f, 0.11f), "WoodDark", solid: false);
-                    Box("Garde", m, new Vector3(0f, 0.012f, 0.058f), new Vector3(0.03f, 0.024f, 0.008f), "Metal", solid: false);
-                    Box("Lame", m, new Vector3(0f, 0.012f, 0.16f), new Vector3(0.003f, 0.032f, 0.2f), "MetalLight", solid: false);
-                    break;
-                default:
-                    throw new InvalidOperationException($"No ground model for {file}");
-            }
-        }
-
-        // A cylinder lying along Z, centred at `z` and `y` above the ground.
-        static void Lying(string name, Transform m, float y, float z, float radius, float length, string mat)
-            => Cylinder(name, m, new Vector3(0f, y, z), radius, length, mat, Quaternion.Euler(90f, 0f, 0f), solid: false);
-
-        static void Can(Transform m, float radius, float height, string label)
-        {
-            Cylinder("Boite", m, new Vector3(0f, height / 2f, 0f), radius, height, "MetalLight", solid: false);
-            Cylinder("Etiquette", m, new Vector3(0f, height / 2f, 0f), radius + 0.002f, height * 0.7f, label, solid: false);
-            Cylinder("Couvercle", m, new Vector3(0f, height + 0.002f, 0f), radius * 0.9f, 0.004f, "Metal", solid: false);
         }
 
         static void FitCollider(GameObject root)

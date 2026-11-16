@@ -1,0 +1,15 @@
+// Dead branch lying along Y, 1.8 m long (the scene builder stretches it), crooked, thinning toward +Y, with two
+// broken stubs.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "bark", "color": "#4E3B2C"},
+  {"op": "material", "name": "bark_light", "color": "#5E4A38"},
+
+  {"op": "create", "id": "wood", "material": "bark",
+   "gen": {"tube": {"r": 0.045, "r2": 0.02, "seg": 8,
+     "path": [[0, -0.9, 0.045], [0.03, -0.4, 0.042], [-0.02, 0.15, 0.035], [0.02, 0.6, 0.026], [0, 0.9, 0.02]]}}},
+  {"op": "create", "id": "stub_a", "material": "bark_light", "embed": ["wood"],
+   "gen": {"tube": {"r": 0.025, "r2": 0.012, "seg": 8, "path": [[0.01, -0.3, 0.045], [-0.16, -0.12, 0.06]]}}},
+  {"op": "create", "id": "stub_b", "material": "bark_light", "embed": ["wood"],
+   "gen": {"tube": {"r": 0.018, "r2": 0.01, "seg": 8, "path": [[0.0, 0.4, 0.03], [0.14, 0.58, 0.05]]}}}
+]

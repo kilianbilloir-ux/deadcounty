@@ -1,0 +1,27 @@
+// Sardine tin, 110 x 70 x 25 mm, rounded corners, a yellow printed lid and its key ring.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "tin", "color": "#9AA0A4"},
+  {"op": "material", "name": "tin_dark", "color": "#7C8286"},
+  {"op": "material", "name": "print", "color": "#D8B030"},
+  {"op": "material", "name": "fish", "color": "#24508A"},
+
+  {"op": "create", "id": "tin", "material": "tin",
+   "gen": {"extrude": {"depth": 23, "unit": "mm",
+     "profile": [[-55, -35, 12], [55, -35, 12], [55, 35, 12], [-55, 35, 12]], "seg": 8}},
+   "place": {"anchor": "bottom", "to": "ground"}},
+  {"op": "create", "id": "rim", "material": "tin_dark", "embed": ["tin"],
+   "gen": {"extrude": {"depth": 3, "unit": "mm",
+     "profile": [[-56, -36, 13], [56, -36, 13], [56, 36, 13], [-56, 36, 13]], "seg": 8}},
+   "t": [0, 0, "22mm"]},
+  {"op": "create", "id": "print", "material": "print", "embed": ["rim"],
+   "gen": {"extrude": {"depth": 1.2, "unit": "mm",
+     "profile": [[-50, -30, 9], [50, -30, 9], [50, 30, 9], [-50, 30, 9]], "seg": 8}},
+   "t": [0, 0, "23.5mm"]},
+  {"op": "create", "id": "fish", "material": "fish", "embed": ["print"],
+   "gen": {"extrude": {"depth": 0.8, "unit": "mm",
+     "profile": [[-38, 0], [-22, -10], [8, -11], [24, -3], [36, -11], [36, 11], [24, 3], [8, 11], [-22, 10]]}},
+   "t": ["-4mm", 0, "24.4mm"]},
+  {"op": "create", "id": "key", "material": "tin_dark",
+   "gen": {"torus": {"R": "8mm", "r": "1.5mm", "seg": 8}}, "t": ["42mm", "-20mm", "25.3mm"]}
+]

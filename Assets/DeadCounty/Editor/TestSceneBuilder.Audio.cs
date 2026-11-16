@@ -9,7 +9,8 @@ namespace DeadCounty.EditorTools
 {
     // Sounds are synthesised here (see Synth) into 16-bit mono WAVs next to their SoundCue assets; seeds are stable
     // and unchanged files are not rewritten, so a rebuild leaves git clean. A cue with takes in Audio/Recorded plays
-    // those instead: voices, animals and music, which synthesis does poorly (scripts/audio/generate_sounds.py).
+    // those instead: voices, animals, the blows of weapons and music, which synthesis does poorly
+    // (scripts/audio/generate_sounds.py).
     public static partial class TestSceneBuilder
     {
         const string AudioDir = "Assets/DeadCounty/Audio";
@@ -30,8 +31,9 @@ namespace DeadCounty.EditorTools
 
         // name may contain one folder: "Player/Step_Grass" gives Audio/Player/Step_Grass_0.wav... and
         // Audio/Player/SC_Step_Grass.asset. render is called once per variant with an rng seeded from name and variant.
+        // A cue recorded in several voices (SoundCue.voices) lists its takes voice by voice.
         static SoundCue CueAsset(string name, SoundChannel channel, int variants, Func<System.Random, float[]> render,
-            float volume = 1f, float pitchJitter = 0.05f, float minDistance = 1f, float maxDistance = 25f)
+            float volume = 1f, float pitchJitter = 0.05f, float minDistance = 1f, float maxDistance = 25f, int voices = 1)
         {
             var slash = name.LastIndexOf('/');
             var dir = slash < 0 ? AudioDir : $"{AudioDir}/{name.Substring(0, slash)}";
@@ -53,6 +55,7 @@ namespace DeadCounty.EditorTools
             cue.channel = channel;
             cue.minDistance = minDistance;
             cue.maxDistance = maxDistance;
+            cue.voices = voices;
             EditorUtility.SetDirty(cue);
             return cue;
         }

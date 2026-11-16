@@ -1,0 +1,32 @@
+// One 1.2 m bay of double-sided store shelving, 0.7 m deep, 1.76 m to the top of its header: a base, a centre
+// back panel, an upright at each end, three shelves per side (tops at 0.195, 0.675 and 1.155 m, centred 0.175 m
+// either side of the back) with price strips, and the green header. The scene builder lines bays up along X.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "iron", "color": "#4D5257"},
+  {"op": "material", "name": "panel", "color": "#9AA0A4"},
+  {"op": "material", "name": "shelf", "color": "#B4B9BC"},
+  {"op": "material", "name": "strip", "color": "#E6E6E0"},
+  {"op": "material", "name": "header", "color": "#2F5A3A"},
+
+  {"op": "create", "id": "base", "material": "iron",
+   "gen": {"box": {"size": [1.2, 0.7, 0.16]}}, "t": [0, 0, 0.08]},
+  {"op": "create", "id": "back", "material": "panel",
+   "gen": {"box": {"size": [1.2, 0.04, 1.44]}}, "t": [0, 0, 0.88]},
+  {"op": "create", "id": "uprights", "material": "iron", "embed": ["back"],
+   "gen": {"box": {"size": [0.04, 0.08, 1.6]}}, "mods": [{"array": {"count": 2, "step": [1.16, 0, 0]}}], "t": [0, 0, 0.96]},
+  {"op": "create", "id": "shelves", "material": "shelf",
+   "gen": {"box": {"size": [1.12, 0.31, 0.03]}}, "mods": [{"array": {"count": 2, "step": [0, 0.35, 0]}}, {"array": {"count": 3, "step": [0, 0, 0.48]}}], "t": [0, 0, 0.66]},
+  {"op": "create", "id": "bracket", "material": "iron", "embed": ["shelves"],
+   "gen": {"extrude": {"plane": "yz", "depth": 0.02, "origin": [-0.55, 0, 0], "profile": [[0.02, 0.645], [0.3, 0.645], [0.02, 0.565]]}},
+   "mods": [{"array": {"count": 2, "step": [0, 0, 0.48]}}]},
+  {"op": "create", "id": "bracket_r", "material": "iron", "embed": ["shelves"], "mirror_of": "bracket"},
+  {"op": "create", "id": "bracket_b", "material": "iron", "embed": ["shelves"], "mirror_of": {"src": "bracket", "plane": {"axis": "y", "at": 0}}},
+  {"op": "create", "id": "bracket_rb", "material": "iron", "embed": ["shelves"], "mirror_of": {"src": "bracket_r", "plane": {"axis": "y", "at": 0}}},
+  {"op": "create", "id": "strips", "material": "strip",
+   "gen": {"box": {"size": [1.12, 0.01, 0.04]}}, "mods": [{"array": {"count": 2, "step": [0, 0.67, 0]}}, {"array": {"count": 3, "step": [0, 0, 0.48]}}], "t": [0, 0, 0.665]},
+  {"op": "create", "id": "header", "material": "header", "embed": ["uprights"],
+   "gen": {"box": {"size": [1.2, 0.06, 0.16]}}, "t": [0, 0, 1.68]},
+  {"op": "create", "id": "band", "material": "strip", "embed": ["header", "uprights"],
+   "gen": {"box": {"size": [1.2, 0.064, 0.025]}}, "t": [0, 0, 1.7]}
+]

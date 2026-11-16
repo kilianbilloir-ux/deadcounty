@@ -23,6 +23,8 @@ namespace DeadCounty.UI
 
         public void SetKey(string text) => key.text = text;
 
+        public void SetLabel(string text) => action.text = text;
+
         public void Show(bool shown, string label = null)
         {
             row.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;

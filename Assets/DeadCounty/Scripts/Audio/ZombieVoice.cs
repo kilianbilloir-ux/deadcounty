@@ -3,15 +3,15 @@ using UnityEngine;
 
 namespace DeadCounty.Audio
 {
-    public enum ZombieVocal { Moan, Breath, Alert, Sniff, Growl, Call, Windup, Frustrated }
+    public enum ZombieVocal { Moan, Breath, Alert, Sniff, Growl, Call, Windup, Frustrated, Rise }
 
     // Who wins a voice slot: the tier first, then the closer zombie within a tier.
     public enum VocalPriority { Ambient, Searching, Hunting, Reaction, Telegraph }
 
     public enum StepKind { Soft, Hard, Gravel }
 
-    // A zombie's own voice, drawn from its seed so it keeps it across resets: a pitch (a bigger or smaller throat)
-    // and the two neighbouring variants of every cue it favours.
+    // A zombie's own voice, drawn from its seed so it keeps it across resets: a pitch (a bigger or smaller throat),
+    // one of the voices a cue is recorded in, and the two neighbouring variants of every cue recorded in one voice.
     public readonly struct ZombieVoice
     {
         public const float MinPitch = 0.86f;
@@ -43,9 +43,15 @@ namespace DeadCounty.Audio
             return new ZombieVoice(Mathf.Lerp(MinPitch, MaxPitch, fraction), (int)(h & 0xffu));
         }
 
-        public int PickClip(int count, System.Random rng)
+        // `voices` runs of clips laid end to end: the zombie keeps to the run of its own voice.
+        public int PickClip(int count, int voices, System.Random rng)
         {
             if (count <= 0) return -1;
+            if (voices > 1 && count >= voices)
+            {
+                var run = count / voices;
+                return Variant % voices * run + rng.Next(run);
+            }
             var index = Variant % count;
             return count > 1 && rng.NextDouble() < 0.5 ? (index + 1) % count : index;
         }

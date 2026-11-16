@@ -40,8 +40,9 @@ namespace DeadCounty.Player
         PlayerInventoryScreen inventoryScreen;
         InputAction cancel, submit, navigate;
         readonly List<Label> keyLabels = new();
+        readonly List<Label> controlLabels = new();
         VisualElement titleScreen, pauseScreen, mainPage, settingsPage, controlsPage, audioPage, sensitivityBar, sensitivityFill;
-        Label invertValue, fullscreenValue, uiScaleValue, tipsValue, flashesValue;
+        Label invertValue, fullscreenValue, uiScaleValue, tipsValue, flashesValue, languageValue;
         KeyHint titleConfirmHint, confirmHint, backHint;
         // The page on screen, null while every menu is closed; settingsReturn is the page Options was opened from.
         List<Item> titleItems, mainItems, settingsItems, controlsItems, audioItems, items, settingsReturn;
@@ -106,6 +107,7 @@ namespace DeadCounty.Player
             uiScaleValue = Find<Label>(root, "option-ui-scale-value");
             tipsValue = Find<Label>(root, "option-tips-value");
             flashesValue = Find<Label>(root, "option-flashes-value");
+            languageValue = Find<Label>(root, "option-language-value");
 
             titleItems = new List<Item>
             {
@@ -130,6 +132,7 @@ namespace DeadCounty.Player
                 Entry(root, "option-flashes", ToggleFlashes, _ => ToggleFlashes()),
                 Entry(root, "option-controls", () => ShowPage(controlsItems)),
                 Entry(root, "option-audio", () => ShowPage(audioItems)),
+                Entry(root, "option-language", ToggleLanguage, _ => ToggleLanguage()),
                 Entry(root, "option-back", () => ShowPage(settingsReturn), sound: MenuFeedback.Back),
             };
             controlsItems = BuildControls(Find<VisualElement>(root, "controls-list"));
@@ -144,17 +147,33 @@ namespace DeadCounty.Player
                 Feedback?.Invoke(MenuFeedback.Step);
             });
 
-            titleConfirmHint = new KeyHint(Find<VisualElement>(root, "title-hints"), "Valider");
+            titleConfirmHint = new KeyHint(Find<VisualElement>(root, "title-hints"));
             var hints = Find<VisualElement>(root, "pause-hints");
-            confirmHint = new KeyHint(hints, "Valider");
-            backHint = new KeyHint(hints, "Retour");
+            confirmHint = new KeyHint(hints);
+            backHint = new KeyHint(hints);
+            Translate(GameSettings.Language);
             ShowKeys();
             InputPrompts.KeysChanged += ShowKeys;
+            GameSettings.LanguageChanged += Translate;
             ShowPage(null);
             if (titleRequested) ShowTitle();
         }
 
-        void OnDestroy() => InputPrompts.KeysChanged -= ShowKeys;
+        void OnDestroy()
+        {
+            InputPrompts.KeysChanged -= ShowKeys;
+            GameSettings.LanguageChanged -= Translate;
+        }
+
+        // What this menu wrote itself; the layout's own texts are PlayerHudController's.
+        void Translate(Language _)
+        {
+            titleConfirmHint.SetLabel(Loc.T("Valider"));
+            confirmHint.SetLabel(Loc.T("Valider"));
+            backHint.SetLabel(Loc.T("Retour"));
+            for (var i = 0; i < controlLabels.Count; i++) controlLabels[i].text = Loc.T(KeyBindings.Rows[i].Label);
+            if (items != null) ShowValues();
+        }
 
         void OnDisable()
         {
@@ -206,8 +225,9 @@ namespace DeadCounty.Player
                 row.AddToClassList("menu-item");
                 row.AddToClassList("option-row");
                 row.AddToClassList("controls-row");
-                var label = new Label(binding.Label) { pickingMode = PickingMode.Ignore };
+                var label = new Label(Loc.T(binding.Label)) { pickingMode = PickingMode.Ignore };
                 label.AddToClassList("option-label");
+                controlLabels.Add(label);
                 var key = new Label { pickingMode = PickingMode.Ignore };
                 key.AddToClassList("keycap");
                 key.AddToClassList("controls-key");
@@ -222,7 +242,7 @@ namespace DeadCounty.Player
 
         void Rebind(KeyBindings.Row binding, Label key)
         {
-            key.text = "Appuyez sur une touche";
+            key.text = Loc.T("Appuyez sur une touche");
             key.AddToClassList("controls-key--waiting");
             KeyBindings.Rebind(binding, () =>
             {
@@ -427,22 +447,28 @@ namespace DeadCounty.Player
             ShowValues();
         }
 
+        void ToggleLanguage() => GameSettings.Language = GameSettings.Language == Language.French ? Language.English : Language.French;
+
         // Screen.fullScreen only changes on the next frame: show the value asked for.
         void ToggleFullScreen()
         {
             var fullScreen = !Screen.fullScreen;
             Screen.fullScreen = fullScreen;
-            fullscreenValue.text = fullScreen ? "Oui" : "Non";
+            fullscreenValue.text = YesNo(fullScreen);
         }
+
+        static string YesNo(bool value) => Loc.T(value ? "Oui" : "Non");
 
         void ShowValues()
         {
             sensitivityFill.style.width = Length.Percent(Mathf.InverseLerp(MinSensitivity, MaxSensitivity, controller.MouseSensitivity) * 100f);
-            invertValue.text = controller.InvertLook ? "Oui" : "Non";
-            fullscreenValue.text = Screen.fullScreen ? "Oui" : "Non";
-            uiScaleValue.text = Mathf.RoundToInt(GameSettings.UiScale * 100f) + "\u00A0%";
-            tipsValue.text = GameSettings.Tips ? "Oui" : "Non";
-            flashesValue.text = GameSettings.ReduceFlashes ? "Oui" : "Non";
+            invertValue.text = YesNo(controller.InvertLook);
+            fullscreenValue.text = YesNo(Screen.fullScreen);
+            uiScaleValue.text = Loc.Percent(Mathf.RoundToInt(GameSettings.UiScale * 100f));
+            tipsValue.text = YesNo(GameSettings.Tips);
+            flashesValue.text = YesNo(GameSettings.ReduceFlashes);
+            // Each language under its own name, whatever the one shown.
+            languageValue.text = GameSettings.Language == Language.French ? "Français" : "English";
             ShowVolumes();
         }
     }

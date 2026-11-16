@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Effort
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 0d1fa14a999de44f2b9bfe69a6281eee, type: 3}
+  - {fileID: 8300000, guid: d6b4f6c97c579415386d1c6ffd1cb85e, type: 3}
+  - {fileID: 8300000, guid: fca87faf52f5c4124a61a24139ad4969, type: 3}
+  - {fileID: 8300000, guid: c7f09e1b45e55400ca7009bfcfff974c, type: 3}
+  - {fileID: 8300000, guid: 7ef284ab07ce04c5ba667082eec97839, type: 3}
+  - {fileID: 8300000, guid: 2242b59155d1f4d4890d68d7bbd524f3, type: 3}
+  volume: 0.55
+  pitch: {x: 0.96, y: 1.04}
+  channel: 0
+  minDistance: 1
+  maxDistance: 15
+  voices: 1

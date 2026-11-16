@@ -70,7 +70,7 @@ namespace DeadCounty.Player
         InputAction move, look, jump, run, sprint, crouch, cancel, click;
         LocomotionState motion;
         Vector3 groundNormal = Vector3.up, knockbackVelocity;
-        float yaw, pitch, verticalVelocity, cameraTargetStandingY, landingNoiseTimer, recoveryTimer;
+        float yaw, pitch, verticalVelocity, cameraTargetStandingY, seatedEyeHeight, landingNoiseTimer, recoveryTimer;
         float knockbackTimer, staggerTimer, staggerSpeedFactor = 1f;
         float commitTimer, commitYaw;
         float lastGroundedTime = float.NegativeInfinity, lastJumpPressTime = float.NegativeInfinity;
@@ -92,6 +92,8 @@ namespace DeadCounty.Player
         public bool Resting { get; set; }
         // Movement, jump, crouch and interaction input are read.
         public bool Controllable => InputEnabled && !menuOpen && !Resting;
+        // Sitting down to rest (PlayerRest): the body stays put, the player still looks around and uses the bag.
+        public bool Seated { get; private set; }
         // Carrying more than the inventory capacity (GDD 8.5).
         public bool Encumbered { get; set; }
         // Options menu settings.
@@ -183,8 +185,31 @@ namespace DeadCounty.Player
             pitch = Mathf.Clamp(pitch + (InvertLook ? delta.y : -delta.y), minPitch, maxPitch);
         }
 
+        // Sits where the player stands, or on a seat when given its place. `eyeHeight` is where the camera target
+        // comes down to, above the feet.
+        public void Sit(float eyeHeight, Vector3? position = null, Quaternion? rotation = null)
+        {
+            seatedEyeHeight = eyeHeight;
+            if (IsCrouching) StandUp();
+            if (position.HasValue) Teleport(position.Value, rotation ?? transform.rotation);
+            motion = LocomotionState.Facing(transform.forward);
+            Gait = Gait.Idle;
+            Velocity = Vector3.zero;
+            CurrentSpeed = 0f;
+            Seated = true;
+        }
+
+        // Back on the feet, where the player sat down from when a seat moved them.
+        public void Rise(Vector3? position = null, Quaternion? rotation = null)
+        {
+            Seated = false;
+            if (position.HasValue) Teleport(position.Value, rotation ?? transform.rotation);
+        }
+
         void Move()
         {
+            // Not moved at all: a seat puts the body inside the furniture's collider.
+            if (Seated) return;
             var dt = Time.deltaTime;
             var committed = commitTimer > 0f;
             var input = Controllable && !committed ? Vector2.ClampMagnitude(move.ReadValue<Vector2>(), 1f) : Vector2.zero;
@@ -264,7 +289,8 @@ namespace DeadCounty.Player
 
         void UpdateStamina()
         {
-            var activity = !IsGrounded ? StaminaActivity.Airborne
+            var activity = Seated ? StaminaActivity.Rest
+                : !IsGrounded ? StaminaActivity.Airborne
                 : Gait == Gait.Sprint ? StaminaActivity.Sprint
                 : Gait == Gait.Run ? StaminaActivity.Run
                 : CurrentSpeed > 0.1f ? StaminaActivity.Walk
@@ -369,13 +395,15 @@ namespace DeadCounty.Player
 
         void UpdateCrouch()
         {
-            if (Controllable && crouch.WasPressedThisFrame() && (!IsCrouching || CanStand())) IsCrouching = !IsCrouching;
+            if (Controllable && !Seated && crouch.WasPressedThisFrame() && (!IsCrouching || CanStand())) IsCrouching = !IsCrouching;
 
             var height = Mathf.MoveTowards(controller.height, IsCrouching ? crouchHeight : standingHeight, heightChangeSpeed * Time.deltaTime);
             controller.height = height;
             controller.center = Vector3.up * height / 2f;
+            // The camera comes down with the head, crouching or sitting.
             var target = cameraTarget.localPosition;
-            target.y = cameraTargetStandingY * height / standingHeight;
+            var eye = Seated ? seatedEyeHeight : cameraTargetStandingY * height / standingHeight;
+            target.y = Mathf.MoveTowards(target.y, eye, heightChangeSpeed * Time.deltaTime);
             cameraTarget.localPosition = target;
         }
 

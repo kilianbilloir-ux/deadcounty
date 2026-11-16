@@ -1,0 +1,24 @@
+// Fallen trunk, 4 m long along X, 0.62 m thick at the butt: tapering bark, sawn ends showing lighter wood and
+// heartwood, two broken branch stubs.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "bark", "color": "#4E3B2C"},
+  {"op": "material", "name": "bark_dark", "color": "#3E2F23"},
+  {"op": "material", "name": "wood", "color": "#9A7B55"},
+  {"op": "material", "name": "heart", "color": "#7A5A3C"},
+
+  {"op": "create", "id": "trunk", "material": "bark",
+   "gen": {"cylinder": {"r1": 0.31, "r2": 0.26, "h": 3.96, "seg": 12}}, "r": [0, 90, 0], "t": [0, 0, 0.31]},
+  {"op": "create", "id": "end_butt", "material": "wood", "embed": ["trunk"],
+   "gen": {"cylinder": {"r": 0.28, "h": 0.03, "seg": 12}}, "r": [0, 90, 0], "t": [-1.975, 0, 0.31]},
+  {"op": "create", "id": "heart_butt", "material": "heart", "embed": ["end_butt", "trunk"],
+   "gen": {"cylinder": {"r": 0.1, "h": 0.03, "seg": 8}}, "r": [0, 90, 0], "t": [-1.985, 0.02, 0.32]},
+  {"op": "create", "id": "end_top", "material": "wood", "embed": ["trunk"],
+   "gen": {"cylinder": {"r": 0.23, "h": 0.03, "seg": 12}}, "r": [0, 90, 0], "t": [1.975, 0, 0.31]},
+  {"op": "create", "id": "heart_top", "material": "heart", "embed": ["end_top", "trunk"],
+   "gen": {"cylinder": {"r": 0.08, "h": 0.03, "seg": 8}}, "r": [0, 90, 0], "t": [1.985, -0.02, 0.3]},
+  {"op": "create", "id": "stub_a", "material": "bark_dark", "embed": ["trunk"],
+   "gen": {"cylinder": {"r1": 0.07, "r2": 0.05, "h": 0.3, "seg": 8}}, "r": [-55, 0, 20], "t": [0.7, -0.28, 0.5]},
+  {"op": "create", "id": "stub_b", "material": "bark_dark", "embed": ["trunk"],
+   "gen": {"cylinder": {"r1": 0.06, "r2": 0.04, "h": 0.26, "seg": 8}}, "r": [35, 10, 0], "t": [-0.9, 0.17, 0.6]}
+]

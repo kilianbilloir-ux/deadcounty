@@ -1,0 +1,24 @@
+// Lectern, 0.6 x 0.45 x 1.3 m: a square column on a foot, a desk sloping 20 degrees down toward -Y with a lip to hold
+// the red bible lying on it.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#7A5A3C"},
+  {"op": "material", "name": "wood_dark", "color": "#4A3828"},
+  {"op": "material", "name": "cover", "color": "#6E3530"},
+  {"op": "material", "name": "pages", "color": "#E6E6E0"},
+
+  {"op": "create", "id": "foot", "material": "wood_dark",
+   "gen": {"box": {"size": [0.42, 0.36, 0.06]}}, "mods": [{"bevel": {"width": "1.5cm"}}], "t": [0, 0, 0.03]},
+  {"op": "create", "id": "column", "material": "wood", "embed": ["foot"],
+   "gen": {"box": {"size": [0.12, 0.12, 1.06]}}, "t": [0, 0, 0.58]},
+  {"op": "create", "id": "collar", "material": "wood_dark", "embed": ["column"],
+   "gen": {"box": {"size": [0.2, 0.2, 0.05]}}, "t": [0, 0, 1.085]},
+  {"op": "create", "id": "desk", "material": "wood", "embed": ["collar", "column"],
+   "gen": {"extrude": {"plane": "yz", "depth": 0.6, "profile": [[-0.21, 1.1], [0.21, 1.1], [0.21, 1.3], [-0.21, 1.15]]}}},
+  {"op": "create", "id": "lip", "material": "wood_dark", "embed": ["desk"],
+   "gen": {"box": {"size": [0.6, 0.03, 0.06]}}, "t": [0, -0.225, 1.15]},
+  {"op": "create", "id": "bible", "material": "cover", "embed": ["desk"],
+   "gen": {"box": {"size": [0.36, 0.27, 0.045]}}, "r": [20, 0, 0], "t": [0, 0.0, 1.245]},
+  {"op": "create", "id": "page_edge", "material": "pages", "embed": ["bible"],
+   "gen": {"box": {"size": [0.34, 0.26, 0.03]}}, "r": [20, 0, 0], "t": [0.012, 0.0, 1.245]}
+]
