@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Rise
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: 9d70346369af2402eb922b4d544de1c6, type: 3}
+  - {fileID: 8300000, guid: 3d9ee6f81c942445cb2c0c92eb01e286, type: 3}
+  - {fileID: 8300000, guid: 9d567ef89d51348318881a240d3f1408, type: 3}
+  - {fileID: 8300000, guid: f719c17107df046efbfde9cce4ca16d7, type: 3}
+  - {fileID: 8300000, guid: de7dc23283b0147eb8bc0143801e2877, type: 3}
+  - {fileID: 8300000, guid: 0c75540c174404785be9b32c7be0670b, type: 3}
+  - {fileID: 8300000, guid: 35c5c38cad5f745f7ba49488526b4d8e, type: 3}
+  - {fileID: 8300000, guid: e0a9032eeaf7c44d9952c232a2df45c2, type: 3}
+  volume: 0.75
+  pitch: {x: 0.95, y: 1.05}
+  channel: 0
+  minDistance: 2
+  maxDistance: 22
+  voices: 4

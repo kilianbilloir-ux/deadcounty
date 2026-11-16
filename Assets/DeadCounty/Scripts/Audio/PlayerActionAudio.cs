@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
 using DeadCounty.Items;
 using DeadCounty.Player;
 using DeadCounty.UI;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace DeadCounty.Audio
 {
+    // Weapons carry their own swing and blow (ItemDefinition), bare hands shove, a blow at the ground stomps, and a
+    // blow that kills cracks on top of its own sound.
     [RequireComponent(typeof(PlayerInteractor), typeof(PlayerInventory))]
     public class PlayerActionAudio : MonoBehaviour
     {
@@ -13,6 +17,9 @@ namespace DeadCounty.Audio
         const float HeadHeight = 1.6f;
         const float DropDistance = 0.6f;
         const float StrikeDistance = 1f;
+        const float GroundHeight = 0.2f;
+        // Stamina cost of a swing that always draws a grunt; lighter swings draw one less often.
+        const float EffortCost = 14f;
         // Progress per second above which a search is hurried (1 s instead of 2.5 s by default).
         const float HurriedProgressRate = 0.7f;
         const float RummageFadeOut = 8f;
@@ -25,8 +32,14 @@ namespace DeadCounty.Audio
         [SerializeField] SoundCue drop;
         [SerializeField] SoundCue flashlightClick;
         [SerializeField] SoundCue bed;
+        [Tooltip("A weapon's swing without its own, and the shove.")]
         [SerializeField] SoundCue swing;
+        [Tooltip("A weapon's blow without its own.")]
         [SerializeField] SoundCue strike;
+        [SerializeField] SoundCue shove;
+        [SerializeField] SoundCue stomp;
+        [SerializeField] SoundCue kill;
+        [SerializeField] SoundCue effort;
 
         PlayerInteractor interactor;
         PlayerInventory inventory;
@@ -36,6 +49,9 @@ namespace DeadCounty.Audio
         AudioSource rummageSource;
         float rummageVolume, lastProgress;
         bool flashlightWasOn, wasAsleep;
+
+        // Every combat cue played, with where: lets tests hear the fight without an AudioListener.
+        public event Action<SoundCue, Vector3> Played;
 
         void Awake()
         {
@@ -151,14 +167,34 @@ namespace DeadCounty.Audio
             Sfx.Play(cue, transform.position + Vector3.up * HeadHeight);
         }
 
-        // A shove cuts less air than a weapon.
+        // A shove cuts less air than a weapon, a stomp none. Heavier swings draw a grunt more often, a stomp always.
         void OnSwung(ItemDefinition weapon)
-            => Sfx.Play(swing, transform.position + Vector3.up * HandsHeight + transform.forward * 0.4f, weapon != null ? 1f : 0.5f, weapon != null ? 1f : 0.8f);
+        {
+            var stomping = weapon == null && combat.Ground;
+            var hands = transform.position + Vector3.up * HandsHeight + transform.forward * 0.4f;
+            if (weapon != null) Play(Either(weapon.SwingSound, swing), hands);
+            else if (!stomping) Play(swing, hands, 0.5f, 0.8f);
+            if (stomping || Random.value < combat.Swing.Stats.StaminaCost / EffortCost)
+                Play(effort, transform.position + Vector3.up * HeadHeight);
+        }
 
         void OnStruck(int hits, int kills)
         {
-            if (hits > 0) Sfx.Play(strike, transform.position + Vector3.up * HandsHeight + transform.forward * StrikeDistance);
+            if (hits == 0) return;
+            var weapon = combat.Weapon;
+            var at = transform.position + transform.forward * StrikeDistance + Vector3.up * (combat.Ground ? GroundHeight : HandsHeight);
+            Play(weapon != null ? Either(weapon.HitSound, strike) : combat.Ground ? stomp : shove, at);
+            if (kills > 0) Play(kill, at);
         }
+
+        void Play(SoundCue cue, Vector3 at, float volume = 1f, float pitch = 1f)
+        {
+            if (cue == null) return;
+            Sfx.Play(cue, at, volume, pitch);
+            Played?.Invoke(cue, at);
+        }
+
+        static SoundCue Either(SoundCue own, SoundCue fallback) => own != null ? own : fallback;
 
         void OnDropped(ItemDefinition item) => Sfx.Play(drop, transform.position + transform.forward * DropDistance);
     }

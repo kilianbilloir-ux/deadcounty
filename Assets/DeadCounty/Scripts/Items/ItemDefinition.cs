@@ -1,3 +1,4 @@
+using DeadCounty.Audio;
 using DeadCounty.Combat;
 using UnityEngine;
 
@@ -27,6 +28,10 @@ namespace DeadCounty.Items
 
         [Tooltip("Swing of the item once in hand; read for the Weapon category only.")]
         public WeaponStats Weapon;
+        [Tooltip("Heard as the weapon cuts the air; without one, the generic swing.")]
+        public SoundCue SwingSound;
+        [Tooltip("Heard where the weapon lands; without one, the generic blow.")]
+        public SoundCue HitSound;
 
         [Tooltip("Model shown when the item lies on the ground, pivot on the ground with a collider on its root; a weapon lies along +Z with its grip at the pivot. Without one the item drops as a plain box.")]
         public GameObject WorldModel;

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06fe4561ca0e44499738e5530ed5f6a, type: 3}
+  m_Name: SC_Hit_Crowbar
+  m_EditorClassIdentifier: DeadCounty.Runtime::DeadCounty.Audio.SoundCue
+  clips:
+  - {fileID: 8300000, guid: fcb5f4c9ea9e440aeb605b95302a39fb, type: 3}
+  - {fileID: 8300000, guid: 37e3f8926a5174ca599cf70fe70e70c1, type: 3}
+  - {fileID: 8300000, guid: 8af071641f1264ca889377ea57e2d7fa, type: 3}
+  - {fileID: 8300000, guid: 63116bd823449431a810ea176c241bac, type: 3}
+  volume: 1
+  pitch: {x: 0.94, y: 1.06}
+  channel: 0
+  minDistance: 1
+  maxDistance: 22
+  voices: 1

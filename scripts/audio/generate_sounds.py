@@ -8,9 +8,10 @@ synthesised sound back.
 Needs the SA3 Studio server on SA3_STUDIO_URL (default http://127.0.0.1:8420) and numpy + soundfile, so run it
 with the server's own interpreter:
 
-    <studio>/stable-audio-3/optimized/mlx/.venv/bin/python scripts/audio/generate_sounds.py [Folder/Name ...]
+    <studio>/stable-audio-3/optimized/mlx/.venv/bin/python scripts/audio/generate_sounds.py [--force] [Folder/Name ...]
 
-Seeds are fixed: the same server and weights give the same files again.
+Only missing takes are generated; --force regenerates the named cues (all of them without names). Seeds are fixed:
+the same server and weights give the same files again.
 """
 
 from __future__ import annotations
@@ -32,34 +33,64 @@ AVOID = "music, melody, speech, words, talking, laughter"
 PEAK = 0.9
 SILENCE = 0.03
 MIN_LENGTH = 0.25
+# Light blows and a knife's swish are shorter than the blips MIN_LENGTH rejects elsewhere.
+MIN_LENGTHS = {"Player/Swing_Blade": 0.12, "Player/Hit_Bat": 0.12, "Player/Hit_Knife": 0.12, "Player/Shove": 0.12}
 RETRIES = 4
 SFX = "TrackType: SFX, "
 
+# The throats a zombie can have. A voiced cue is recorded in each, takes laid out voice by voice: the scene builder
+# marks the cue with as many voices (ZombieVoices in TestSceneBuilder.AudioZombies.cs) and a zombie keeps to one.
+VOICES = [
+    "in a deep, low, gravelly voice, a big heavy man",
+    "in a thin, high, wheezing voice, a frail old man, airy and breathy",
+    "in a wet, gurgling, bubbling voice, blood in the throat",
+    "in a shrill, raspy, screeching voice, torn vocal cords",
+]
+# cue, takes per voice, seconds generated, longest kept (s), prompt with {voice}.
+VOICED = [
+    ("Zombie/Moan", 2, 3, 2.2, "a single slow guttural zombie moan {voice}, a dead man groaning with a rattling throat, close and dry"),
+    ("Zombie/Growl", 2, 2, 1.4, "a short aggressive zombie growl {voice}, a snarling throat rattle, close and dry"),
+    ("Zombie/Alert", 2, 2, 0.9, "a sudden sharp zombie snarl {voice}, one startled rasping bark from a dead throat, close and dry"),
+    ("Zombie/Breath", 2, 2, 1.6, "one slow rattling exhale of a zombie {voice}, laboured breathing, close and dry"),
+    ("Zombie/Call", 2, 3, 1.8, "a loud zombie shriek calling the others {voice}, an inhuman scream, outdoors"),
+    ("Zombie/Frustrated", 2, 3, 1.8, "a frustrated zombie grunting and snarling {voice}, angry guttural noises, close and dry"),
+    ("Zombie/Windup", 2, 2, 1.1, "a rising zombie growl {voice}, building up just before it attacks, close and dry"),
+    ("Zombie/Rise", 2, 2, 1.4, "a zombie dragging itself up off the ground {voice}, one long strained groan of effort, close and dry"),
+    ("Zombie/Hurt", 2, 1, 0.7, "a zombie struck hard {voice}, one short choked grunt of pain, close and dry"),
+    ("Zombie/Death", 2, 3, 1.8, "a zombie's last rattling groan as it dies {voice}, a long exhale fading out, close and dry"),
+]
 # cue, takes, seconds generated, longest kept (s), prompt.
 ONE_SHOTS = [
-    ("Zombie/Moan", 5, 3, 2.2, "a single slow guttural zombie moan, a hoarse dead man groaning with a rattling throat, close and dry"),
-    ("Zombie/Growl", 4, 2, 1.4, "a short aggressive zombie growl, a snarling wet throat rattle, close and dry"),
-    ("Zombie/Alert", 4, 2, 0.9, "a sudden sharp zombie snarl, one startled rasping bark from a dead throat, close and dry"),
-    ("Zombie/Breath", 3, 2, 1.6, "one slow wet rattling exhale of a zombie, raspy laboured breathing, close and dry"),
-    ("Zombie/Call", 3, 3, 1.8, "a loud hoarse zombie shriek calling the others, an inhuman scream, outdoors"),
-    ("Zombie/Frustrated", 3, 3, 1.8, "a frustrated zombie grunting and snarling, angry guttural noises, close and dry"),
     ("Zombie/Sniff", 3, 2, 1.1, "a creature sniffing the air, two short wet sniffs through a rotten nose, close and dry"),
-    ("Zombie/Windup", 3, 2, 1.1, "a rising zombie growl building up just before it attacks, close and dry"),
-    ("Zombie/Hurt", 3, 1, 0.7, "a zombie struck hard, one short choked grunt of pain from a dead throat, close and dry"),
-    ("Zombie/Death", 3, 3, 1.8, "a zombie's last rattling groan as it dies, a long wet exhale fading out, close and dry"),
     ("Zombie/Fall", 3, 1, 0.8, "a heavy body collapsing onto the ground, one dull thud with a rustle of clothes, close and dry"),
+    ("Zombie/Feed", 4, 2, 1.4, "a creature feeding on raw flesh, wet chewing, tearing and slurping, close and dry"),
     ("Ambience/Bird", 6, 2, 1.4, "a single small songbird singing one short phrase, outdoors, field recording"),
-    ("Ambience/Crow", 2, 3, 2.2, "a crow cawing twice in the distance, open countryside, field recording"),
-    ("Ambience/Dog", 2, 3, 2.0, "a dog barking twice far away, rural echo, field recording"),
-    ("Ambience/Owl", 2, 3, 2.6, "an owl hooting at night in the distance, quiet forest, field recording"),
-    ("Ambience/DistantScream", 2, 3, 2.6, "a human scream of terror very far away, echoing across empty streets"),
-    ("Ambience/DistantShot", 2, 3, 2.6, "a single distant gunshot echoing across a valley, long tail"),
-    ("Ambience/DistantAlarm", 2, 4, 3.0, "a car alarm wailing far away, muffled by distance, empty town"),
-    ("Player/Hurt", 5, 1, 0.5, "a short male grunt of pain, one sharp breathy exclamation, close and dry"),
-    ("Player/Death", 2, 3, 2.0, "a man's last choking gasp as he dies, a breathy collapse, close and dry"),
-    ("Player/Eat", 2, 2, 1.4, "a person chewing food from a tin can, a few wet bites, close and dry"),
-    ("Player/Drink", 2, 2, 1.6, "a person drinking water from a plastic bottle, three gulps, close and dry"),
-    ("Player/Bandage", 2, 2, 1.3, "cloth bandage being wrapped and pulled tight around an arm, fabric rustle and tear, close and dry"),
+    ("Ambience/Crow", 4, 3, 2.2, "a crow cawing twice in the distance, open countryside, field recording"),
+    ("Ambience/Woodpecker", 3, 3, 2.0, "a woodpecker drumming on a tree trunk in the distance, one rapid burst of knocks, quiet forest, field recording"),
+    ("Ambience/Cow", 3, 3, 2.6, "a cow mooing far away across a field, one long low moo, rural countryside, field recording"),
+    ("Ambience/Dog", 4, 3, 2.0, "a dog barking twice far away, rural echo, field recording"),
+    ("Ambience/Owl", 4, 3, 2.6, "an owl hooting at night in the distance, quiet forest, field recording"),
+    ("Ambience/Coyote", 3, 4, 3.0, "coyotes howling and yipping far away at night, open prairie, field recording"),
+    ("Ambience/Shutter", 3, 3, 2.0, "a loose wooden shutter banging twice against a wall in the wind, outdoors, field recording"),
+    ("Ambience/DistantScream", 4, 3, 2.6, "a human scream of terror very far away, echoing across empty streets"),
+    ("Ambience/DistantShot", 4, 3, 2.6, "a single distant gunshot echoing across a valley, long tail"),
+    ("Ambience/DistantAlarm", 3, 4, 3.0, "a car alarm wailing far away, muffled by distance, empty town"),
+    ("Ambience/DistantHorde", 3, 4, 3.0, "a crowd of zombies moaning together very far away, a low eerie chorus of groans carried by the wind, empty town"),
+    ("Ambience/DistantGlass", 3, 3, 2.2, "a window shattering far away, glass breaking and falling, echoing across empty streets"),
+    ("Player/Hurt", 8, 1, 0.5, "a short male grunt of pain, one sharp breathy exclamation, close and dry"),
+    ("Player/Death", 3, 3, 2.0, "a man's last choking gasp as he dies, a breathy collapse, close and dry"),
+    ("Player/Eat", 4, 2, 1.4, "a person chewing food from a tin can, a few wet bites, close and dry"),
+    ("Player/Drink", 4, 2, 1.6, "a person drinking water from a plastic bottle, three gulps, close and dry"),
+    ("Player/Bandage", 3, 2, 1.3, "cloth bandage being wrapped and pulled tight around an arm, fabric rustle and tear, close and dry"),
+    ("Player/Effort", 6, 1, 0.45, "a man's short grunt of effort as he swings a heavy weapon, one sharp breathy exhale through clenched teeth, close and dry"),
+    ("Player/Swing_Blade", 4, 1, 0.4, "a quick airy whoosh of a blade slicing through the air, one short swoosh, close and dry"),
+    ("Player/Swing_Heavy", 4, 1, 0.6, "a heavy baseball bat swung hard through the air, one deep powerful whoosh, close and dry"),
+    ("Player/Hit_Bat", 4, 1, 0.6, "a heavy punch impact, a wooden club whacking flesh, a meaty body hit, close and dry"),
+    ("Player/Hit_Crowbar", 4, 1, 0.6, "melee combat impact, a heavy steel crowbar hitting a body, a meaty thud with a dull metallic ring and a crack of bone, close and dry"),
+    ("Player/Hit_Knife", 4, 1, 0.5, "a knife stabbing into flesh, one quick wet stab and squelch, close and dry"),
+    ("Player/Shove", 3, 1, 0.5, "two hands shoving a person hard in the chest, a dull body thump and a rustle of clothes, close and dry"),
+    ("Player/Stomp", 4, 1, 0.6, "a heavy boot stomping down on a body lying on the ground, a deep thud with a wet crunch, close and dry"),
+    ("Player/Kill", 4, 1, 0.6, "a skull cracking under a heavy blow, a sharp crunch of bone and a wet splatter, close and dry"),
 ]
 # cue, seconds generated, seconds kept, RMS the loop is brought to (that of the synthesised loop it replaces, so
 # the cue volumes still hold), model, prompt.
@@ -103,7 +134,7 @@ def fade(samples: np.ndarray, rate: int, attack: float, release: float) -> np.nd
     return out
 
 
-def one_shot(path: Path, longest: float) -> tuple[np.ndarray, int] | None:
+def one_shot(path: Path, longest: float, shortest: float) -> tuple[np.ndarray, int] | None:
     """Mono, cut to the sound itself, capped in length; None when the take is silence or a blip."""
     data, rate = sf.read(path, dtype="float32", always_2d=True)
     mono = data.mean(axis=1)
@@ -112,7 +143,7 @@ def one_shot(path: Path, longest: float) -> tuple[np.ndarray, int] | None:
         return None
     start = max(0, loud[0] - int(0.01 * rate))
     mono = mono[start:min(loud[-1] + int(0.05 * rate), start + int(longest * rate))]
-    if len(mono) < MIN_LENGTH * rate:
+    if len(mono) < shortest * rate:
         return None
     mono = fade(mono, rate, 0.004, min(0.12, len(mono) / rate / 4))
     return mono * (PEAK / np.abs(mono).max()), rate
@@ -140,26 +171,36 @@ def seed_of(cue: str, take: int, attempt: int) -> int:
 
 
 def main() -> None:
-    wanted = set(sys.argv[1:])
-    for cue, takes, seconds, longest, prompt in ONE_SHOTS:
-        if wanted and cue not in wanted:
+    force = "--force" in sys.argv
+    wanted = set(sys.argv[1:]) - {"--force"}
+
+    def due(cue: str, take: int) -> bool:
+        return (not wanted or cue in wanted) and (force or not path_of(cue, take).exists())
+
+    jobs = [(cue, take, seconds, longest, prompt) for cue, takes, seconds, longest, prompt in ONE_SHOTS for take in range(takes)]
+    jobs += [(cue, v * per + k, seconds, longest, prompt.format(voice=voice))
+             for cue, per, seconds, longest, prompt in VOICED for v, voice in enumerate(VOICES) for k in range(per)]
+    for cue, take, seconds, longest, prompt in jobs:
+        if not due(cue, take):
             continue
-        for take in range(takes):
-            for attempt in range(RETRIES):
-                result = one_shot(generate(SFX + prompt, "sm-sfx", seconds, seed_of(cue, take, attempt)), longest)
-                if result is not None:
-                    break
-            else:
-                raise RuntimeError(f"{cue} take {take}: {RETRIES} silent generations")
-            write(cue, take, *result)
+        for attempt in range(RETRIES):
+            result = one_shot(generate(SFX + prompt, "sm-sfx", seconds, seed_of(cue, take, attempt)), longest, MIN_LENGTHS.get(cue, MIN_LENGTH))
+            if result is not None:
+                break
+        else:
+            raise RuntimeError(f"{cue} take {take}: {RETRIES} silent generations")
+        write(cue, take, *result)
     for cue, seconds, length, rms, model, prompt in LOOPS:
-        if wanted and cue not in wanted:
-            continue
-        write(cue, 0, *loop(generate(prompt, model, seconds, seed_of(cue, 0, 0)), length, rms, stereo=cue.startswith("Music/")))
+        if due(cue, 0):
+            write(cue, 0, *loop(generate(prompt, model, seconds, seed_of(cue, 0, 0)), length, rms, stereo=cue.startswith("Music/")))
+
+
+def path_of(cue: str, take: int) -> Path:
+    return OUT_DIR / f"{cue}_{take}.wav"
 
 
 def write(cue: str, take: int, samples: np.ndarray, rate: int) -> None:
-    out = OUT_DIR / f"{cue}_{take}.wav"
+    out = path_of(cue, take)
     out.parent.mkdir(parents=True, exist_ok=True)
     sf.write(out, samples, rate, subtype="PCM_16")
     rms = float(np.sqrt(np.mean(samples ** 2)))

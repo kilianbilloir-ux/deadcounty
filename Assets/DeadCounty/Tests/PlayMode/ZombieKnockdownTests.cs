@@ -31,7 +31,9 @@ namespace DeadCounty.Tests
             var capsule = zombie.GetComponent<CapsuleCollider>();
             var model = zombie.transform.Find("Model");
             var falls = 0;
+            var rises = 0;
             zombie.Felled += () => falls++;
+            zombie.GettingUp += () => rises++;
             yield return FelledFromTheFront(zombie);
 
             Assert.That(falls, Is.EqualTo(1));
@@ -48,6 +50,7 @@ namespace DeadCounty.Tests
             // Coroutines resume before LateUpdate: let the animator see this frame.
             yield return null;
             Assert.That(zombie.State, Is.EqualTo(ZombieState.Chase));
+            Assert.That(rises, Is.EqualTo(1));
             Assert.That(zombie.IsDown, Is.False);
             Assert.That(animator.Down, Is.False, "the body is still getting up");
             Assert.That(Vector3.Angle(model.up, Vector3.up), Is.LessThan(8f));

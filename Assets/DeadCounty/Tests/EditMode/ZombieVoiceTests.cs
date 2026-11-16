@@ -31,10 +31,30 @@ namespace DeadCounty.Tests
             var voice = ZombieVoice.FromSeed(11);
             var rng = new System.Random(3);
             var picked = new HashSet<int>();
-            for (var i = 0; i < 200; i++) picked.Add(voice.PickClip(count, rng));
+            for (var i = 0; i < 200; i++) picked.Add(voice.PickClip(count, 1, rng));
             Assert.That(picked, Is.EquivalentTo(new[] { voice.Variant % count, (voice.Variant + 1) % count }));
-            Assert.That(voice.PickClip(1, rng), Is.EqualTo(0));
-            Assert.That(voice.PickClip(0, rng), Is.EqualTo(-1));
+            Assert.That(voice.PickClip(1, 1, rng), Is.EqualTo(0));
+            Assert.That(voice.PickClip(0, 1, rng), Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void ACueRecordedInSeveralVoicesKeepsEachZombieToItsOwn()
+        {
+            const int voices = 4;
+            const int count = 8;
+            var rng = new System.Random(3);
+            var heard = new HashSet<int>();
+            foreach (var voice in Enumerable.Range(1, 24).Select(ZombieVoice.FromSeed))
+            {
+                var picked = new HashSet<int>();
+                for (var i = 0; i < 100; i++) picked.Add(voice.PickClip(count, voices, rng));
+                var own = voice.Variant % voices;
+                Assert.That(picked, Is.EquivalentTo(new[] { own * 2, own * 2 + 1 }), "a zombie strayed out of its voice or kept to one take");
+                heard.Add(own);
+            }
+            Assert.That(heard.Count, Is.EqualTo(voices), "24 zombies do not cover the four voices");
+            // Fewer takes than voices: no voice to keep to.
+            Assert.That(ZombieVoice.FromSeed(5).PickClip(3, voices, rng), Is.InRange(0, 2));
         }
 
         [Test]

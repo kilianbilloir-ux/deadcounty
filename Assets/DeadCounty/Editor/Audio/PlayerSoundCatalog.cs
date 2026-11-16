@@ -54,6 +54,15 @@ namespace DeadCounty.EditorTools
         public const string Bed = "Player/Bed";
         public const string Swing = "Player/Swing";
         public const string Strike = "Player/Strike";
+        public const string SwingBlade = "Player/Swing_Blade";
+        public const string SwingHeavy = "Player/Swing_Heavy";
+        public const string HitBat = "Player/Hit_Bat";
+        public const string HitCrowbar = "Player/Hit_Crowbar";
+        public const string HitKnife = "Player/Hit_Knife";
+        public const string Shove = "Player/Shove";
+        public const string Stomp = "Player/Stomp";
+        public const string Kill = "Player/Kill";
+        public const string Effort = "Player/Effort";
         public const string DoorLatch = "World/Door_Latch";
         public const string DoorCreak = "World/Door_Creak";
         public const string DoorShut = "World/Door_Shut";
@@ -87,6 +96,16 @@ namespace DeadCounty.EditorTools
             entries.Add(new Entry(Bed, 2, Trimmed(ActionRecipes.Bed), 0.6f, 0.04f, 1f, 12f));
             entries.Add(new Entry(Swing, 4, Trimmed(ZombieBodyRecipes.Whoosh), 0.6f, 0.1f, 1f, 12f));
             entries.Add(new Entry(Strike, 4, Trimmed(ZombieBodyRecipes.Hit), 1f, 0.08f, 1f, 20f));
+            // Recorded (scripts/audio/generate_sounds.py); the synthesised whoosh and blow stand in without the takes.
+            entries.Add(new Entry(SwingBlade, 4, Trimmed(ZombieBodyRecipes.Whoosh), 0.45f, 0.08f, 1f, 10f));
+            entries.Add(new Entry(SwingHeavy, 4, Trimmed(ZombieBodyRecipes.Whoosh), 0.7f, 0.08f, 1f, 12f));
+            entries.Add(new Entry(HitBat, 4, Trimmed(ZombieBodyRecipes.Hit), 1f, 0.06f, 1f, 20f));
+            entries.Add(new Entry(HitCrowbar, 4, Trimmed(ZombieBodyRecipes.Hit), 1f, 0.06f, 1f, 22f));
+            entries.Add(new Entry(HitKnife, 4, Trimmed(ZombieBodyRecipes.Hit), 0.8f, 0.06f, 1f, 12f));
+            entries.Add(new Entry(Shove, 3, Trimmed(ZombieBodyRecipes.Hit), 0.7f, 0.06f, 1f, 12f));
+            entries.Add(new Entry(Stomp, 4, Trimmed(BodyRecipes.Land), 1f, 0.06f, 1f, 18f));
+            entries.Add(new Entry(Kill, 4, Trimmed(ZombieBodyRecipes.Hit), 0.8f, 0.05f, 1f, 15f));
+            entries.Add(new Entry(Effort, 6, Trimmed(BodyRecipes.Hurt), 0.55f, 0.04f, 1f, 15f));
             entries.Add(new Entry(DoorLatch, 4, Trimmed(ActionRecipes.DoorLatch), 0.6f, 0.05f, 1f, 15f));
             entries.Add(new Entry(DoorCreak, 5, Trimmed(ActionRecipes.DoorCreak), 0.3f, 0.08f, 1f, 20f));
             entries.Add(new Entry(DoorShut, 4, Trimmed(ActionRecipes.DoorShut), 0.75f, 0.05f, 1.5f, 25f));

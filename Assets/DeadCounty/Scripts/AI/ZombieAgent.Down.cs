@@ -22,6 +22,8 @@ namespace DeadCounty.AI
         public Vector3 BodyCenter => down ? motor.Position + fallDirection * LyingTorso : motor.Position;
         // A fall starts: felled, or felled again while getting up.
         public event Action Felled;
+        // The body starts to push itself up off the ground.
+        public event Action GettingUp;
 
         // After the brain went down. A blow on a body already lying changes nothing here.
         void Fall()
@@ -54,6 +56,7 @@ namespace DeadCounty.AI
             rising = true;
             // In step with the brain, which started the rise up to a frame ago.
             if (animator != null) animator.StandUp(tuning.RiseTime - (brain.StateTime - brain.DownDuration));
+            GettingUp?.Invoke();
         }
 
         void GetUp()

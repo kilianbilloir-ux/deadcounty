@@ -15,8 +15,11 @@ MonoBehaviour:
   clips:
   - {fileID: 8300000, guid: f125a1b15c5fb41ebbad51a942405669, type: 3}
   - {fileID: 8300000, guid: 4b9610a15ca0f4ff499b5c7ed67eb208, type: 3}
+  - {fileID: 8300000, guid: 3461de965bae64c628035b45cecf5229, type: 3}
+  - {fileID: 8300000, guid: 32bec245a41044f428fd3cf8c7742fcb, type: 3}
   volume: 0.4
   pitch: {x: 0.96, y: 1.04}
   channel: 1
   minDistance: 200
   maxDistance: 500
+  voices: 1

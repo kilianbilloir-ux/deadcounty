@@ -42,10 +42,11 @@ namespace DeadCounty.EditorTools
             BuiltLamps.Clear();
             DoorSpots.Clear();
             ConfigureProject();
+            // Before the items: weapons carry their own sounds.
+            EnsureSounds();
             var items = EnsureItems();
             EnsureItemModels(items);
             EnsureLootTables(items);
-            EnsureSounds();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             EnsureItemIcons(items);
