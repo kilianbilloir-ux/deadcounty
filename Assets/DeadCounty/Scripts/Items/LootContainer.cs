@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DeadCounty.Perception;
 using DeadCounty.Player;
+using DeadCounty.UI;
 using DeadCounty.World;
 using UnityEngine;
 
@@ -32,8 +33,8 @@ namespace DeadCounty.Items
 
         public bool Searched { get; private set; }
 
-        public override string DisplayName => Searched ? $"{displayName} (fouillé)" : displayName;
-        public override string Action => Searched ? null : "Fouiller";
+        public override string DisplayName => Searched ? Loc.T("{0} (fouillé)", Loc.T(displayName)) : Loc.T(displayName);
+        public override string Action => Searched ? null : Loc.T("Fouiller");
         public override Vector3 PromptPoint => promptPoint;
 
         void Awake()

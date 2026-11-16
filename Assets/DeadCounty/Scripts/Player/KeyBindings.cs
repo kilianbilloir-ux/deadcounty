@@ -39,6 +39,7 @@ namespace DeadCounty.Player
             new("Sauter", "Player/Jump"),
             new("Frapper", "Player/Attack"),
             new("Interagir", "Player/Interact"),
+            new("Se reposer", "Player/Rest"),
             new("Lampe torche", "Player/Flashlight"),
             new("Inventaire", "Player/Inventory"),
             new("Jeter un objet", "Player/Drop"),

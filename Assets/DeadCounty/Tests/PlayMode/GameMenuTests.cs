@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
+using DeadCounty.Core;
 using DeadCounty.Player;
 using DeadCounty.UI;
 using NUnit.Framework;
@@ -77,6 +78,38 @@ namespace DeadCounty.Tests
             Assert.That(controller.MenuOpen, Is.False);
             Assert.That(Root.Q("title").style.display.value, Is.EqualTo(DisplayStyle.None));
             Assert.That(titleCamera.GetComponent<CinemachineCamera>().enabled, Is.False, "the view must go back to the player camera");
+        }
+
+        [UnityTest]
+        public IEnumerator TheTitleShowsFirstLightThenTheSunRisesToTheHourOfTheGame()
+        {
+            var sky = new GameObject("TestDayNight");
+            sky.SetActive(false);
+            var sun = sky.AddComponent<Light>();
+            sun.type = LightType.Directional;
+            var clock = sky.AddComponent<DayNightDirector>();
+            clock.Configure(sun, 11f, DayNightModel.DayLengthSeconds);
+            sky.SetActive(true);
+            try
+            {
+                yield return ShowTitle();
+                var title = titleCamera.GetComponent<TitleScreen>();
+                yield return null;
+                Assert.That(clock.Hour, Is.EqualTo(title.TitleHour), "the sky behind the title is not at first light");
+                Assert.That(WorldLighting.NightFactor, Is.InRange(0.2f, 0.6f), "first light is neither night nor day");
+
+                yield return Press(Key.Enter);
+                yield return new WaitForSeconds(title.SunriseSeconds * 0.5f);
+                Assert.That(clock.Hour, Is.InRange(title.TitleHour + 0.5f, 10.5f), "the sun does not climb while the view goes back to the player");
+                yield return new WaitForSeconds(title.SunriseSeconds * 0.5f + 0.3f);
+                Assert.That(clock.Hour, Is.EqualTo(11f).Within(0.05f), "the game does not start at its own hour");
+                Assert.That(clock.Day, Is.EqualTo(1));
+                Assert.That(WorldLighting.NightFactor, Is.Zero);
+            }
+            finally
+            {
+                Object.Destroy(sky);
+            }
         }
 
         [UnityTest]
@@ -192,6 +225,44 @@ namespace DeadCounty.Tests
             {
                 GameSettings.UiScale = savedScale;
                 GameSettings.Tips = savedTips;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator TheLanguageOptionRewritesEveryTextAtOnce()
+        {
+            var saved = GameSettings.Language;
+            try
+            {
+                GameSettings.Language = Language.French;
+                yield return Press(Key.Escape);
+                yield return Press(Key.DownArrow);
+                yield return Press(Key.Enter);
+                for (var i = 0; i < 8; i++) yield return Press(Key.DownArrow);
+                Assert.That(Root.Q<Label>("option-language-value").text, Is.EqualTo("Français"));
+                yield return Press(Key.Enter);
+
+                Assert.That(GameSettings.Language, Is.EqualTo(Language.English));
+                Assert.That(Root.Q<Label>("option-language-value").text, Is.EqualTo("English"));
+                Assert.That(Root.Q<Label>("option-back").text, Is.EqualTo("Back"), "a text of the layout");
+                Assert.That(Root.Q<Label>("option-tips-value").text, Is.EqualTo(GameSettings.Tips ? "Yes" : "No"), "a value the menu writes");
+                Assert.That(Root.Q("controls-list").Q<Label>(className: "option-label").text, Is.EqualTo("Move forward"), "a row the menu built");
+                Assert.That(Root.Q("pause-hints").Query<Label>(className: "prompt-action").ToList().ConvertAll(l => l.text), Is.EqualTo(new[] { "Confirm", "Back" }));
+                Assert.That(Root.Q("pause-hints").Query<Label>(className: "keycap").ToList().ConvertAll(l => l.text), Is.EqualTo(new[] { "Enter", "Esc" }), "the keys are named in English too");
+                Assert.That(Root.Q<Label>("flashlight").text, Is.EqualTo("Flashlight off"), "a text the HUD writes when the lamp changes");
+                Assert.That(Root.Q<Label>("weapon").text, Is.EqualTo("Kitchen knife"));
+                Assert.That(Root.Q<Label>("game-over-title").text, Is.EqualTo("YOU DIED"));
+
+                yield return Press(Key.RightArrow);
+                Assert.That(GameSettings.Language, Is.EqualTo(Language.French));
+                Assert.That(Root.Q<Label>("option-back").text, Is.EqualTo("Retour"));
+                Assert.That(Root.Q<Label>("flashlight").text, Is.EqualTo("Lampe éteinte"));
+                Assert.That(Root.Q<Label>("weapon").text, Is.EqualTo("Couteau de cuisine"));
+                Assert.That(Root.Q("pause-hints").Query<Label>(className: "keycap").ToList().ConvertAll(l => l.text), Is.EqualTo(new[] { "Entrée", "Échap" }));
+            }
+            finally
+            {
+                GameSettings.Language = saved;
             }
         }
 

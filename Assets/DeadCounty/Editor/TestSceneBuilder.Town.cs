@@ -212,7 +212,7 @@ namespace DeadCounty.EditorTools
             // Living room: the sofa faces the TV against the kitchen wall.
             Rug(f, new Vector3(2.2f, 0f, 2.6f), 0f, new Vector2(3f, 2f), rng.NextDouble() < 0.5 ? "Rug" : "RugBlue");
             Sofa(f, "Canape", At(2f, 1.05f), 180f, 2.2f, fabric);
-            Table(f, "Table_Basse", At(2f, 2.7f), 0f, new Vector3(1.2f, 0.42f, 0.6f), "Furniture");
+            Table(f, "Table_Basse", At(2f, 2.7f), 0f, new Vector3(1.2f, 0.42f, 0.6f));
             Searchable(TvStand(f, At(2f, 5.6f), 0f).gameObject, "Meuble TV", "LT_Salon");
             Armchair(f, At(4.6f, 3.4f), 90f, fabric);
             Bookcase(f, At(0.3f, 2.8f), -90f, rng);
@@ -223,7 +223,7 @@ namespace DeadCounty.EditorTools
             // Kitchen: worktop and fridge along the side wall, a table with its chairs, one knocked over.
             Searchable(Counter(f, At(0.4f, 8.4f), -90f, 3f, true, rng).gameObject, "Placards", "LT_Cuisine_Placard");
             Searchable(Fridge(f, At(0.5f, 6.5f), -90f).gameObject, "Réfrigérateur", "LT_Cuisine_Frigo");
-            Table(f, "Table_Cuisine", At(3.6f, 8f), 0f, new Vector3(1.6f, 0.75f, 0.9f), "Furniture");
+            Table(f, "Table_Cuisine", At(3.6f, 8f), 0f, new Vector3(1.6f, 0.75f, 0.9f));
             Chair(f, At(3.1f, 7.25f), 180f);
             Chair(f, At(4.1f, 7.25f), 180f);
             Chair(f, At(3.1f, 8.75f), 0f);

@@ -1,0 +1,19 @@
+// Suitcase lying flat, 0.7 x 0.45 x 0.22 m, handle toward -Y: a rounded shell split by a dark zip band, corner
+// wheels and a carry handle. The shell colour #7A4C3A is repainted by the scene builder.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "shell", "color": "#7A4C3A"},
+  {"op": "material", "name": "strap", "color": "#2A2A2A"},
+  {"op": "material", "name": "metal", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "shell", "material": "shell",
+   "gen": {"box": {"size": [0.7, 0.45, 0.22], "radius": 0.035, "seg": 4}}, "t": [0, 0, 0.11]},
+  {"op": "create", "id": "zip", "material": "strap", "embed": ["shell"],
+   "gen": {"box": {"size": [0.68, 0.454, 0.02]}}, "t": [0, 0, 0.11]},
+  {"op": "create", "id": "handle", "material": "strap", "embed": ["shell"],
+   "gen": {"tube": {"r": 0.012, "seg": 8, "bend": 0.025, "path": [[-0.08, -0.22, 0.13], [-0.08, -0.255, 0.13], [0.08, -0.255, 0.13], [0.08, -0.22, 0.13]]}}},
+  {"op": "create", "id": "wheels", "material": "strap", "embed": ["shell"],
+   "gen": {"cylinder": {"r": 0.03, "h": 0.03, "seg": 8}}, "r": [0, 90, 0], "mods": [{"array": {"count": 2, "step": [0, 0.36, 0]}}], "t": [0.345, 0, 0.17]},
+  {"op": "create", "id": "rail", "material": "metal", "embed": ["shell"],
+   "gen": {"box": {"size": [0.4, 0.03, 0.012]}}, "mods": [{"array": {"count": 2, "step": [0, 0.2, 0]}}], "t": [0.1, 0, 0.222]}
+]

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DeadCounty.Core;
 using DeadCounty.Perception;
+using DeadCounty.UI;
 using UnityEngine;
 
 namespace DeadCounty.World
@@ -54,8 +55,8 @@ namespace DeadCounty.World
         // Share of the push time already spent forcing the door.
         public float ForceProgress => push / forceTime;
 
-        public override string DisplayName => "Porte";
-        public override string Action => targetAngle == 0f ? "Ouvrir" : "Fermer";
+        public override string DisplayName => Loc.T("Porte");
+        public override string Action => Loc.T(targetAngle == 0f ? "Ouvrir" : "Fermer");
         public override Vector3 PromptPoint => Doorway.Center + Vector3.up * PromptHeight;
 
         void Awake()

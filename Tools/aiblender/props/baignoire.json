@@ -1,0 +1,27 @@
+// Bathtub, 1.7 x 0.8 x 0.6 m, along X with the taps at the -X end: a hollow enamel shell with a rolled rim, a mixer
+// tap and a drain.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "enamel", "color": "#E8E8E4"},
+  {"op": "material", "name": "inside", "color": "#D2D2CC"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "shell", "material": "enamel",
+   "gen": {"loft": {"sections": [
+     {"at": 0, "profile": [[-0.78, -0.34, 0.1], [0.78, -0.34, 0.1], [0.78, 0.34, 0.1], [-0.78, 0.34, 0.1]]},
+     {"at": 0.54, "profile": [[-0.84, -0.39, 0.1], [0.84, -0.39, 0.1], [0.84, 0.39, 0.1], [-0.84, 0.39, 0.1]]},
+     {"at": 0.6, "profile": [[-0.85, -0.4, 0.1], [0.85, -0.4, 0.1], [0.85, 0.4, 0.1], [-0.85, 0.4, 0.1]]}]}},
+   "mods": [{"boolean": {"op": "difference", "with": ["hollow"]}}]},
+  {"op": "create", "id": "hollow",
+   "gen": {"loft": {"sections": [
+     {"at": 0.14, "profile": [[-0.6, -0.24, 0.1], [0.56, -0.24, 0.1], [0.56, 0.24, 0.1], [-0.6, 0.24, 0.1]]},
+     {"at": 0.62, "profile": [[-0.74, -0.33, 0.1], [0.76, -0.33, 0.1], [0.76, 0.33, 0.1], [-0.74, 0.33, 0.1]]}]}}},
+  {"op": "create", "id": "lining", "material": "inside", "embed": ["shell"],
+   "gen": {"box": {"size": [1.12, 0.44, 0.02]}}, "t": [-0.02, 0, 0.15]},
+  {"op": "create", "id": "drain", "material": "steel", "embed": ["lining"],
+   "gen": {"cylinder": {"r": 0.03, "h": 0.01, "seg": 8}}, "t": [-0.45, 0, 0.164]},
+  {"op": "create", "id": "tap", "material": "steel", "embed": ["shell"],
+   "gen": {"tube": {"r": 0.02, "seg": 8, "bend": 0.05, "path": [[-0.8, 0, 0.58], [-0.8, 0, 0.76], [-0.64, 0, 0.76], [-0.64, 0, 0.66]]}}},
+  {"op": "create", "id": "knobs", "material": "steel", "embed": ["shell"],
+   "gen": {"cylinder": {"r": 0.025, "h": 0.06, "seg": 8}}, "mods": [{"array": {"count": 2, "step": [0, 0.26, 0]}}], "t": [-0.8, 0, 0.63]}
+]

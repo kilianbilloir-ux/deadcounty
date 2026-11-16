@@ -1,0 +1,17 @@
+// Litter: a broken bottle lying on its side and shards of glass, 0.2 x 0.16 x 0.05 m, all in mat_Glass.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "mat_Glass", "color": "#34424D"},
+
+  {"op": "create", "id": "bottle", "material": "mat_Glass",
+   "gen": {"revolve": {"axis": "x", "seg": 8, "origin": [-0.1, -0.03, 0.025],
+     "profile": [[0, 0.0], [0.025, 0.0], [0.025, 0.1], [0.011, 0.13], [0.011, 0.17], [0.013, 0.175], [0.0, 0.175]]}},
+   "mods": [{"boolean": {"op": "difference", "with": ["break"]}}]},
+  {"op": "create", "id": "break", "gen": {"box": {"size": [0.06, 0.08, 0.08]}}, "r": [0, 30, 20], "t": [-0.1, -0.03, 0.03]},
+  {"op": "create", "id": "shard_a", "material": "mat_Glass",
+   "gen": {"extrude": {"plane": "xy", "depth": 0.004, "origin": [0, 0, 0.002], "profile": [[-0.09, 0.02], [-0.04, 0.035], [-0.07, 0.07]]}}},
+  {"op": "create", "id": "shard_b", "material": "mat_Glass",
+   "gen": {"extrude": {"plane": "xy", "depth": 0.004, "origin": [0, 0, 0.002], "profile": [[0.02, 0.03], [0.07, 0.05], [0.04, 0.08], [0.01, 0.06]]}}},
+  {"op": "create", "id": "shard_c", "material": "mat_Glass",
+   "gen": {"extrude": {"plane": "xy", "depth": 0.004, "origin": [0, 0, 0.002], "profile": [[0.06, -0.08], [0.1, -0.06], [0.08, -0.04]]}}}
+]

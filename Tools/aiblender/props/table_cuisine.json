@@ -1,0 +1,21 @@
+// Kitchen table, 1.6 x 0.9 x 0.75 m: a plank top on an apron and four tapered legs.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#6A4E3A"},
+  {"op": "material", "name": "wood_light", "color": "#7A5C46"},
+  {"op": "material", "name": "wood_dark", "color": "#553D2C"},
+
+  {"op": "create", "id": "top", "material": "wood",
+   "gen": {"box": {"size": [1.6, 0.9, 0.045]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, 0, 0.7275]},
+  {"op": "create", "id": "plank", "material": "wood_light", "embed": ["top"],
+   "gen": {"box": {"size": [1.56, 0.28, 0.046]}}, "t": [0, 0, 0.7275]},
+  {"op": "create", "id": "apron", "material": "wood_dark", "embed": ["top"],
+   "gen": {"box": {"size": [1.44, 0.74, 0.1]}}, "t": [0, 0, 0.655]},
+  {"op": "create", "id": "leg", "material": "wood_dark", "embed": ["apron", "top"],
+   "gen": {"loft": {"origin": [-0.72, -0.37, 0], "sections": [
+     {"at": 0, "profile": [[-0.025, -0.025], [0.025, -0.025], [0.025, 0.025], [-0.025, 0.025]]},
+     {"at": 0.71, "profile": [[-0.04, -0.04], [0.04, -0.04], [0.04, 0.04], [-0.04, 0.04]]}]}}},
+  {"op": "create", "id": "leg_r", "material": "wood_dark", "mirror_of": "leg", "embed": ["apron", "top"]},
+  {"op": "create", "id": "leg_b", "material": "wood_dark", "mirror_of": {"src": "leg", "plane": {"axis": "y", "at": 0}}, "embed": ["apron", "top"]},
+  {"op": "create", "id": "leg_rb", "material": "wood_dark", "mirror_of": {"src": "leg_r", "plane": {"axis": "y", "at": 0}}, "embed": ["apron", "top"]}
+]

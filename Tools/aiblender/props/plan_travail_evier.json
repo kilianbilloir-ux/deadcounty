@@ -1,0 +1,23 @@
+// Kitchen run with its sink: plan_travail, plus a steel sink set into the worktop at x = 0.6 (a fifth of the
+// length) and its tap.
+[
+  {"op": "use", "file": "plan_travail.json"},
+  {"op": "material", "name": "steel_dark", "color": "#7E8488"},
+
+  {"op": "create", "id": "sink_cut", "gen": {"box": {"size": [0.46, 0.36, 0.2]}}, "t": [0.6, 0, 0.83]},
+  {"op": "create", "id": "basin_cut", "gen": {"box": {"size": [0.42, 0.32, 0.2]}}, "t": [0.6, 0, 0.85]},
+  {"op": "create", "id": "basin", "material": "steel_dark",
+   "gen": {"box": {"size": [0.46, 0.36, 0.17]}}, "t": [0.6, 0, 0.815],
+   "mods": [{"boolean": {"op": "difference", "with": ["basin_cut"]}}]},
+  {"op": "create", "id": "rim", "material": "steel",
+   "gen": {"box": {"size": [0.52, 0.42, 0.008]}}, "t": [0.6, 0, 0.904],
+   "mods": [{"boolean": {"op": "difference", "with": ["basin_cut"]}}]},
+  {"op": "create", "id": "drain", "material": "steel",
+   "gen": {"cylinder": {"r": 0.03, "h": 0.006, "seg": 8}}, "t": [0.6, 0, 0.753]},
+  {"op": "create", "id": "tap_foot", "material": "steel",
+   "gen": {"cylinder": {"r": 0.03, "h": 0.03, "seg": 8}}, "t": [0.6, 0.25, 0.915]},
+  {"op": "create", "id": "tap", "material": "steel", "embed": ["tap_foot"],
+   "gen": {"tube": {"r": 0.014, "seg": 8, "bend": 0.04, "path": [[0.6, 0.25, 0.92], [0.6, 0.25, 1.13], [0.6, 0.07, 1.13], [0.6, 0.07, 1.08]]}}},
+  {"op": "add_mod", "id": "base", "boolean": {"op": "difference", "with": ["sink_cut"]}},
+  {"op": "add_mod", "id": "worktop", "boolean": {"op": "difference", "with": ["sink_cut"]}}
+]

@@ -7,6 +7,11 @@ namespace DeadCounty.EditorTools
     public static partial class TestSceneBuilder
     {
         const float RoadblockZ = 124f;
+        // Litter models in the order of the materials the boxes they replaced drew from: paper, crate, glass, metal,
+        // black plastic.
+        static readonly string[] DebrisModels = { "debris_papier", "debris_planche", "debris_verre", "debris_canette", "debris_plastique" };
+        // Bounding box of every litter model, 0.2 x 0.05 x 0.16 m.
+        const float DebrisVolume = 0.2f * 0.05f * 0.16f;
 
         static void BuildStreetDressing(Transform parent)
         {
@@ -70,8 +75,7 @@ namespace DeadCounty.EditorTools
             collider.size = new Vector3(length, 0.9f, 0.6f);
             for (var row = 0; row < 3; row++)
             for (var x = -length / 2f + 0.3f + (row % 2) * 0.25f; x < length / 2f - 0.25f; x += 0.55f)
-                MeshObject("Sac", wall, SandbagMesh(), new Vector3(x, 0.14f + row * 0.26f, Range(rng, -0.05f, 0.05f)),
-                    Quaternion.Euler(0f, Range(rng, -8f, 8f), 0f), Vector3.one, new[] { "Burlap" }, false);
+                Model("Sac", wall, new Vector3(x, 0.01f + row * 0.25f, Range(rng, -0.05f, 0.05f)), Quaternion.Euler(0f, Range(rng, -8f, 8f), 0f), "sac_sable");
         }
 
         static void TrafficCone(Transform parent, Vector3 pos, bool knocked)
@@ -82,21 +86,13 @@ namespace DeadCounty.EditorTools
                 cone.localRotation = Quaternion.Euler(0f, 40f, 90f);
                 cone.localPosition += Vector3.up * 0.16f;
             }
-            Box("Socle", cone, new Vector3(0f, 0.02f, 0f), new Vector3(0.36f, 0.04f, 0.36f), "Obstacle", solid: false);
-            MeshObject("Cone", cone, ConeMesh(8), new Vector3(0f, 0.04f, 0f), Quaternion.identity, new Vector3(0.14f, 0.6f, 0.14f), new[] { "Obstacle" }, false);
-            Cylinder("Bande", cone, new Vector3(0f, 0.36f, 0f), 0.085f, 0.07f, "SignWhite", solid: false);
+            Model("Modele", cone, Vector3.zero, null, "cone");
         }
 
         static void Suitcase(Transform parent, Vector3 pos, float yaw, string mat, bool open)
         {
             var c = Group(parent, "Valise", pos, yaw);
-            Box("Coque", c, new Vector3(0f, 0.12f, 0f), new Vector3(0.7f, 0.22f, 0.45f), mat, solid: false);
-            Box("Poignee", c, new Vector3(0f, 0.14f, -0.25f), new Vector3(0.18f, 0.04f, 0.03f), "Strap", solid: false);
-            if (!open) return;
-            // Lid thrown back and clothes spilling out.
-            Box("Couvercle", c, new Vector3(0f, 0.28f, 0.42f), new Vector3(0.7f, 0.08f, 0.45f), mat, Quaternion.Euler(-70f, 0f, 0f), solid: false);
-            Box("Vetement", c, new Vector3(0.1f, 0.25f, 0f), new Vector3(0.5f, 0.04f, 0.3f), "Linen", Quaternion.Euler(0f, 15f, 0f), solid: false);
-            Box("Vetement", c, new Vector3(-0.45f, 0.02f, -0.35f), new Vector3(0.4f, 0.03f, 0.5f), "ZombieShirtBlue", Quaternion.Euler(0f, -30f, 0f), solid: false);
+            Model("Modele", c, Vector3.zero, null, open ? "valise_ouverte" : "valise", ("#7A4C3A", mat));
         }
 
         static void Papers(Transform parent, Vector3 center, Vector2 area, System.Random rng, int count)
@@ -111,15 +107,15 @@ namespace DeadCounty.EditorTools
         {
             var pile = Group(parent, "Sacs_Poubelle", pos);
             for (var i = 0; i < count; i++)
-                MeshObject("Sac", pile, TrashBagMesh(), new Vector3(Range(rng, -0.5f, 0.5f), 0f, Range(rng, -0.4f, 0.4f)),
-                    Quaternion.Euler(0f, Range(rng, 0f, 360f), Range(rng, -10f, 10f)), Vector3.one * Range(rng, 0.85f, 1.15f), new[] { "CarBlack" }, false);
+                Model("Sac", pile, new Vector3(Range(rng, -0.5f, 0.5f), 0f, Range(rng, -0.4f, 0.4f)),
+                    Quaternion.Euler(0f, Range(rng, 0f, 360f), Range(rng, -10f, 10f)), "sac_poubelle").transform.localScale = Vector3.one * Range(rng, 0.85f, 1.15f);
         }
 
         // On its side, lid off, rubbish spilt on the pavement.
         static void TippedBin(Transform parent, Vector3 pos, System.Random rng)
         {
             var yaw = Range(rng, 0f, 360f);
-            Cylinder("Poubelle_Renversee", parent, pos + Vector3.up * 0.3f, 0.3f, 1f, "CarGreen", Quaternion.Euler(0f, yaw, 90f), solid: false);
+            Model("Poubelle_Renversee", parent, pos, Quaternion.Euler(0f, yaw, 0f), "poubelle_renversee");
             Debris(parent, pos + Quaternion.Euler(0f, yaw, 0f) * new Vector3(0.9f, 0f, 0f), rng, 5);
         }
 
@@ -128,10 +124,13 @@ namespace DeadCounty.EditorTools
             var pile = Group(parent, "Debris", pos);
             for (var i = 0; i < count; i++)
             {
+                // Same draws, in the same order, as the boxes these pieces replaced, so the rest of the street keeps its
+                // layout: each piece takes the volume of its box.
                 var size = new Vector3(Range(rng, 0.08f, 0.3f), Range(rng, 0.02f, 0.08f), Range(rng, 0.08f, 0.25f));
-                string[] mats = { "Paper", "Crate", "Glass", "Metal", "CarBlack" };
-                Box("Dechet", pile, new Vector3(Range(rng, -0.7f, 0.7f), size.y / 2f + 0.02f, Range(rng, -0.6f, 0.6f)), size, mats[rng.Next(mats.Length)],
-                    Quaternion.Euler(0f, Range(rng, 0f, 360f), 0f), solid: false);
+                var position = new Vector3(Range(rng, -0.7f, 0.7f), 0.02f, Range(rng, -0.6f, 0.6f));
+                var model = DebrisModels[rng.Next(DebrisModels.Length)];
+                Model("Dechet", pile, position, Quaternion.Euler(0f, Range(rng, 0f, 360f), 0f), model).transform.localScale
+                    = Vector3.one * Mathf.Pow(size.x * size.y * size.z / DebrisVolume, 1f / 3f);
             }
         }
 
@@ -150,12 +149,7 @@ namespace DeadCounty.EditorTools
             var bike = Group(parent, "Velo", pos, yaw);
             bike.localRotation *= Quaternion.Euler(80f, 0f, 0f);
             bike.localPosition += Vector3.up * 0.05f;
-            foreach (var x in new[] { -0.52f, 0.52f })
-                Cylinder("Roue", bike, new Vector3(x, 0.34f, 0f), 0.34f, 0.04f, "Tire", Quaternion.Euler(90f, 0f, 0f), solid: false);
-            Box("Cadre", bike, new Vector3(0f, 0.5f, 0f), new Vector3(0.9f, 0.04f, 0.04f), "SignRed", Quaternion.Euler(0f, 0f, -12f), solid: false);
-            Box("Tube_Selle", bike, new Vector3(-0.18f, 0.55f, 0f), new Vector3(0.04f, 0.45f, 0.04f), "SignRed", Quaternion.Euler(0f, 0f, 15f), solid: false);
-            Box("Selle", bike, new Vector3(-0.24f, 0.8f, 0f), new Vector3(0.22f, 0.05f, 0.1f), "CarBlack", solid: false);
-            Box("Guidon", bike, new Vector3(0.42f, 0.82f, 0f), new Vector3(0.04f, 0.04f, 0.5f), "Metal", solid: false);
+            Model("Modele", bike, Vector3.zero, null, "velo");
         }
 
         static void ShoppingCart(Transform parent, Vector3 pos, float yaw, bool tipped)
@@ -166,18 +160,7 @@ namespace DeadCounty.EditorTools
                 cart.localRotation *= Quaternion.Euler(0f, 0f, 90f);
                 cart.localPosition += Vector3.up * 0.3f;
             }
-            const float length = 0.9f, width = 0.55f;
-            // Wire basket: a floor and four thin walls.
-            Box("Fond", cart, new Vector3(0f, 0.45f, 0f), new Vector3(length, 0.02f, width), "MetalLight", solid: false);
-            Box("Paroi", cart, new Vector3(0f, 0.7f, width / 2f), new Vector3(length, 0.5f, 0.015f), "MetalLight", solid: false);
-            Box("Paroi", cart, new Vector3(0f, 0.7f, -width / 2f), new Vector3(length, 0.5f, 0.015f), "MetalLight", solid: false);
-            Box("Paroi", cart, new Vector3(length / 2f, 0.7f, 0f), new Vector3(0.015f, 0.5f, width), "MetalLight", solid: false);
-            Box("Paroi", cart, new Vector3(-length / 2f, 0.7f, 0f), new Vector3(0.015f, 0.5f, width), "MetalLight", solid: false);
-            Box("Poignee", cart, new Vector3(-length / 2f - 0.1f, 1f, 0f), new Vector3(0.04f, 0.04f, width), "SignRed", solid: false);
-            Box("Chassis", cart, new Vector3(0f, 0.2f, 0f), new Vector3(length, 0.03f, width - 0.1f), "Metal", solid: false);
-            foreach (var x in new[] { -0.38f, 0.38f })
-            foreach (var z in new[] { -0.2f, 0.2f })
-                Cylinder("Roulette", cart, new Vector3(x, 0.06f, z), 0.06f, 0.03f, "Tire", Quaternion.Euler(90f, 0f, 0f), solid: false);
+            Model("Modele", cart, Vector3.zero, null, "caddie");
         }
     }
 }

@@ -8,7 +8,8 @@ namespace DeadCounty.Audio
     public enum Surface { Grass, Dirt, Gravel, Asphalt, Concrete, Wood, Metal }
 
     // What is underfoot, read from the material of the collider below: the builder names its materials
-    // M_Proto_<palette key>, so the palette key decides the surface.
+    // M_Proto_<palette key>, so the palette key decides the surface. The block around a model has no material and
+    // says it with a GroundSurfaceTag.
     public static class GroundSurface
     {
         const float ProbeHeight = 0.5f;
@@ -23,6 +24,7 @@ namespace DeadCounty.Audio
         {
             if (!Physics.Raycast(position + Vector3.up * ProbeHeight, Vector3.down, out var hit, ProbeHeight + ProbeDepth, Mask, QueryTriggerInteraction.Ignore))
                 return Fallback;
+            if (hit.collider.TryGetComponent<GroundSurfaceTag>(out var tag)) return tag.surface;
             if (!hit.collider.TryGetComponent<Renderer>(out var renderer)) return Fallback;
             var material = renderer.sharedMaterial;
             if (material == null) return Fallback;

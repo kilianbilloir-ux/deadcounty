@@ -183,6 +183,8 @@ namespace DeadCounty.EditorTools
             added |= AddMissing<PlayerSleep>(player);
             added |= AddMissing<PlayerLoadout>(player);
             added |= AddMissing<PlayerCombat>(player);
+            added |= AddMissing<PlayerRest>(player);
+            added |= SlowStamina(player);
             added |= AddMissing<PlayerPoseDriver>(player);
             added |= AddMissing<PlayerDeathFlow>(rig);
             added |= AddMissing<PlayerHudController>(rig);
@@ -355,6 +357,23 @@ namespace DeadCounty.EditorTools
             so.FindProperty("lensLit").objectReferenceValue = Mat("LampGlow");
             so.FindProperty("lensDark").objectReferenceValue = Mat("Glass");
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // A rig saved before stamina came back slowly holds the old rates, under which standing still beats sitting
+        // down: it takes the current defaults once. Rates tuned in the Inspector since are kept.
+        static bool SlowStamina(GameObject player)
+        {
+            var so = new SerializedObject(player.GetComponent<PlayerStamina>());
+            var settings = so.FindProperty("settings");
+            if (settings.FindPropertyRelative("IdleRegenPerSecond").floatValue < settings.FindPropertyRelative("RestRegenPerSecond").floatValue) return false;
+            var defaults = StaminaSettings.Default;
+            settings.FindPropertyRelative("RegenDelay").floatValue = defaults.RegenDelay;
+            settings.FindPropertyRelative("IdleRegenPerSecond").floatValue = defaults.IdleRegenPerSecond;
+            settings.FindPropertyRelative("WalkRegenPerSecond").floatValue = defaults.WalkRegenPerSecond;
+            settings.FindPropertyRelative("RestRegenPerSecond").floatValue = defaults.RestRegenPerSecond;
+            settings.FindPropertyRelative("ExhaustionRecoverThreshold").floatValue = defaults.ExhaustionRecoverThreshold;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return true;
         }
 
         static bool AddMissing<T>(GameObject target) where T : Component

@@ -1,0 +1,38 @@
+// Ice merchandiser, 1.6 x 0.8 x 1.1 m, doors at the front (-Y): a white insulated cabinet on a dark plinth, two
+// doors with bar handles, a blue band lettered ICE, a vent grille on the right side.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "white", "color": "#E6E6E0"},
+  {"op": "material", "name": "white_shade", "color": "#CFCFC8"},
+  {"op": "material", "name": "blue", "color": "#2E4766"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+  {"op": "material", "name": "dark", "color": "#33373B"},
+
+  {"op": "create", "id": "plinth", "material": "dark",
+   "gen": {"box": {"size": [1.54, 0.72, 0.08]}}, "t": [0, 0.02, 0.04]},
+  {"op": "create", "id": "cabinet", "material": "white_shade", "embed": ["plinth"],
+   "gen": {"box": {"size": [1.6, 0.76, 1.0]}}, "t": [0, 0.02, 0.57]},
+  {"op": "create", "id": "lid", "material": "white", "embed": ["cabinet"],
+   "gen": {"box": {"size": [1.6, 0.8, 0.05]}}, "mods": [{"bevel": {"width": "1.5cm"}}], "t": [0, 0, 1.075]},
+  {"op": "create", "id": "doors", "material": "white", "embed": ["cabinet"],
+   "gen": {"box": {"size": [0.775, 0.04, 0.9]}}, "mods": [{"bevel": {"width": "1.5cm"}}, {"array": {"count": 2, "step": [0.79, 0, 0]}}],
+   "t": [0, -0.37, 0.57]},
+  {"op": "create", "id": "seam", "material": "dark", "embed": ["cabinet", "doors"],
+   "gen": {"box": {"size": [0.016, 0.03, 0.9]}}, "t": [0, -0.365, 0.57]},
+  {"op": "create", "id": "band", "material": "blue", "embed": ["doors"],
+   "gen": {"box": {"size": [1.4, 0.01, 0.22]}}, "t": [0, -0.393, 0.78]},
+  {"op": "create", "id": "letter_i", "material": "white", "embed": ["band"],
+   "gen": {"box": {"size": [0.035, 0.008, 0.14]}}, "t": [-0.16, -0.399, 0.78]},
+  {"op": "create", "id": "letter_c", "material": "white", "embed": ["band"],
+   "gen": {"extrude": {"plane": "xz", "depth": 0.008, "origin": [0, -0.399, 0],
+     "profile": [[-0.05, 0.71], [0.05, 0.71], [0.05, 0.745], [-0.015, 0.745], [-0.015, 0.815], [0.05, 0.815], [0.05, 0.85], [-0.05, 0.85]]}}},
+  {"op": "create", "id": "letter_e", "material": "white", "embed": ["band"],
+   "gen": {"extrude": {"plane": "xz", "depth": 0.008, "origin": [0, -0.399, 0],
+     "profile": [[0.11, 0.71], [0.21, 0.71], [0.21, 0.745], [0.145, 0.745], [0.145, 0.765], [0.19, 0.765], [0.19, 0.795],
+                 [0.145, 0.795], [0.145, 0.815], [0.21, 0.815], [0.21, 0.85], [0.11, 0.85]]}}},
+  {"op": "create", "id": "handles", "material": "steel", "embed": ["doors"],
+   "gen": {"tube": {"r": 0.014, "seg": 8, "bend": 0.03, "path": [[-0.1, -0.385, 0.34], [-0.1, -0.43, 0.34], [-0.1, -0.43, 0.6], [-0.1, -0.385, 0.6]]}},
+   "mods": [{"array": {"count": 2, "step": [0.2, 0, 0]}}]},
+  {"op": "create", "id": "vent", "material": "dark", "embed": ["cabinet"],
+   "gen": {"box": {"size": [0.01, 0.5, 0.03]}}, "mods": [{"array": {"count": 4, "step": [0, 0, 0.06]}}], "t": [0.8, 0, 0.25]}
+]

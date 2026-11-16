@@ -1,0 +1,32 @@
+// Church pew, 2.6 x 0.5 x 0.9 m, facing +Y: a seat and a tall back between two carved ends, a hymnal rack on the
+// back for the row behind, a centre leg.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#7A5A3C"},
+  {"op": "material", "name": "wood_light", "color": "#8C6A48"},
+  {"op": "material", "name": "wood_dark", "color": "#4A3828"},
+  {"op": "material", "name": "hymnal", "color": "#6E3530"},
+
+  {"op": "create", "id": "end_l", "material": "wood_dark",
+   "gen": {"extrude": {"plane": "yz", "depth": 0.06, "origin": [-1.27, 0, 0],
+     "profile": [[-0.25, 0], [0.25, 0], [0.25, 0.04], [0.21, 0.08], [0.21, 0.5], [0.25, 0.56], [0.24, 0.62], [0.1, 0.64],
+                 [-0.02, 0.72], [-0.12, 0.88], [-0.18, 0.9], [-0.25, 0.9]]}}},
+  {"op": "create", "id": "end_r", "material": "wood_dark", "mirror_of": "end_l"},
+  {"op": "create", "id": "seat", "material": "wood_light", "embed": ["end_l", "end_r"],
+   "gen": {"box": {"size": [2.5, 0.42, 0.06]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, 0.03, 0.44]},
+  {"op": "create", "id": "apron", "material": "wood", "embed": ["seat", "end_l", "end_r"],
+   "gen": {"box": {"size": [2.5, 0.03, 0.1]}}, "t": [0, 0.22, 0.37]},
+  {"op": "create", "id": "leg", "material": "wood", "embed": ["seat", "apron"],
+   "gen": {"box": {"size": [0.06, 0.36, 0.41]}}, "t": [0, 0.02, 0.205]},
+  {"op": "create", "id": "back", "material": "wood", "embed": ["seat", "end_l", "end_r"],
+   "gen": {"box": {"size": [2.5, 0.05, 0.41]}}, "t": [0, -0.2, 0.675]},
+  {"op": "create", "id": "back_rail", "material": "wood_light", "embed": ["back", "end_l", "end_r"],
+   "gen": {"box": {"size": [2.5, 0.07, 0.04]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, -0.2, 0.88]},
+  {"op": "create", "id": "rack", "material": "wood_dark", "embed": ["back", "end_l", "end_r"],
+   "gen": {"box": {"size": [2.5, 0.12, 0.02]}}, "t": [0, -0.275, 0.62]},
+  {"op": "create", "id": "rack_lip", "material": "wood_dark", "embed": ["rack", "end_l", "end_r"],
+   "gen": {"box": {"size": [2.5, 0.02, 0.1]}}, "t": [0, -0.325, 0.66]},
+  {"op": "create", "id": "hymnals", "material": "hymnal", "embed": ["rack", "back", "rack_lip"],
+   "gen": {"box": {"size": [0.16, 0.035, 0.22]}}, "r": [8, 0, 0],
+   "mods": [{"array": {"count": 3, "step": [0.75, 0, 0]}}], "t": [-0.2, -0.28, 0.73]}
+]

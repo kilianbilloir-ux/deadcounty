@@ -1,0 +1,13 @@
+// Wooden pallet, 1.2 x 0.7 x 0.12 m: five top boards across three stringers, three bottom boards.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "wood", "color": "#7A5A3C"},
+  {"op": "material", "name": "wood_light", "color": "#8C6A48"},
+
+  {"op": "create", "id": "bottom", "material": "wood",
+   "gen": {"box": {"size": [0.14, 0.7, 0.022]}}, "mods": [{"array": {"count": 3, "step": [0.53, 0, 0]}}], "t": [0, 0, 0.011]},
+  {"op": "create", "id": "stringers", "material": "wood", "embed": ["bottom"],
+   "gen": {"box": {"size": [1.2, 0.08, 0.078]}}, "mods": [{"array": {"count": 3, "step": [0, 0.31, 0]}}], "t": [0, 0, 0.06]},
+  {"op": "create", "id": "top", "material": "wood_light", "embed": ["stringers"],
+   "gen": {"box": {"size": [0.15, 0.7, 0.022]}}, "mods": [{"array": {"count": 5, "step": [0.2625, 0, 0]}}], "t": [0, 0, 0.109]}
+]
