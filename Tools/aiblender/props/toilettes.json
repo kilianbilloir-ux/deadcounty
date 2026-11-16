@@ -1,0 +1,27 @@
+// Toilet, 0.45 x 0.66 x 0.8 m, bowl at the front (-Y): a pedestal, an oval bowl with its seat and lid, a cistern
+// with a flush lever.
+[
+  {"op": "set_look", "preset": "polygon"},
+  {"op": "material", "name": "porcelain", "color": "#E8E8E4"},
+  {"op": "material", "name": "shade", "color": "#D2D2CC"},
+  {"op": "material", "name": "seat", "color": "#B8B2A4"},
+  {"op": "material", "name": "steel", "color": "#9AA0A4"},
+
+  {"op": "create", "id": "pedestal", "material": "shade",
+   "gen": {"loft": {"sections": [
+     {"at": 0, "profile": [[-0.13, -0.2, 0.05], [0.13, -0.2, 0.05], [0.13, 0.2, 0.05], [-0.13, 0.2, 0.05]]},
+     {"at": 0.3, "profile": [[-0.11, -0.2, 0.05], [0.11, -0.2, 0.05], [0.11, 0.18, 0.05], [-0.11, 0.18, 0.05]]},
+     {"at": 0.38, "profile": [[-0.19, -0.3, 0.12], [0.19, -0.3, 0.12], [0.19, 0.17, 0.05], [-0.19, 0.17, 0.05]]}]}}},
+  {"op": "create", "id": "bowl", "material": "porcelain", "embed": ["pedestal"],
+   "gen": {"extrude": {"plane": "xy", "depth": 0.06, "origin": [0, 0, 0.4],
+     "profile": [[-0.2, -0.31, 0.14], [0.2, -0.31, 0.14], [0.2, 0.17, 0.04], [-0.2, 0.17, 0.04]], "seg": 8}}},
+  {"op": "create", "id": "lid", "material": "seat", "embed": ["bowl"],
+   "gen": {"extrude": {"plane": "xy", "depth": 0.025, "origin": [0, 0, 0.44],
+     "profile": [[-0.19, -0.3, 0.13], [0.19, -0.3, 0.13], [0.19, 0.14, 0.03], [-0.19, 0.14, 0.03]], "seg": 8}}},
+  {"op": "create", "id": "cistern", "material": "porcelain", "embed": ["bowl", "pedestal"],
+   "gen": {"box": {"size": [0.42, 0.17, 0.38]}}, "mods": [{"bevel": {"width": "2cm"}}], "t": [0, 0.245, 0.58]},
+  {"op": "create", "id": "cistern_lid", "material": "shade", "embed": ["cistern"],
+   "gen": {"box": {"size": [0.44, 0.19, 0.04]}}, "mods": [{"bevel": {"width": "1cm"}}], "t": [0, 0.245, 0.78]},
+  {"op": "create", "id": "lever", "material": "steel", "embed": ["cistern"],
+   "gen": {"box": {"size": [0.08, 0.02, 0.02]}}, "t": [-0.13, 0.152, 0.7]}
+]

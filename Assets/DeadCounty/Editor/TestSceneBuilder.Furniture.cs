@@ -58,23 +58,18 @@ namespace DeadCounty.EditorTools
         {
             const float depth = 0.9f;
             var p = Piece(parent, name, pos, yaw, new Vector3(width, 0.85f, depth));
-            Legs(p, width - 0.1f, depth - 0.1f, 0.1f, 0.05f, "WoodDark");
-            Bit(p, "Assise", new Vector3(0f, 0.27f, 0.02f), new Vector3(width - 0.3f, 0.34f, depth - 0.06f), fabric);
-            Bit(p, "Dossier", new Vector3(0f, 0.6f, depth / 2f - 0.11f), new Vector3(width, 0.5f, 0.22f), fabric);
-            foreach (var x in new[] { -1f, 1f })
-                Bit(p, "Accoudoir", new Vector3(x * (width / 2f - 0.09f), 0.4f, 0f), new Vector3(0.18f, 0.6f, depth), fabric);
-            var seats = Mathf.Max(1, Mathf.RoundToInt((width - 0.3f) / 0.6f));
-            var seatWidth = (width - 0.36f) / seats;
-            for (var i = 0; i < seats; i++)
-                Bit(p, "Coussin", new Vector3(-width / 2f + 0.18f + seatWidth * (i + 0.5f), 0.5f, -0.05f), new Vector3(seatWidth - 0.03f, 0.12f, depth - 0.3f), fabric);
+            // One model per size: the armchair, or the three-seater whatever the width asked for.
+            Model("Modele", p, Vector3.zero, null, width < 1.5f ? "fauteuil" : "canape", ("#5E6B7A", fabric), ("#6C7A8A", Shade(fabric, 0.12f)));
             return p;
         }
 
-        static Transform Table(Transform parent, string name, Vector3 pos, float yaw, Vector3 size, string mat)
+        static Transform Table(Transform parent, string name, Vector3 pos, float yaw, Vector3 size)
         {
             var p = Piece(parent, name, pos, yaw, size);
-            Bit(p, "Plateau", new Vector3(0f, size.y - 0.025f, 0f), new Vector3(size.x, 0.05f, size.z), mat);
-            Legs(p, size.x - 0.06f, size.z - 0.06f, size.y - 0.05f, 0.06f, mat);
+            // Two models, stretched to the size asked for: the low one for coffee tables.
+            var model = size.y < 0.6f ? "table_basse" : "table_cuisine";
+            var made = ModelMesh(model).Mesh.bounds.size;
+            Model("Modele", p, Vector3.zero, null, model).transform.localScale = new Vector3(size.x / made.x, size.y / made.y, size.z / made.z);
             return p;
         }
 
@@ -83,9 +78,7 @@ namespace DeadCounty.EditorTools
         {
             var p = Piece(parent, "Chaise", pos, yaw, new Vector3(0.45f, 0.9f, 0.45f), solid: false);
             if (tipped.HasValue) p.localRotation *= tipped.Value;
-            Legs(p, 0.42f, 0.42f, 0.45f, 0.04f, "Wood");
-            Bit(p, "Assise", new Vector3(0f, 0.47f, 0f), new Vector3(0.45f, 0.04f, 0.45f), "Wood");
-            Bit(p, "Dossier", new Vector3(0f, 0.72f, 0.2f), new Vector3(0.42f, 0.45f, 0.04f), "Wood");
+            Model("Modele", p, Vector3.zero, null, "chaise");
             return p;
         }
 
@@ -164,10 +157,7 @@ namespace DeadCounty.EditorTools
         static Transform Fridge(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Frigo", pos, yaw, new Vector3(0.7f, 1.8f, 0.7f));
-            Bit(p, "Caisse", new Vector3(0f, 0.9f, 0f), new Vector3(0.7f, 1.8f, 0.7f), "Porcelain");
-            Bit(p, "Joint", new Vector3(0f, 1.22f, -0.355f), new Vector3(0.68f, 0.015f, 0.01f), "MetalLight");
-            Bit(p, "Poignee_Haut", new Vector3(0.28f, 1.45f, -0.37f), new Vector3(0.03f, 0.3f, 0.03f), "MetalLight");
-            Bit(p, "Poignee_Bas", new Vector3(0.28f, 0.95f, -0.37f), new Vector3(0.03f, 0.3f, 0.03f), "MetalLight");
+            Model("Modele", p, Vector3.zero, null, "frigo");
             return p;
         }
 
@@ -175,14 +165,7 @@ namespace DeadCounty.EditorTools
         {
             const float width = 1.6f, length = 2.1f;
             var p = Piece(parent, "Lit", pos, yaw, new Vector3(width, 0.62f, length));
-            Bit(p, "Cadre", new Vector3(0f, 0.2f, 0f), new Vector3(width, 0.2f, length), "Furniture");
-            Legs(p, width, length, 0.1f, 0.06f, "Furniture");
-            Bit(p, "Tete", new Vector3(0f, 0.55f, length / 2f - 0.04f), new Vector3(width + 0.06f, 1.1f, 0.08f), "Furniture");
-            Bit(p, "Pied_Lit", new Vector3(0f, 0.38f, -length / 2f + 0.03f), new Vector3(width + 0.04f, 0.56f, 0.06f), "Furniture");
-            Bit(p, "Matelas", new Vector3(0f, 0.4f, 0.02f), new Vector3(width - 0.08f, 0.2f, length - 0.14f), "Mattress");
-            Bit(p, "Couverture", new Vector3(0f, 0.515f, -0.28f), new Vector3(width - 0.02f, 0.05f, 1.3f), blanket, Quaternion.Euler(0f, 4f, 0f));
-            foreach (var x in new[] { -0.38f, 0.38f })
-                Bit(p, "Oreiller", new Vector3(x, 0.55f, length / 2f - 0.32f), new Vector3(0.6f, 0.12f, 0.36f), "Linen", Quaternion.Euler(0f, x * 10f, 0f));
+            Model("Modele", p, Vector3.zero, null, "lit", ("#6E5A48", blanket), ("#5C4A3A", Shade(blanket, -0.15f)));
             return p;
         }
 
@@ -304,20 +287,14 @@ namespace DeadCounty.EditorTools
         {
             const float length = 1.7f, width = 0.8f, height = 0.6f;
             var p = Piece(parent, "Baignoire", pos, yaw, new Vector3(length, height, width));
-            Bit(p, "Coque", new Vector3(0f, height / 2f, 0f), new Vector3(length, height, width), "Porcelain");
-            // A darker inset reads as the hollow seen from above.
-            Bit(p, "Creux", new Vector3(0.05f, height - 0.005f, 0f), new Vector3(length - 0.25f, 0.02f, width - 0.16f), "MetalLight");
-            Bit(p, "Robinet", new Vector3(-length / 2f + 0.08f, height + 0.08f, 0f), new Vector3(0.05f, 0.16f, 0.05f), "MetalLight");
+            Model("Modele", p, Vector3.zero, null, "baignoire");
             return p;
         }
 
         static Transform Toilet(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Toilettes", pos, yaw, new Vector3(0.45f, 0.8f, 0.65f));
-            Bit(p, "Pied", new Vector3(0f, 0.18f, 0.02f), new Vector3(0.28f, 0.36f, 0.36f), "Porcelain");
-            Bit(p, "Cuvette", new Vector3(0f, 0.38f, -0.06f), new Vector3(0.4f, 0.08f, 0.48f), "Porcelain");
-            Bit(p, "Abattant", new Vector3(0f, 0.43f, -0.06f), new Vector3(0.38f, 0.02f, 0.44f), "Linen");
-            Bit(p, "Reservoir", new Vector3(0f, 0.6f, 0.24f), new Vector3(0.42f, 0.38f, 0.16f), "Porcelain");
+            Model("Modele", p, Vector3.zero, null, "toilettes");
             return p;
         }
 

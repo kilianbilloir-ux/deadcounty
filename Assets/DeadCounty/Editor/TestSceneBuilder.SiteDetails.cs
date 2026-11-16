@@ -10,21 +10,7 @@ namespace DeadCounty.EditorTools
         static void FuelPump(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Pompe", pos, yaw, new Vector3(0.5f, 1.6f, 0.7f));
-            Bit(p, "Corps", new Vector3(0f, 0.6f, 0f), new Vector3(0.48f, 1.2f, 0.66f), "SignRed");
-            Bit(p, "Tete", new Vector3(0f, 1.4f, 0f), new Vector3(0.52f, 0.4f, 0.7f), "SignWhite");
-            Bit(p, "Bande", new Vector3(0f, 1.58f, 0f), new Vector3(0.54f, 0.05f, 0.72f), "SignRed");
-            foreach (var side in new[] { -1f, 1f })
-            {
-                var face = side * 0.355f;
-                Bit(p, "Ecran", new Vector3(0f, 1.44f, face), new Vector3(0.32f, 0.16f, 0.01f), "CarBlack");
-                for (var i = 0; i < 3; i++)
-                    Bit(p, "Bouton", new Vector3(-0.12f + i * 0.12f, 1.28f, face), new Vector3(0.07f, 0.04f, 0.015f), "SignYellow");
-                Bit(p, "Support", new Vector3(0.14f, 1f, face + side * 0.03f), new Vector3(0.1f, 0.14f, 0.06f), "CarBlack");
-                Bit(p, "Pistolet", new Vector3(0.14f, 1.02f, face + side * 0.08f), new Vector3(0.05f, 0.18f, 0.05f), "CarBlack", Quaternion.Euler(side * 20f, 0f, 0f));
-                // Hose hanging from the nozzle in a loop and back into the body.
-                Bit(p, "Tuyau", new Vector3(0.14f, 0.7f, face + side * 0.1f), new Vector3(0.035f, 0.5f, 0.035f), "Strap");
-                Bit(p, "Tuyau", new Vector3(0.0f, 0.45f, face + side * 0.08f), new Vector3(0.3f, 0.035f, 0.035f), "Strap", Quaternion.Euler(0f, 0f, 20f));
-            }
+            Model("Modele", p, Vector3.zero, null, "pompe");
         }
 
         // Fridges with open-framed doors: drinks on wire shelves, seen through the frames (local front -Z).
@@ -192,22 +178,14 @@ namespace DeadCounty.EditorTools
         static void Hydrant(Transform parent, Vector3 pos)
         {
             var h = Group(parent, "Borne_Incendie", pos);
-            Cylinder("Corps", h, new Vector3(0f, 0.28f, 0f), 0.12f, 0.56f, "SignRed");
-            Cylinder("Chapeau", h, new Vector3(0f, 0.6f, 0f), 0.1f, 0.08f, "SignRed", solid: false);
-            Cylinder("Ecrou", h, new Vector3(0f, 0.67f, 0f), 0.03f, 0.05f, "MetalLight", solid: false);
-            Cylinder("Sortie", h, new Vector3(0f, 0.38f, 0f), 0.05f, 0.34f, "SignRed", Quaternion.Euler(0f, 0f, 90f), solid: false);
-            Cylinder("Sortie", h, new Vector3(0f, 0.38f, 0f), 0.06f, 0.3f, "MetalLight", Quaternion.Euler(90f, 0f, 0f), solid: false);
+            Model("Modele", h, Vector3.zero, null, "borne_incendie");
+            Solid(h, new Vector3(0f, 0.28f, 0f), new Vector3(0.24f, 0.56f, 0.24f));
         }
 
         static void Bench(Transform parent, Vector3 pos, float yaw)
         {
             var p = Piece(parent, "Banc_Public", pos, yaw, new Vector3(1.6f, 0.85f, 0.5f));
-            for (var i = 0; i < 3; i++)
-                Bit(p, "Latte", new Vector3(0f, 0.45f, -0.15f + i * 0.13f), new Vector3(1.6f, 0.04f, 0.1f), "Wood");
-            for (var i = 0; i < 2; i++)
-                Bit(p, "Dossier", new Vector3(0f, 0.62f + i * 0.14f, 0.24f), new Vector3(1.6f, 0.1f, 0.03f), "Wood", Quaternion.Euler(-10f, 0f, 0f));
-            foreach (var x in new[] { -0.7f, 0.7f })
-                Bit(p, "Pied", new Vector3(x, 0.38f, 0.02f), new Vector3(0.05f, 0.76f, 0.5f), "Metal");
+            Model("Modele", p, Vector3.zero, null, "banc");
         }
 
         static void NewsBox(Transform parent, Vector3 pos, float yaw, string mat)

@@ -4,35 +4,16 @@ namespace DeadCounty.EditorTools
 {
     public static partial class TestSceneBuilder
     {
-        // Vehicles point along their local +X. An abandoned car may keep its driver door open.
+        // Vehicles point along their local +X. An abandoned car may keep its driver door open; a burnt one is the same
+        // model all in soot, sunk on its rims.
         static Transform Car(Transform parent, string name, Vector3 pos, float yaw, string paint, bool burnt = false, float tilt = 0f, bool doorOpen = false)
         {
             var car = Group(parent, name, pos, yaw);
             car.localRotation *= Quaternion.Euler(tilt, 0f, tilt * 0.5f);
             var y = burnt ? -0.2f : 0f;
-            var trim = burnt ? "CarBurnt" : "Metal";
             var dark = burnt ? "CarBurnt" : "CarBlack";
-            Box("Carrosserie", car, new Vector3(0f, 0.7f + y, 0f), new Vector3(4.5f, 0.75f, 1.85f), paint);
-            Box("Habitacle", car, new Vector3(-0.25f, 1.38f + y, 0f), new Vector3(2.3f, 0.62f, 1.62f), burnt ? "CarBurnt" : "Glass", solid: false);
-            Box("Toit", car, new Vector3(-0.25f, 1.71f + y, 0f), new Vector3(2.1f, 0.06f, 1.64f), paint, solid: false);
-            foreach (var x in new[] { 0.86f, -0.25f, -1.36f })
-            foreach (var z in new[] { -0.8f, 0.8f })
-                Box("Montant", car, new Vector3(x, 1.38f + y, z), new Vector3(0.1f, 0.62f, 0.04f), paint, solid: false);
-            Box("Pare_Choc", car, new Vector3(2.28f, 0.45f + y, 0f), new Vector3(0.12f, 0.25f, 1.86f), trim, solid: false);
-            Box("Pare_Choc", car, new Vector3(-2.28f, 0.45f + y, 0f), new Vector3(0.12f, 0.25f, 1.86f), trim, solid: false);
-            Box("Calandre", car, new Vector3(2.26f, 0.68f + y, 0f), new Vector3(0.04f, 0.2f, 0.9f), dark, solid: false);
-            foreach (var x in new[] { -2.35f, 2.35f })
-                Box("Plaque", car, new Vector3(x, 0.47f + y, 0f), new Vector3(0.02f, 0.13f, 0.36f), burnt ? "CarBurnt" : "SignWhite", solid: false);
-            foreach (var z in new[] { -1f, 1f })
-            {
-                Box("Phare", car, new Vector3(2.26f, 0.78f + y, z * 0.62f), new Vector3(0.06f, 0.14f, 0.36f), burnt ? "CarBurnt" : "SignWhite", solid: false);
-                Box("Feu", car, new Vector3(-2.26f, 0.8f + y, z * 0.62f), new Vector3(0.06f, 0.14f, 0.3f), burnt ? "CarBurnt" : "SignRed", solid: false);
-                foreach (var x in new[] { 0.85f, -0.3f, -1.4f })
-                    Box("Joint_Porte", car, new Vector3(x, 0.72f + y, z * 0.93f), new Vector3(0.02f, 0.55f, 0.01f), dark, solid: false);
-                foreach (var x in new[] { 0.5f, -0.65f })
-                    Box("Poignee", car, new Vector3(x, 0.92f + y, z * 0.935f), new Vector3(0.14f, 0.03f, 0.02f), trim, solid: false);
-                Box("Retroviseur", car, new Vector3(0.72f, 1.12f + y, z * 1.02f), new Vector3(0.1f, 0.1f, 0.18f), paint, solid: false);
-            }
+            Model("Modele", car, new Vector3(0f, y, 0f), null, "voiture", burnt ? (AnyColor, "CarBurnt") : ("#7A2420", paint));
+            Solid(car, new Vector3(0f, 0.7f + y, 0f), new Vector3(4.5f, 0.75f, 1.85f));
             if (doorOpen)
             {
                 // Driver door swung out on its front hinge; the dark opening shows behind it.
@@ -41,7 +22,6 @@ namespace DeadCounty.EditorTools
                 Box("Panneau", hinge, new Vector3(-0.56f, 0.72f, 0.03f), new Vector3(1.12f, 0.55f, 0.05f), paint, solid: false);
                 Box("Vitre", hinge, new Vector3(-0.56f, 1.3f, 0.03f), new Vector3(1.02f, 0.55f, 0.03f), "Glass", solid: false);
             }
-            if (!burnt) Wheels(car, 1.4f, 0.85f, 0.36f);
             return car;
         }
 
@@ -63,14 +43,8 @@ namespace DeadCounty.EditorTools
         {
             var truck = Group(parent, name, pos, yaw);
             truck.localRotation *= Quaternion.Euler(tilt, 0f, 0f);
-            Box("Chassis", truck, new Vector3(0f, 0.75f, 0f), new Vector3(5.3f, 0.7f, 1.95f), paint);
-            Box("Cabine", truck, new Vector3(0.45f, 1.48f, 0f), new Vector3(1.9f, 0.76f, 1.75f), "Glass", solid: false);
-            Box("Toit", truck, new Vector3(0.45f, 1.88f, 0f), new Vector3(1.8f, 0.06f, 1.77f), paint, solid: false);
-            Box("Ridelle", truck, new Vector3(-1.45f, 1.3f, 0.93f), new Vector3(2.3f, 0.42f, 0.08f), paint, solid: false);
-            Box("Ridelle", truck, new Vector3(-1.45f, 1.3f, -0.93f), new Vector3(2.3f, 0.42f, 0.08f), paint, solid: false);
-            Box("Hayon", truck, new Vector3(-2.6f, 1.3f, 0f), new Vector3(0.08f, 0.42f, 1.95f), paint, solid: false);
-            Box("Pare_Choc", truck, new Vector3(2.7f, 0.5f, 0f), new Vector3(0.14f, 0.28f, 1.96f), "MetalLight", solid: false);
-            Wheels(truck, 1.7f, 0.9f, 0.42f);
+            Model("Modele", truck, Vector3.zero, null, "pickup", ("#7A2420", paint));
+            Solid(truck, new Vector3(0f, 0.75f, 0f), new Vector3(5.3f, 0.7f, 1.95f));
         }
 
         static void Bus(Transform parent, Vector3 pos, float yaw)
@@ -116,12 +90,12 @@ namespace DeadCounty.EditorTools
         static void Sawhorse(Transform parent, Vector3 pos, float yaw)
         {
             var s = Group(parent, "Barriere", pos, yaw);
-            Box("Barre", s, new Vector3(0f, 0.95f, 0f), new Vector3(2f, 0.22f, 0.06f), "SignRed");
-            Box("Pied", s, new Vector3(-0.8f, 0.45f, 0f), new Vector3(0.06f, 0.9f, 0.5f), "SignWhite", solid: false);
-            Box("Pied", s, new Vector3(0.8f, 0.45f, 0f), new Vector3(0.06f, 0.9f, 0.5f), "SignWhite", solid: false);
+            Model("Modele", s, Vector3.zero, null, "barriere");
+            Solid(s, new Vector3(0f, 0.95f, 0f), new Vector3(2f, 0.22f, 0.06f));
         }
 
-        static void Barrel(Transform parent, Vector3 pos, string mat) => Cylinder("Baril", parent, pos + Vector3.up * 0.45f, 0.3f, 0.9f, mat);
+        static void Barrel(Transform parent, Vector3 pos, string mat)
+            => Solid(Model("Baril", parent, pos, null, "baril", ("#A8322A", mat)).transform, new Vector3(0f, 0.45f, 0f), new Vector3(0.54f, 0.9f, 0.54f));
 
         static void Container(Transform parent, string name, Vector3 pos, float yaw, string mat)
         {
@@ -131,7 +105,7 @@ namespace DeadCounty.EditorTools
         }
 
         static void HayBale(Transform parent, Vector3 pos, float yaw)
-            => Cylinder("Botte_Foin", parent, pos + Vector3.up * 0.75f, 0.75f, 1.3f, "Hay", Quaternion.Euler(0f, yaw, 90f));
+            => Solid(Model("Botte_Foin", parent, pos, Quaternion.Euler(0f, yaw, 0f), "botte_foin").transform, new Vector3(0f, 0.75f, 0f), new Vector3(1.3f, 1.5f, 1.3f));
 
         static void Log(Transform parent, Vector3 pos, float yaw)
             => Cylinder("Tronc_Couche", parent, pos + Vector3.up * 0.3f, 0.3f, 4f, "Trunk", Quaternion.Euler(0f, yaw, 90f));
@@ -181,13 +155,11 @@ namespace DeadCounty.EditorTools
 
         static void Mailbox(Transform parent, Vector3 pos)
         {
-            Post("Boite_Lettres_Pied", parent, pos, 1.05f, 0.05f, "Wood", solid: false);
-            Box("Boite_Lettres", parent, pos + Vector3.up * 1.15f, new Vector3(0.28f, 0.25f, 0.5f), "Metal", solid: false);
-            Box("Drapeau", parent, pos + new Vector3(0.16f, 1.3f, 0.1f), new Vector3(0.02f, 0.2f, 0.12f), "SignRed", solid: false);
+            Model("Boite_Lettres", parent, pos, null, "boite_lettres");
         }
 
         static void TrashCan(Transform parent, Vector3 pos, string mat = "CarGreen")
-            => Cylinder("Poubelle", parent, pos + Vector3.up * 0.5f, 0.3f, 1f, mat);
+            => Solid(Model("Poubelle", parent, pos, null, "poubelle", ("#3E5444", mat)).transform, new Vector3(0f, 0.5f, 0f), new Vector3(0.54f, 1f, 0.54f));
 
         static void Shed(Transform parent, Vector3 pos, float yaw, string roof)
         {
@@ -200,11 +172,8 @@ namespace DeadCounty.EditorTools
         static void PicnicTable(Transform parent, Vector3 pos, float yaw)
         {
             var t = Group(parent, "Table_Pique_Nique", pos, yaw);
-            Box("Plateau", t, new Vector3(0f, 0.75f, 0f), new Vector3(1.8f, 0.06f, 0.8f), "Wood");
-            Box("Banc", t, new Vector3(0f, 0.45f, 0.6f), new Vector3(1.8f, 0.05f, 0.3f), "Wood", solid: false);
-            Box("Banc", t, new Vector3(0f, 0.45f, -0.6f), new Vector3(1.8f, 0.05f, 0.3f), "Wood", solid: false);
-            Box("Pied", t, new Vector3(-0.7f, 0.37f, 0f), new Vector3(0.08f, 0.74f, 1.4f), "WoodDark", solid: false);
-            Box("Pied", t, new Vector3(0.7f, 0.37f, 0f), new Vector3(0.08f, 0.74f, 1.4f), "WoodDark", solid: false);
+            Model("Modele", t, Vector3.zero, null, "table_pique_nique");
+            Solid(t, new Vector3(0f, 0.75f, 0f), new Vector3(1.8f, 0.06f, 0.8f));
         }
 
         static void Clothesline(Transform parent, Vector3 a, Vector3 b)
@@ -220,9 +189,8 @@ namespace DeadCounty.EditorTools
         static Light StreetLamp(Transform parent, Vector3 basePos, float yaw)
         {
             var lamp = Group(parent, "Lampadaire", basePos, yaw);
-            Post("Mat", lamp, Vector3.zero, 6.5f, 0.1f, "Metal");
-            Box("Bras", lamp, new Vector3(0f, 6.4f, 0.9f), new Vector3(0.08f, 0.08f, 1.8f), "Metal", solid: false);
-            Box("Tete", lamp, new Vector3(0f, 6.3f, 1.7f), new Vector3(0.35f, 0.12f, 0.6f), "LampGlow", solid: false);
+            Model("Modele", lamp, Vector3.zero, null, "lampadaire");
+            Solid(lamp, new Vector3(0f, 3.25f, 0f), new Vector3(0.2f, 6.5f, 0.2f));
             return SpotLight(lamp, "Lumiere_Sodium", new Vector3(0f, 6.2f, 1.7f), Quaternion.Euler(90f, 0f, 0f), new Color(1f, 0.78f, 0.45f), 12f, 16f, 120f, false);
         }
 

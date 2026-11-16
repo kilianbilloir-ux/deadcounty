@@ -82,9 +82,7 @@ namespace DeadCounty.EditorTools
                 cone.localRotation = Quaternion.Euler(0f, 40f, 90f);
                 cone.localPosition += Vector3.up * 0.16f;
             }
-            Box("Socle", cone, new Vector3(0f, 0.02f, 0f), new Vector3(0.36f, 0.04f, 0.36f), "Obstacle", solid: false);
-            MeshObject("Cone", cone, ConeMesh(8), new Vector3(0f, 0.04f, 0f), Quaternion.identity, new Vector3(0.14f, 0.6f, 0.14f), new[] { "Obstacle" }, false);
-            Cylinder("Bande", cone, new Vector3(0f, 0.36f, 0f), 0.085f, 0.07f, "SignWhite", solid: false);
+            Model("Modele", cone, Vector3.zero, null, "cone");
         }
 
         static void Suitcase(Transform parent, Vector3 pos, float yaw, string mat, bool open)
